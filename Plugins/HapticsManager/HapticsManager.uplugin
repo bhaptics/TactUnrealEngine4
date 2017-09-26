@@ -1,0 +1,23 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.0",
+	"FriendlyName": "HapticsManager",
+	"Description": "bHaptics haptic library",
+	"Category": "Haptic",
+	"CreatedBy": "bHaptics Inc.",
+	"CreatedByURL": "http://bhaptics.com",
+	"DocsURL": "http://github.com/bhaptics/tac-cpp",
+	"MarketplaceURL": "",
+	"SupportURL": "http://bhaptics.com",
+	"CanContainContent": false,
+	"IsBetaVersion": false,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "HapticsManager",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	]
+}
