@@ -23,7 +23,7 @@ Current version is 1.0.0
 * The Haptic Manager has 3 different ways of submitting feedback: using preset haptic files, specifying specifc motors or 'dots' to play,
   or specifying a point on the device.
 
-** Presets
+### Presets
 * Presets can be constructed through using the bHaptics designer at https://designer.bhaptics.com
 * After signing in, you can create a new project and design a certain feedback for use in the game.
 * In order to use the feedback in Unreal, export the feedback from the Designer and place the new file into the bHapticsManager/Feedbacks
@@ -31,25 +31,25 @@ Current version is 1.0.0
 * The files are automatically loaded by the HapticsManager blueprint on play, and are stored using the file name as a key.
 * To play the feedback, merely call the SubmitFeedback function from the Haptics Manager, using the specified feedback as a key.
 
-** Dots
+### Dots
 * You can also access each individual motor using the SubmitFeedbackUsingDots function, which takes in an array of DotPoints as an input.
 * A DotPoint represents an individual motor in the array, specifying which index the motor is and what intensity it should vibrate.
 * The index ranges from 0 to 19 for the tactosy and tactot devices, and 0 to 6 for the tactal, and moves from left to right.
 * Since the input for this function is an array, you can send multiple dots as a feedback effect at once.
 
-** Paths
+### Paths
 * To give a better sense of location on the devices, SubmitFeedbackUsingPaths can be called using the PathPoints structure.
 * PathPoints give the illusion that the feedback is coming from a point between two motors and can be used to make the feedback seem more continuous.
 * The structure consists of an X and Y coordinate on the device plane, as well as the intensity of the feedback.
 * The coordinates range from the top-left of the device as (0,0) to the bottom-right as (1,1).
 * Multiple points can be submitted together with the feedback effect.
 
-**Other Functionality
+### Other Functionality
 * Other functions are provided to help give more freedom in developing different kinds of feedback.
 * For example, checks for whether a specified feedback is playing are provided as well as functions to cease the feedback.
 * These can be used to add effects such as interrupt feedback, or even to loop a certain feedback.
 
-##Packaging
+## Packaging
 * As of yet, there are still some issues with the plugin when packaging a project, and some additional steps are needed to work around them.
 * Some source code requires exceptions, and so exceptions must be enabled by adding 'UEBuildConfiguration.bForceEnableExceptions = true;' to the project's
   TargetRules.
