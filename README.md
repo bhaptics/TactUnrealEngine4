@@ -34,7 +34,7 @@ This template project demonstrates how to integrate the bHaptics plugin into a p
 
 ## Notes
 * The dummies are facing forwards by default, and so hits will trigger the front vest to vibrate. To test the back motors, rotate the dummies, so you can still see the visualisation during the demo.
-* This is merely a demo template demonstrating the use of the HapticManager blueprint and actor in a game level. To implement this into your existing levels, please read the Plugin README in the plugins folder of this project for more details on the plugin itself.
+* This is merely a demo template demonstrating the use of the HapticManager blueprint and actor in a game level. To implement this into your existing levels, please read the Plugin README in the [plugins folder](https://github.com/bhaptics/TactUnrealEngine4/tree/master/Plugins) of this project for more details on the plugin itself.
 * For tutorials into creating your own haptic feedback and implementing the functions shown in this template, see our tutorial playlist [here](https://www.youtube.com/playlist?list=PLfaa78_N6dlvd0Ha0s0Y_LT62-Oqp8N2A).
 
 ## Contact
