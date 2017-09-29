@@ -47,10 +47,10 @@ to the list of public dependency module names, and generate the solution files a
 ## Packaging
 * As of yet, there are still some issues with the plugin when packaging a project, and some additional steps are needed to work around them.
 * Some source code requires exceptions, and so exceptions must be enabled by adding
-'''
+```
 UEBuildConfiguration.bForceEnableExceptions = true;
-'''
->to the project's TargetRules.
+```
+to the project's TargetRules.
 
 * Before packaging ensure that the Feedbacks folder in the Contents/bHapticsManager folder is also copied with the packaging. You can control this in the Project Settings -> Packaging (advanced options) -> Additional Non-Asset Directories To Copy.
 * The plugin also uses a dll (bHapticUtility64.dll) to run the bHaptics Player if it is installed; however, this dll is not copied when packaging and must be done manually into the Plugins/HapticsManager/ directory. However, this functionality is optional and will not affect the haptic feedback.
