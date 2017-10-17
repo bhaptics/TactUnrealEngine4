@@ -246,7 +246,10 @@ namespace bhaptics
                         auto hapticFeedbackData = keyPair->second.feedbackMap.at(timePast);
                         for (auto &feedback : hapticFeedbackData)
                         {
-                            map[feedback.position] = feedback;
+                            //map[feedback.position] = feedback;
+							map[feedback.position].dotPoints.insert(map[feedback.position].dotPoints.end(), feedback.dotPoints.begin(), feedback.dotPoints.end());
+							map[feedback.position].pathPoints.insert(map[feedback.position].pathPoints.end(), feedback.pathPoints.begin(), feedback.pathPoints.end());
+							map[feedback.position].texture = feedback.texture;
                         }
                     }
                 }
