@@ -6,30 +6,8 @@ using UnrealBuildTool;
 
 public class HapticsManager : ModuleRules
 {
-    public string GetUProjectPath()
+    public HapticsManager(ReadOnlyTargetRules Target) : base(Target)
     {
-        //Change this according to your module's relative location to your project file. If there is any better way to do this I'm interested!
-        //Assuming Source/ThirdParty/YourLib/
-        return Directory.GetParent(ModuleDirectory).Parent.ToString();
-    }
-
-    private void CopyToBinaries(string Filepath, TargetInfo Target)
-    {
-        string binariesDir = Path.Combine(GetUProjectPath(), "Binaries", Target.Platform.ToString());
-        string filename = Path.GetFileName(Filepath);
-
-        if (!Directory.Exists(binariesDir))
-            Directory.CreateDirectory(binariesDir);
-
-        if (!File.Exists(Path.Combine(binariesDir, filename)))
-            File.Copy(Filepath, Path.Combine(binariesDir, filename), true);
-    }
-
-    public HapticsManager(TargetInfo Target)
-	{
-
-        //UEBuildConfiguration.bForceEnableExceptions = true;
-
         PublicIncludePaths.AddRange(
 			new string[] {
                 "HapticsManager/Public"
@@ -81,7 +59,5 @@ public class HapticsManager : ModuleRules
 
         //PublicAdditionalLibraries.Add(ModuleDirectory + "/bHapticUtility.dll");
         //RuntimeDependencies.Add(new RunTimeDependency(ModuleDirectory + "/bHapticUtility.dll"));
-
-        CopyToBinaries(ModuleDirectory + "/bHapticUtility.dll",Target);
 	}
 }

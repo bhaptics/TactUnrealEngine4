@@ -77,7 +77,7 @@ DerivedDataCache/*
 #Packaged Folder
 Packaged/*
 
-#Plugin FOlders
+#Plugin Folders
 Plugins/*/Intermediate/*
 
 Plugins/*/Binaries/*

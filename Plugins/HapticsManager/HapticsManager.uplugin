@@ -1,23 +1,25 @@
 {
-	"FileVersion": 3,
+	"FileVersion": 1,
 	"Version": 1,
 	"VersionName": "1.0",
+	"EngineVersion" : "4.17.0",
 	"FriendlyName": "HapticsManager",
 	"Description": "bHaptics haptic library",
 	"Category": "Haptic",
 	"CreatedBy": "bHaptics Inc.",
 	"CreatedByURL": "http://bhaptics.com",
-	"DocsURL": "http://github.com/bhaptics/tac-cpp",
-	"MarketplaceURL": "",
-	"SupportURL": "http://bhaptics.com",
-	"CanContainContent": false,
+	"DocsURL": "https://github.com/bhaptics/TactUnrealEngine4/tree/master/Plugins",
+	"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/content/f2d84866699e419fbb97cddc7d6530b9",
+	"SupportURL": "https://github.com/bhaptics/TactUnrealEngine4/issues/new",
+	"CanContainContent": true,
 	"IsBetaVersion": false,
-	"Installed": false,
+	"Installed": true,
 	"Modules": [
 		{
 			"Name": "HapticsManager",
 			"Type": "Runtime",
 			"LoadingPhase": "Default"
 		}
-	]
+	],
+	"WhitelistPlatforms": [ "Win64", "Win32"]
 }

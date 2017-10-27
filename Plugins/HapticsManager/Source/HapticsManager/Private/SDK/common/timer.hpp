@@ -1,3 +1,4 @@
+//Copyright bHaptics Inc. 2017
 #ifndef BHAPTICS_TIMER
 #define BHAPTICS_TIMER
 

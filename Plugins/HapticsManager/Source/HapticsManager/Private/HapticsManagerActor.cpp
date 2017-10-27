@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+//Copyright bHaptics Inc. 2017
 
 #include "HapticsManagerPrivatePCH.h"
 #include "HapticsManagerActor.h"
@@ -16,9 +16,34 @@ FCriticalSection AHapticsManagerActor::m_Mutex;
 // Sets default values
 AHapticsManagerActor::AHapticsManagerActor()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	bhaptics::HapticPlayer::instance()->destroy();
+
+}
+
+void AHapticsManagerActor::OnConstruction(const FTransform & Transform)
+{
+	Super::OnConstruction(Transform);
+
+	if (!HasAnyFlags(RF_Transient))
+	{
+		TArray<FString> HapticFiles;
+		FString FileDirectory = LoadFeedbackFiles(HapticFiles);
+		for (int i = 0; i < HapticFiles.Num(); i++)
+		{
+			FString FileName = HapticFiles[i];
+			FString FilePath = FileDirectory;
+			int32 index;
+			FileName.FindChar(TCHAR('.'), index);
+			FilePath.Append("/");
+			FilePath.Append(FileName);
+			FString Key = FileName.Left(index);
+
+			RegisterFeeback(Key, FilePath);
+			HapticFileNames.AddUnique(*Key);
+		}
+	}
 }
 
 // Called when the game starts or when spawned
@@ -62,17 +87,20 @@ void AHapticsManagerActor::BeginPlay()
 	InitialiseDots(TactotBack);
 	InitialiseDots(TactotFront);
 	//*/
+
 }
 
 void AHapticsManagerActor::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	//Super::End
 	bhaptics::HapticPlayer::instance()->destroy();
+	ChangedFeedbacks.Empty();
 }
 
 void AHapticsManagerActor::Destroyed()
 {
 	bhaptics::HapticPlayer::instance()->destroy();
+	ChangedFeedbacks.Empty();
 }
 
 // Called every frame
@@ -142,11 +170,14 @@ void AHapticsManagerActor::RegisterFeeback(const FString &Key, const FString &Fi
 FString AHapticsManagerActor::LoadFeedbackFiles(TArray<FString>& FilesOut)
 {
 
-	FString RootFolderFullPath = FPaths::GameContentDir() + "bHapticsManager\\Feedbacks";
+	FString RootFolderFullPath = FPaths::GameContentDir() + "HapticsManager/Feedback";
+	if (!FPaths::DirectoryExists(RootFolderFullPath) && !UseProjectFeedbackFolder)
+	{
+		RootFolderFullPath = FPaths::ConvertRelativePathToFull(FPaths::EnginePluginsDir()) + "Marketplace/HapticsManager/Feedback";
+	}
 	UE_LOG(LogTemp, Log, TEXT("Looking in dir : %s"), *RootFolderFullPath);
 
 	FPaths::NormalizeDirectoryName(RootFolderFullPath);
-
 	IFileManager& FileManager = IFileManager::Get();
 
 	FString Ext = "*.tactosy";
@@ -351,6 +382,7 @@ void AHapticsManagerActor::VisualiseFeedback(FHapticFeedback Feedback, TArray<US
 		float DotPosition = FCString::Atof(*ComponentName);
 		float Scale = Feedback.Values[DotPosition] / 100.0;
 		UStaticMeshComponent* DotMesh = Cast<UStaticMeshComponent>(TactSuitItem[i]);
+
 		if (DotMesh == NULL)
 		{
 			continue;

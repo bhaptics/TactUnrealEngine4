@@ -1,3 +1,5 @@
+//Copyright bHaptics Inc. 2017
+
 #ifndef BHAPTICS_HPP
 #define BHAPTICS_HPP
 
@@ -154,9 +156,16 @@ namespace bhaptics
 			{
 				return;
 			}
-
-			ws->send(message);
-			ws->poll();
+			
+			try
+			{
+				ws->send(message);
+				ws->poll();
+			}
+			catch (exception &e)
+			{
+				printf("Exception : %s\n", e.what());
+			}
 
 		}
 
@@ -246,11 +255,10 @@ namespace bhaptics
                         auto hapticFeedbackData = keyPair->second.feedbackMap.at(timePast);
                         for (auto &feedback : hapticFeedbackData)
                         {
-                            //map[feedback.position] = feedback;
 							map[feedback.position].dotPoints.insert(map[feedback.position].dotPoints.end(), feedback.dotPoints.begin(), feedback.dotPoints.end());
 							map[feedback.position].pathPoints.insert(map[feedback.position].pathPoints.end(), feedback.pathPoints.begin(), feedback.pathPoints.end());
 							map[feedback.position].texture = feedback.texture;
-                        }
+						}
                     }
                 }
             }
@@ -327,9 +335,6 @@ namespace bhaptics
                 printf("Exception : %s\n", e.what());
             }
 
-            /*vector<uint8_t> values(_motorSize, 0);
-            HapticFeedback feedback(Right, values, DOT_MODE);
-            playFeedback(feedback);*/
 			_enable = true;
 			vector<DotPoint> points;
 			HapticFeedbackFrame feedback(Right,points);
@@ -457,10 +462,6 @@ namespace bhaptics
 
         void destroy()
         {
-            //vector<uint8_t> values(_motorSize, 0);
-            //HapticFeedback feedback(All, values, DOT_MODE);
-            //playFeedback(feedback);
-
 			vector<DotPoint> points;
 			HapticFeedbackFrame feedback(All,points);
 			playFeedbackFrame(feedback);
@@ -474,7 +475,6 @@ namespace bhaptics
 			ws->close();
 			ws->poll();
 			ws.reset();
-			//delete ws;
         }
 
 		void enableFeedback()

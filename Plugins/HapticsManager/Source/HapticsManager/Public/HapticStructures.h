@@ -1,8 +1,8 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+//Copyright bHaptics Inc. 2017
 
 #pragma once
 #include "Engine.h"
-#include "CoreMinimal.h"
+//#include "CoreMinimal.h"
 #include "HapticStructures.generated.h"
 
 /**
@@ -39,8 +39,8 @@ struct FDotPoint
 
 	FDotPoint(int32 _index, int32 _intensity)
 	{
-		Index = _index;
-		Intensity = _intensity;
+		Index = FMath::Clamp(_index,0,19);
+		Intensity = FMath::Clamp(_intensity,0,100);
 	}
 	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = Vars)
@@ -76,7 +76,9 @@ struct FPathPoint
 		int YRound = _y * 1000;
 		X = XRound/1000;
 		Y = YRound / 1000;
-		Intensity = _intensity;
+		X = FMath::Clamp(X, 0.0f, 1.0f);
+		Y = FMath::Clamp(Y, 0.0f, 1.0f);
+		Intensity = FMath::Clamp(_intensity, 0, 100);
 	}
 };
 
