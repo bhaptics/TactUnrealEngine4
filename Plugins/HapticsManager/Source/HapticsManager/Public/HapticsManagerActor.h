@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+//Copyright bHaptics Inc. 2017
 
 #pragma once
 
@@ -22,12 +22,17 @@ public:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	virtual void OnConstruction(const FTransform & Transform) override;
+
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	
 	// Called every frame
 	virtual void Tick( float DeltaSeconds ) override;
 
     virtual void Destroyed() override;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Haptics")
+		TArray<FName> HapticFileNames;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Haptics")
 		TArray<USceneComponent*> TactotFront;
@@ -43,6 +48,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Haptics")
 		TArray<USceneComponent*> Tactal;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Haptics")
+		bool UseProjectFeedbackFolder = false;
 
 	UFUNCTION(BlueprintCallable,
 		Category = "bHaptics")
@@ -61,7 +69,7 @@ public:
     void SubmitRegisteredIntesityDuration(const FString &Key, float Intensity, float Duration);
 
     UFUNCTION(BlueprintCallable,
-        meta = (DisplayName = "Register tactosy feedback",
+        meta = (DisplayName = "Register Haptic feedback",
             Keywords = "bHaptics"),
         Category = "bHaptics")
     void RegisterFeeback(const FString &Key, const FString &FilePath);
@@ -146,4 +154,5 @@ public:
 
 	 private:
 		 static FCriticalSection m_Mutex;
+		 bool MessagePlayed = false;
 };

@@ -1,3 +1,4 @@
+//Copyright bHaptics Inc. 2017
 #ifndef BHAPTICS_MODEL
 #define BHAPTICS_MODEL
 
@@ -17,19 +18,24 @@ namespace bhaptics
         Custom1 = 251, Custom2 = 252, Custom3 = 253, Custom4 = 254
     };
 
-    enum FeeddbackMode {
+    enum FeedbackMode {
         PATH_MODE,
         DOT_MODE
     };
 
-    struct DotPoint
+	struct DotPoint
     {
         int index;
         int intensity;
         DotPoint(int _index, int _intensity)
         {
-            index = _index;
+			index = _index;
+			if (_index < 0)
+				index = 0;
+			else if (_index > 19)
+				index = 19;
             intensity = _intensity;
+
         }
     };
 
@@ -41,13 +47,18 @@ namespace bhaptics
 
         PathPoint(float _x, float _y, int _intensity)
         {
-            x = _x;
-            y = _y;
+			x = _x;
+			y = _y;
             intensity = _intensity;
+
+			if (_x < 0)
+			{
+
+			}
         }
     };
 
-    struct HapticFeedbackFrame
+	struct HapticFeedbackFrame
     {
         vector<PathPoint> pathPoints;
         vector<DotPoint> dotPoints;
@@ -76,10 +87,10 @@ namespace bhaptics
     struct HapticFeedback
     {
         Position position;
-        FeeddbackMode mode;
+        FeedbackMode mode;
         vector<uint8_t> values;
 
-        HapticFeedback(Position _pos, const int _val[], FeeddbackMode _mod)
+        HapticFeedback(Position _pos, const int _val[], FeedbackMode _mod)
         {
             position = _pos;
             mode = _mod;
@@ -90,7 +101,7 @@ namespace bhaptics
             }
         }
 
-        HapticFeedback(Position _pos, const vector<uint8_t> &_val, FeeddbackMode _mod)
+        HapticFeedback(Position _pos, const vector<uint8_t> &_val, FeedbackMode _mod)
         {
             position = _pos;
             mode = _mod;
@@ -134,53 +145,6 @@ namespace bhaptics
         int StartTime;
         int EndTime;
 
-		/**
-        BufferedHapticFeedback(HapticFeedback feedback, int durationMillis, int interval)
-        {
-            int i;
-
-            for (i = 0; i < durationMillis / interval; i++)
-            {
-                if (feedback.position == All)
-                {
-
-                    HapticFeedback left(Left, feedback.values, feedback.mode);
-                    HapticFeedback right(Right, feedback.values, feedback.mode);
-                    HapticFeedback vBack(VestBack, feedback.values, feedback.mode);
-                    HapticFeedback vFront(VestFront, feedback.values, feedback.mode);
-                    HapticFeedback head(Head, feedback.values, feedback.mode);
-                    int time = i * interval;
-                    feedbackMap[time] = { left, right, vBack, vFront, head };
-                }
-                else
-                {
-                    feedbackMap[i * interval] = { feedback };
-                }
-
-
-            }
-            StartTime = -1;
-            vector<HapticFeedback> f;
-            int bytes[20] = { 0 };
-            if (feedback.position == All)
-            {
-                HapticFeedback left(Left, bytes, feedback.mode);
-                HapticFeedback right(Right, bytes, feedback.mode);
-                HapticFeedback vBack(VestBack, bytes, feedback.mode);
-                HapticFeedback vFront(VestFront, bytes, feedback.mode);
-                HapticFeedback head(Head, bytes, feedback.mode);
-                f = { left, right, vBack, vFront, head };
-            }
-            else
-            {
-                f = { feedback };
-
-            }
-
-            feedbackMap[i * interval] = f;
-            EndTime = i * interval;
-        }*/
-
 		BufferedHapticFeedback(Position position, vector<DotPoint> points, int durationMillis, int interval)
 		{
 			int i;
@@ -207,7 +171,6 @@ namespace bhaptics
 			}
 			StartTime = -1;
 			vector<HapticFeedbackFrame> f;
-			//int bytes[20] = { 0 };
 			vector<DotPoint> emptyPoints;
 			if (position == All)
 			{
@@ -276,11 +239,6 @@ namespace bhaptics
 
         BufferedHapticFeedback(HapticFile hapticFile)
         {
-			/*
-            StartTime = -1;
-            EndTime = hapticFile.durationMillis;
-            feedbackMap = hapticFile.feedback;
-			//*/
 			Initialise(hapticFile);
         }
 

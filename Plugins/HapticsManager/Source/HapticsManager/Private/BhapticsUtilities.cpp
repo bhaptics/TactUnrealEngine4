@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+//Copyright bHaptics Inc. 2017
 #include "HapticsManagerPrivatePCH.h"
 #include "HapticsManager.h"
 #include "BhapticsUtilities.h"
@@ -29,14 +29,12 @@ BhapticsUtilities::BhapticsUtilities()
 void BhapticsUtilities::Init()
 {
 
-	FString FilePath = *FPaths::GamePluginsDir();
+	FString FilePath = *FPaths::EnginePluginsDir();
 #ifdef USEDLL64
-	FilePath.Append("HapticsManager/bHapticUtility64.dll");
+	FilePath.Append("MarketPlace/HapticsManager/DLLs/bHapticUtility64.dll");
 #else
-	FilePath.Append("HapticsManager/bHapticUtility32.dll");
+	FilePath.Append("MarketPlace/HapticsManager/DLLs/bHapticUtility32.dll");
 #endif 
-
-	
 
 	if (FPaths::FileExists(FilePath))
 	{

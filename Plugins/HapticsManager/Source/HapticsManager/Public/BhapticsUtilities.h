@@ -1,12 +1,8 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+//Copyright bHaptics Inc. 2017
 
 #pragma once
 #include "Engine.h"
-#include "CoreMinimal.h"
 
-/**
- * 
- */
 class HAPTICSMANAGER_API BhapticsUtilities
 {
 public:
