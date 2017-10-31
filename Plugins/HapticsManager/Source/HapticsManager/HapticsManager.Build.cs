@@ -6,8 +6,17 @@ using UnrealBuildTool;
 
 public class HapticsManager : ModuleRules
 {
-    public HapticsManager(ReadOnlyTargetRules Target) : base(Target)
+    public string GetUProjectPath()
     {
+        //Change this according to your module's relative location to your project file. If there is any better way to do this I'm interested!
+        //Assuming Source/ThirdParty/YourLib/
+        return Directory.GetParent(ModuleDirectory).Parent.ToString();
+    }
+
+    public HapticsManager(TargetInfo Target)
+	{
+        UEBuildConfiguration.bForceEnableExceptions = true;
+
         PublicIncludePaths.AddRange(
 			new string[] {
                 "HapticsManager/Public"

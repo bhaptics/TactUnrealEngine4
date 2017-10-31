@@ -14,13 +14,14 @@ enum class EPosition : uint8
 	All = 0, Left = 1, Right = 2,
 	Vest = 3,
 	Head = 4,
+	Racket = 5,
 	VestFront = 201, VestBack = 202,
 	GloveLeft = 203, GloveRight = 204,
 	Custom1 = 251, Custom2 = 252, Custom3 = 253, Custom4 = 254
 };
 
 UENUM(BlueprintType)
-enum class EFeeddbackMode: uint8
+enum class EFeedbackMode: uint8
 {
 	PATH_MODE	UMETA(DisplayName = "PATHMODE"),
 	DOT_MODE	UMETA(DisplayName = "DOTMODE")
@@ -130,11 +131,11 @@ struct FHapticFeedback
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Vars)
 	EPosition Position;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Vars)
-	EFeeddbackMode Mode;
+	EFeedbackMode Mode;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Vars)
 	TArray<uint8> Values;
 
-	FHapticFeedback(EPosition _pos, const int _val[], EFeeddbackMode _mod)
+	FHapticFeedback(EPosition _pos, const int _val[], EFeedbackMode _mod)
 	{
 		Position = _pos;
 		Mode = _mod;
@@ -146,15 +147,11 @@ struct FHapticFeedback
 		}
 	}
 
-	FHapticFeedback(EPosition _pos, const TArray<uint8> &_val, EFeeddbackMode _mod)
+	FHapticFeedback(EPosition _pos, const TArray<uint8> &_val, EFeedbackMode _mod)
 	{
 		Position = _pos;
 		Mode = _mod;
-		Values.AddZeroed(20);
-		for (int i = 0; i < 20; i++)
-		{
-			Values[i] = _val[i];
-		}
+		Values = _val;
 	}
 
 	FHapticFeedback() : Position(), Mode()

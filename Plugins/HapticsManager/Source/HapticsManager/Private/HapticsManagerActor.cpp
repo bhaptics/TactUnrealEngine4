@@ -88,19 +88,33 @@ void AHapticsManagerActor::BeginPlay()
 	InitialiseDots(TactotFront);
 	//*/
 
+	TArray<FString> HapticFiles;
+	FString FileDirectory = LoadFeedbackFiles(HapticFiles);
+	for (int i = 0; i < HapticFiles.Num(); i++)
+	{
+		FString FileName = HapticFiles[i];
+		FString FilePath = FileDirectory;
+		int32 index;
+		FileName.FindChar(TCHAR('.'), index);
+		FilePath.Append("/");
+		FilePath.Append(FileName);
+		FString Key = FileName.Left(index);
+
+		RegisterFeeback(Key, FilePath);
+		HapticFileNames.AddUnique(*Key);
+	}
+
 }
 
 void AHapticsManagerActor::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	//Super::End
 	bhaptics::HapticPlayer::instance()->destroy();
-	ChangedFeedbacks.Empty();
 }
 
 void AHapticsManagerActor::Destroyed()
 {
 	bhaptics::HapticPlayer::instance()->destroy();
-	ChangedFeedbacks.Empty();
 }
 
 // Called every frame
@@ -328,33 +342,59 @@ void AHapticsManagerActor::TurnOffRegisteredFeedback(const FString &Key)
 
 void AHapticsManagerActor::UpdateDisplayedFeedback(const char *ReceivedMessage)
 {
+	//*
 	TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject);
 	FString JsonString(ReceivedMessage);
 	TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(JsonString);
 	
 	if (FJsonSerializer::Deserialize(Reader, JsonObject))
 	{
-		int Position = JsonObject->GetIntegerField(TEXT("Position"));
-		FString TempArray =  JsonObject->GetStringField(TEXT("Values"));
-		FString TempValueArray = TempArray.Mid(1, TempArray.Len() - 2);
-		FString* LeftValue = new FString();
-		FString* RightValues= new FString();
+		std::map<std::string, std::vector<int>> DeviceMotors = bhaptics::HapticPlayer::instance()->parseResponse(*JsonObject);
 		
-		TArray<uint8_t> ValuesArray;
-
-		while (TempValueArray.Split(TEXT(","), LeftValue, RightValues))
+		for (auto& Device : DeviceMotors)
 		{
-			ValuesArray.Add(FCString::Atoi(**LeftValue));
-			TempValueArray = *RightValues;
-		}
-		ValuesArray.Add(FCString::Atoi(**RightValues));
-		
-		FHapticFeedback Feedback((EPosition)Position, ValuesArray, EFeeddbackMode::DOT_MODE);
-		m_Mutex.Lock();
-		ChangedFeedbacks.Add(Feedback);
-		m_Mutex.Unlock();
+			TArray<uint8_t> ValuesArray;
+			EPosition Position;
 
-	}
+			if (Device.first == "Left")
+			{
+				Position = EPosition::Left;
+			}
+			else if (Device.first == "Right")
+			{
+				Position = EPosition::Right;
+			}
+			else if (Device.first == "Head")
+			{
+				Position = EPosition::Head;
+			}
+			else if (Device.first == "VestFront")
+			{
+				Position = EPosition::VestFront;
+			}
+			else if (Device.first == "VestBack")
+			{
+				Position = EPosition::VestBack;
+			}
+			else if (Device.first == "Racket")
+			{
+				Position = EPosition::Racket;
+			}
+
+			for (int Index = 0; Index < Device.second.size(); Index++)
+			{
+				ValuesArray.Add(Device.second[Index]);
+			}
+			//ValuesArray.Add(FCString::Atoi(**RightValues));
+
+			FHapticFeedback Feedback(Position,ValuesArray , EFeedbackMode::DOT_MODE);
+			m_Mutex.Lock();
+			ChangedFeedbacks.Add(Feedback);
+			m_Mutex.Unlock();
+		}
+
+
+	}//*/
 
 }
 

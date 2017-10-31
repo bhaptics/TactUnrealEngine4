@@ -25,9 +25,12 @@ namespace bhaptics
     {
 		static HapticPlayer *hapticManager;
         unique_ptr<WebSocket> ws;
+		vector<RegisterRequest> _registered;
 
-        map<string, BufferedHapticFeedback> _registeredSignals;
-        map<string, BufferedHapticFeedback> _activeSignals;
+		PlayerRequest* _activeRequest = nullptr;
+		
+		vector<string> _activeKeys;
+
         mutex mtx;
         int _currentTime = 0;
         int _interval = 20;
@@ -38,7 +41,7 @@ namespace bhaptics
 
         string host = "127.0.0.1";
         int port = 15881;
-        string path = "feedbacks";
+		string path = "v2/feedbacks";//old: "feedbacks";//
 
         int reconnectSec = 5;
         std::chrono::steady_clock::time_point prevReconnect;
@@ -80,48 +83,13 @@ namespace bhaptics
             }
         }
 
-        void playFeedback(const HapticFeedback &feedback)
-        {
-            vector<uint8_t> message(_motorSize + 2, 0);
-            if (feedback.mode == PATH_MODE)
-            {
-                message[0] = 1;
-            }
-            else if (feedback.mode == DOT_MODE)
-            {
-                message[0] = 2;
-            }
-
-            message[1] = (uint8_t)feedback.position;
-
-            for (int i = 0; i < _motorSize; i++)
-            {
-                message[i + 2] = feedback.values[i];
-            }
-
-            send(message);
-        }
-
-		void playFeedbackFrame(const HapticFeedbackFrame &feedback)
+		PlayerRequest* getActiveRequest()
 		{
-			TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject);
-
-			if (!_enable)
+			if (_activeRequest == nullptr)
 			{
-				vector<DotPoint> emptyPoints;
-				HapticFeedbackFrame turnOffFrame(feedback.position,emptyPoints);
-				bhaptics::to_json(*JsonObject, turnOffFrame);
+				_activeRequest = PlayerRequest::Create();
 			}
-			else
-			{
-				bhaptics::to_json(*JsonObject, feedback);
-			}
-
-			FString OutputString;
-			TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&OutputString);
-			FJsonSerializer::Serialize(JsonObject.ToSharedRef(), Writer);
-			std::string jStr(TCHAR_TO_UTF8(*OutputString));
-			sendStr(jStr);
+			return _activeRequest;
 		}
 
         bool connectionCheck()
@@ -140,141 +108,86 @@ namespace bhaptics
             return true;
         }
 
-        void send(const vector<uint8_t> &message)
+        void send()//modify to new structure - done
         {
             if (!connectionCheck())
             {
                 return;
             }
-            ws->sendBinary(message);
+
+			TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject);
+			getActiveRequest()->to_json(*JsonObject);
+
+			//parse
+
+			FString OutputString;
+			TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&OutputString);
+			FJsonSerializer::Serialize(JsonObject.ToSharedRef(), Writer);
+			std::string jStr(TCHAR_TO_UTF8(*OutputString));
+			mtx.lock();
+            ws->send(jStr);
             ws->poll();
+			_activeRequest = nullptr;
+			mtx.unlock();
         }
 
-		void sendStr(const std::string &message)
-		{
-			if (!connectionCheck())
+        void updateActive(const string &key, const Frame& signal)//remove? - keep. Done!
+        {
+			if (!_enable)
+			{
+				return;
+			}
+            //mtx.lock();
+			SubmitRequest req;
+			req.Frame = signal;
+			req.Key = key;
+			req.Type = "frame";
+			getActiveRequest()->Submit.push_back(req);
+			send();
+            //mtx.unlock();
+        }
+
+        void remove(const string &key)//change to turnoff
+        {
+			if (!_enable)
 			{
 				return;
 			}
 			
-			try
-			{
-				ws->send(message);
-				ws->poll();
-			}
-			catch (exception &e)
-			{
-				printf("Exception : %s\n", e.what());
-			}
+			SubmitRequest req;
+			req.Key = key;
+			req.Type = "turnOff";
+			getActiveRequest()->Submit.push_back(req);
 
-		}
-
-        void updateActive(const string &key, const BufferedHapticFeedback& signal)
-        {
-            mtx.lock();
-            _activeSignals[key] = signal;
-            mtx.unlock();
+			send();
         }
 
-        void remove(const string &key)
+        void removeAll()// change to turn off - done
         {
-            mtx.lock();
-            _activeSignals.erase(key);
-            mtx.unlock();
-        }
-
-        void removeAll()
-        {
+			/**
             mtx.lock();
             _activeSignals.clear();
             mtx.unlock();
-        }
-
-        void doRepeat()
-        {
-            reconnect();
-
-			checkMessage();
-
-            if (_activeSignals.size() == 0)
-            {
-                if (_currentTime > 0)
-                {
-                    _currentTime = 0;
-					vector<DotPoint> points;
-					HapticFeedbackFrame rightFeedback(Right, points);
-					HapticFeedbackFrame leftFeedback(Left, points);
-					HapticFeedbackFrame vestFrontfeedback(VestFront, points);
-					HapticFeedbackFrame vestBackFeedback(VestBack, points);
-					HapticFeedbackFrame headFeedback(Head, points);
-					playFeedbackFrame(rightFeedback);
-					playFeedbackFrame(leftFeedback);
-					playFeedbackFrame(vestFrontfeedback);
-					playFeedbackFrame(vestBackFeedback);
-					playFeedbackFrame(headFeedback);
-                }
-
-                return;
-            }
-
-            vector<string> expiredSignals;
-
-			map<Position, HapticFeedbackFrame> map;
-			vector<DotPoint> emptyPoints;
-			HapticFeedbackFrame left(Left, emptyPoints);
-			HapticFeedbackFrame right(Right, emptyPoints);
-			HapticFeedbackFrame vFront(VestFront, emptyPoints);
-			HapticFeedbackFrame vBack(VestBack, emptyPoints);
-			HapticFeedbackFrame head(Head, emptyPoints);
-            map[Left] = left;
-            map[Right] = right;
-            map[VestFront] = vFront;
-            map[VestBack] = vBack;
-            map[Head] = head;
-
-            mtx.lock();
-            for (auto keyPair = _activeSignals.begin(); keyPair != _activeSignals.end(); ++keyPair)
-            {
-                auto key = keyPair->first;
-
-                if (keyPair->second.StartTime > _currentTime || keyPair->second.StartTime < 0)
-                {
-                    keyPair->second.StartTime = _currentTime;
-                }
-
-                int timePast = _currentTime - keyPair->second.StartTime;
-
-                if (timePast > keyPair->second.EndTime)
-                {
-                    expiredSignals.push_back(key);
-                }
-                else
-                {
-                    if (Common::containsKey(timePast, keyPair->second.feedbackMap))
-                    {
-                        auto hapticFeedbackData = keyPair->second.feedbackMap.at(timePast);
-                        for (auto &feedback : hapticFeedbackData)
-                        {
-							map[feedback.position].dotPoints.insert(map[feedback.position].dotPoints.end(), feedback.dotPoints.begin(), feedback.dotPoints.end());
-							map[feedback.position].pathPoints.insert(map[feedback.position].pathPoints.end(), feedback.pathPoints.begin(), feedback.pathPoints.end());
-							map[feedback.position].texture = feedback.texture;
-						}
-                    }
-                }
-            }
-			
-			for (auto keyValue = map.begin(); keyValue != map.end(); ++keyValue)
+			/**/
+			if (!_enable)
 			{
-				auto frame = keyValue->second;
-				playFeedbackFrame(frame);
+				return;
 			}
 
-            mtx.unlock();
+			SubmitRequest req;
+			req.Type = "turnOffAll";
 
-            for (auto &key : expiredSignals)
-            {
-                remove(key);
-            }
+			getActiveRequest()->Submit.push_back(req);
+
+			send();
+        }
+
+        void doRepeat()// remove most and change to only poll - done
+        {
+            reconnect();
+			mtx.lock();
+			checkMessage();
+			mtx.unlock();
 
             _currentTime += _interval;
         }
@@ -288,14 +201,22 @@ namespace bhaptics
     public:
         bool retryConnection = true;
 
-        int registerFeedback(const string &key, const string &filePath)
+        int registerFeedback(const string &key, const string &filePath)// change to SubmitRegistered -done
         {
             try
             {
                 HapticFile file = Util::parse(filePath);
-                BufferedHapticFeedback signal(file);
-                _registeredSignals[key] = signal;
+				RegisterRequest req;
+				req.Key = key;
+				req.Project = file.project;
+				_registered.push_back(req);
+				//BufferedHapticFeedback signal(file);
+				//_registeredSignals[key] = signal;
 
+				PlayerRequest* request = getActiveRequest();
+				request->Register.push_back(req);
+
+				send();
                 return 0;
             } catch(exception &e)
             {
@@ -305,7 +226,7 @@ namespace bhaptics
             }
         }
 
-        void init()
+        void init()//change initialisation of new variables
         {
 			if (_enable)
 				return;
@@ -336,13 +257,15 @@ namespace bhaptics
             }
 
 			_enable = true;
-			vector<DotPoint> points;
-			HapticFeedbackFrame feedback(Right,points);
-			playFeedbackFrame(feedback);
         }
 
-        void submit(const string &key, Position position, const vector<uint8_t> &motorBytes, int durationMillis)
+        void submit(const string &key, Position position, const vector<uint8_t> &motorBytes, int durationMillis)//change to submit - done
         {
+			if (!_enable)
+			{
+				return;
+			}
+
 			vector<DotPoint> points;
 			for (int i = 0; i < motorBytes.size(); i++)
 			{
@@ -352,31 +275,33 @@ namespace bhaptics
 				}
 			}
 
-            BufferedHapticFeedback signal(position,points, durationMillis, _interval);
-            updateActive(key, signal);
+			Frame submitFrame = Frame::AsDotPointFrame(points, position, durationMillis);
+			updateActive(key, submitFrame);
         }
 
-		void submit(const string &key, Position position, const vector<DotPoint> &points, int durationMillis)
+		void submit(const string &key, Position position, const vector<DotPoint> &points, int durationMillis)//change to submit - done
 		{
-			BufferedHapticFeedback signal(position, points, durationMillis, _interval);
-			updateActive(key, signal);
+			//BufferedHapticFeedback signal(position, points, durationMillis, _interval);
+			Frame req = Frame::AsDotPointFrame(points, position, durationMillis);
+			updateActive(key, req);
 		}
 
-        void submit(const string &key, Position position, const vector<PathPoint> &points, int durationMillis)
+        void submit(const string &key, Position position, const vector<PathPoint> &points, int durationMillis)//change to submit - done
         {
 
-            BufferedHapticFeedback signal(position, points, durationMillis, _interval);
-            updateActive(key, signal);
+            //BufferedHapticFeedback signal(position, points, durationMillis, _interval);
+			Frame req = Frame::AsPathPointFrame(points, position, durationMillis);
+            updateActive(key, req);
         }
 
-        void submitRegistered(const string &key, float intensity, float duration)
+        void submitRegistered(const string &key, float intensity, float duration)//change to submitRegistered
         {
-            if (!Common::containsKey(key, _registeredSignals))
+            /*if (!Common::containsKey(key, _registeredSignals))
             {
                 printf("Key : %s is not registered.\n", key.c_str());
 
                 return;
-            }
+            }*/
 
             if (duration < 0.01f || duration > 100.0f)
             {
@@ -390,42 +315,39 @@ namespace bhaptics
                 return;
             }
 
-            BufferedHapticFeedback signal = _registeredSignals.at(key);
+            //BufferedHapticFeedback signal = _registeredSignals.at(key);
 
-            BufferedHapticFeedback copiedFeedbackSignal = BufferedHapticFeedback::Copy(signal, _interval, intensity, duration);
-            updateActive(key, copiedFeedbackSignal);
+            //BufferedHapticFeedback copiedFeedbackSignal = BufferedHapticFeedback::Copy(signal, _interval, intensity, duration);
+            //updateActive(key, copiedFeedbackSignal);
         }
 
-        void submitRegistered(const string &key)
+        void submitRegistered(const string &key)//change to submitRegistered - done
         {
-            if (!Common::containsKey(key, _registeredSignals))
-            {
-                printf("Key : '%s' is not registered.\n", key.c_str());
-
-                return;
-            }
-
-            auto signal = _registeredSignals.at(key);
-
-            signal.StartTime = -1;
-            if (!Common::containsKey(key, _activeSignals))
-            {
-                updateActive(key, signal);
-            } else
-            {
-                _activeSignals.at(key).StartTime = -1;
-            }
+			if (!_enable)
+			{
+				return;
+			}
             
+			SubmitRequest req;
+			req.Key = key;
+			req.Type = "key";
+
+			getActiveRequest()->Submit.push_back(req);
+
+			send();
         }
 
-        bool isPlaying()
+        bool isPlaying()//change with new active structure - done
         {
-            return _activeSignals.size() > 0;
+		    return _activeKeys.size() > 0;
         }
 
-        bool isPlaying(const string &key)
+        bool isPlaying(const string &key) //change with new active structure - done
         {
-            return Common::containsKey(key, _activeSignals);
+			mtx.lock();
+			bool ret = std::find(_activeKeys.begin(), _activeKeys.end(), key) != _activeKeys.end();
+			mtx.unlock();
+			return ret;
         }
 
         void turnOff()
@@ -435,18 +357,12 @@ namespace bhaptics
 
         void turnOff(const string &key)
         {
-            if (!Common::containsKey(key, _activeSignals))
-            {
-                printf("feedback with key( %s ) is not playing.\n", key.c_str());
-                return;
-            }
-
             remove(key);
         }
 
 		void(*dispatchFunctionVar)(const char*);
 
-		void checkMessage()
+		void checkMessage()//change to properly poll, ie add a better dispatch function
 		{
 			if (!ws)
 			{
@@ -462,11 +378,15 @@ namespace bhaptics
 
         void destroy()
         {
-			vector<DotPoint> points;
-			HapticFeedbackFrame feedback(All,points);
-			playFeedbackFrame(feedback);
 			_enable = false;
 			
+			if (_activeRequest != nullptr )
+			{
+				//_activeRequest->
+				//_activeRequest = nullptr;
+			//	delete (_activeRequest);
+			}
+
             if (!ws)
             {
                 return;
@@ -499,6 +419,14 @@ namespace bhaptics
 			}
 
 			_enable = !_enable;
+		}
+
+		map<string, vector<int>> parseResponse(FJsonObject j)
+		{
+			PlayerResponse response;
+			response.from_json(j);
+			_activeKeys = response.ActiveKeys;
+			return response.Status;
 		}
 
 		HapticPlayer(HapticPlayer const&) = delete;
