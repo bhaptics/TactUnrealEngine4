@@ -27,7 +27,7 @@ namespace bhaptics
         unique_ptr<WebSocket> ws;
 		vector<RegisterRequest> _registered;
 
-		PlayerRequest* _activeRequest = nullptr;
+		unique_ptr<PlayerRequest> _activeRequest;
 		
 		vector<string> _activeKeys;
 
@@ -85,11 +85,11 @@ namespace bhaptics
 
 		PlayerRequest* getActiveRequest()
 		{
-			if (_activeRequest == nullptr)
+			if (!_activeRequest)
 			{
-				_activeRequest = PlayerRequest::Create();
+				_activeRequest = unique_ptr<PlayerRequest>(PlayerRequest::Create());
 			}
-			return _activeRequest;
+			return _activeRequest._Myptr();
 		}
 
         bool connectionCheck()
@@ -108,7 +108,7 @@ namespace bhaptics
             return true;
         }
 
-        void send()//modify to new structure - done
+        void send()
         {
             if (!connectionCheck())
             {
@@ -117,8 +117,6 @@ namespace bhaptics
 
 			TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject);
 			getActiveRequest()->to_json(*JsonObject);
-
-			//parse
 
 			FString OutputString;
 			TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&OutputString);
@@ -131,23 +129,21 @@ namespace bhaptics
 			mtx.unlock();
         }
 
-        void updateActive(const string &key, const Frame& signal)//remove? - keep. Done!
+        void updateActive(const string &key, const Frame& signal)
         {
 			if (!_enable)
 			{
 				return;
 			}
-            //mtx.lock();
 			SubmitRequest req;
 			req.Frame = signal;
 			req.Key = key;
 			req.Type = "frame";
 			getActiveRequest()->Submit.push_back(req);
 			send();
-            //mtx.unlock();
         }
 
-        void remove(const string &key)//change to turnoff
+        void remove(const string &key)
         {
 			if (!_enable)
 			{
@@ -162,13 +158,8 @@ namespace bhaptics
 			send();
         }
 
-        void removeAll()// change to turn off - done
+        void removeAll()
         {
-			/**
-            mtx.lock();
-            _activeSignals.clear();
-            mtx.unlock();
-			/**/
 			if (!_enable)
 			{
 				return;
@@ -182,7 +173,7 @@ namespace bhaptics
 			send();
         }
 
-        void doRepeat()// remove most and change to only poll - done
+        void doRepeat()
         {
             reconnect();
 			mtx.lock();
@@ -201,32 +192,22 @@ namespace bhaptics
     public:
         bool retryConnection = true;
 
-        int registerFeedback(const string &key, const string &filePath)// change to SubmitRegistered -done
+        int registerFeedback(const string &key, const string &filePath)
         {
-            try
-            {
-                HapticFile file = Util::parse(filePath);
-				RegisterRequest req;
-				req.Key = key;
-				req.Project = file.project;
-				_registered.push_back(req);
-				//BufferedHapticFeedback signal(file);
-				//_registeredSignals[key] = signal;
+            HapticFile file = Util::parse(filePath);
+			RegisterRequest req;
+			req.Key = key;
+			req.Project = file.project;
+			_registered.push_back(req);
 
-				PlayerRequest* request = getActiveRequest();
-				request->Register.push_back(req);
+			PlayerRequest* request = getActiveRequest();
+			request->Register.push_back(req);
 
-				send();
-                return 0;
-            } catch(exception &e)
-            {
-                printf("Exception : %s\n", e.what());
-
-                return -1;
-            }
+			send();
+            return 0;
         }
 
-        void init()//change initialisation of new variables
+        void init()
         {
 			if (_enable)
 				return;
@@ -245,16 +226,9 @@ namespace bhaptics
             }
 #endif
 
-            try
-            {
-                ws = unique_ptr<WebSocket>(WebSocket::create(host, port, path));
+            ws = unique_ptr<WebSocket>(WebSocket::create(host, port, path));
 
-                connectionCheck();
-            }
-            catch (exception &e)
-            {
-                printf("Exception : %s\n", e.what());
-            }
+            connectionCheck();
 
 			_enable = true;
         }
@@ -267,7 +241,7 @@ namespace bhaptics
 			}
 
 			vector<DotPoint> points;
-			for (int i = 0; i < motorBytes.size(); i++)
+			for (size_t i = 0; i < motorBytes.size(); i++)
 			{
 				if (motorBytes[i] > 0)
 				{
@@ -279,30 +253,20 @@ namespace bhaptics
 			updateActive(key, submitFrame);
         }
 
-		void submit(const string &key, Position position, const vector<DotPoint> &points, int durationMillis)//change to submit - done
+		void submit(const string &key, Position position, const vector<DotPoint> &points, int durationMillis)
 		{
-			//BufferedHapticFeedback signal(position, points, durationMillis, _interval);
 			Frame req = Frame::AsDotPointFrame(points, position, durationMillis);
 			updateActive(key, req);
 		}
 
-        void submit(const string &key, Position position, const vector<PathPoint> &points, int durationMillis)//change to submit - done
+        void submit(const string &key, Position position, const vector<PathPoint> &points, int durationMillis)
         {
-
-            //BufferedHapticFeedback signal(position, points, durationMillis, _interval);
 			Frame req = Frame::AsPathPointFrame(points, position, durationMillis);
             updateActive(key, req);
         }
 
         void submitRegistered(const string &key, float intensity, float duration)//change to submitRegistered
         {
-            /*if (!Common::containsKey(key, _registeredSignals))
-            {
-                printf("Key : %s is not registered.\n", key.c_str());
-
-                return;
-            }*/
-
             if (duration < 0.01f || duration > 100.0f)
             {
                 printf("not allowed duration %f\n", duration);
@@ -315,10 +279,15 @@ namespace bhaptics
                 return;
             }
 
-            //BufferedHapticFeedback signal = _registeredSignals.at(key);
+			SubmitRequest req;
+			req.Key = key;
+			req.Type = "key";
+			req.Parameters["intensityRatio"] = intensity;
+			req.Parameters["durationRatio"] = duration;
 
-            //BufferedHapticFeedback copiedFeedbackSignal = BufferedHapticFeedback::Copy(signal, _interval, intensity, duration);
-            //updateActive(key, copiedFeedbackSignal);
+			getActiveRequest()->Submit.push_back(req);
+
+			send();
         }
 
         void submitRegistered(const string &key)//change to submitRegistered - done
@@ -337,12 +306,12 @@ namespace bhaptics
 			send();
         }
 
-        bool isPlaying()//change with new active structure - done
+        bool isPlaying()
         {
 		    return _activeKeys.size() > 0;
         }
 
-        bool isPlaying(const string &key) //change with new active structure - done
+        bool isPlaying(const string &key)
         {
 			mtx.lock();
 			bool ret = std::find(_activeKeys.begin(), _activeKeys.end(), key) != _activeKeys.end();
@@ -362,7 +331,7 @@ namespace bhaptics
 
 		void(*dispatchFunctionVar)(const char*);
 
-		void checkMessage()//change to properly poll, ie add a better dispatch function
+		void checkMessage()
 		{
 			if (!ws)
 			{
@@ -380,13 +349,6 @@ namespace bhaptics
         {
 			_enable = false;
 			
-			if (_activeRequest != nullptr )
-			{
-				//_activeRequest->
-				//_activeRequest = nullptr;
-			//	delete (_activeRequest);
-			}
-
             if (!ws)
             {
                 return;

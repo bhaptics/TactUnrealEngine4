@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "CoreMinimal.h"
 #include "Engine.h"
 #include "HapticStructures.h"
 #include "GameFramework/Actor.h"

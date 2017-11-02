@@ -1,6 +1,7 @@
 //Copyright bHaptics Inc. 2017
 
 #pragma once
+#include "CoreMinimal.h"
 #include "Engine.h"
 
 class HAPTICSMANAGER_API BhapticsUtilities

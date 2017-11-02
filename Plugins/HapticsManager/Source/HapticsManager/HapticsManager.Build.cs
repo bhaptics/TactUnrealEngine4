@@ -1,4 +1,4 @@
-// Copyright 1998-2016 Epic Games, Inc. All Rights Reserved.
+﻿// Copyright 1998-2016 Epic Games, Inc. All Rights Reserved.
 
 using System;
 using System.IO;
@@ -6,17 +6,9 @@ using UnrealBuildTool;
 
 public class HapticsManager : ModuleRules
 {
-    public string GetUProjectPath()
-    {
-        //Change this according to your module's relative location to your project file. If there is any better way to do this I'm interested!
-        //Assuming Source/ThirdParty/YourLib/
-        return Directory.GetParent(ModuleDirectory).Parent.ToString();
-    }
-
-    public HapticsManager(TargetInfo Target)
+    public HapticsManager(ReadOnlyTargetRules Target): base(Target)
 	{
-        UEBuildConfiguration.bForceEnableExceptions = true;
-
+        PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
         PublicIncludePaths.AddRange(
 			new string[] {
                 "HapticsManager/Public"
@@ -24,7 +16,6 @@ public class HapticsManager : ModuleRules
 			}
 			);
 				
-		
 		PrivateIncludePaths.AddRange(
 			new string[] {
                 "HapticsManager/Private",
@@ -66,7 +57,5 @@ public class HapticsManager : ModuleRules
 			}
 			);
 
-        //PublicAdditionalLibraries.Add(ModuleDirectory + "/bHapticUtility.dll");
-        //RuntimeDependencies.Add(new RunTimeDependency(ModuleDirectory + "/bHapticUtility.dll"));
 	}
 }

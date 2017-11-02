@@ -1,13 +1,12 @@
 //Copyright bHaptics Inc. 2017
-#include "HapticsManagerPrivatePCH.h"
-#include "HapticsManager.h"
+
 #include "BhapticsUtilities.h"
+#include "HapticsManager.h"
+
 
 #if _WIN64
 #define USEDLL64
 #endif
-
-using namespace std;
 
 typedef char*(*_GetExePath)();
 typedef bool(*_IsPlayerInstalled)();

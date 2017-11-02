@@ -1,13 +1,10 @@
 //Copyright bHaptics Inc. 2017
 
 #pragma once
+#include "CoreMinimal.h"
 #include "Engine.h"
-//#include "CoreMinimal.h"
 #include "HapticStructures.generated.h"
 
-/**
- * 
- */
 UENUM(BlueprintType)
 enum class EPosition : uint8
 {

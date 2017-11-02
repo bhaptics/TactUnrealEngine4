@@ -210,7 +210,7 @@ namespace bhaptics
 				break;
 			}
 
-			for (int i = 0; i < PointList.size(); i++)
+			for (size_t i = 0; i < PointList.size(); i++)
 			{
 				TSharedPtr<FJsonObject> pointTemp = MakeShareable(new FJsonObject);
 				PointList[i].to_json(*pointTemp);
@@ -268,7 +268,7 @@ namespace bhaptics
 		{
 			TArray<TSharedPtr<FJsonValue>> feedbackValues;
 
-			for (int i = 0; i < Feedback.size(); i++)
+			for (size_t i = 0; i < Feedback.size(); i++)
 			{
 				TSharedPtr<FJsonObject> dotObjectTemp = MakeShareable(new FJsonObject);
 				Feedback[i].to_json(*dotObjectTemp);
@@ -368,7 +368,7 @@ namespace bhaptics
 			j.SetStringField("PlaybackType",playbackValue.c_str());
 			j.SetStringField("MovingPattern", patternValue.c_str());
 
-			for (int i = 0; i < PointList.size(); i++)
+			for (size_t i = 0; i < PointList.size(); i++)
 			{
 				TSharedPtr<FJsonObject> pointTemp = MakeShareable(new FJsonObject);
 				PointList[i].to_json(*pointTemp);
@@ -429,7 +429,7 @@ namespace bhaptics
 		{
 			TArray<TSharedPtr<FJsonValue>> feedbackValues;
 
-			for (int i = 0; i < Feedback.size(); i++)
+			for (size_t i = 0; i < Feedback.size(); i++)
 			{
 				TSharedPtr<FJsonObject> pathmodeTemp= MakeShareable(new FJsonObject);
 				Feedback[i].to_json(*pathmodeTemp);
@@ -560,7 +560,7 @@ namespace bhaptics
 
 			TArray<TSharedPtr<FJsonValue>> effectValues;
 			
-			for (int i = 0; i < Effects.size(); i++)
+			for (size_t i = 0; i < Effects.size(); i++)
 			{
 				TSharedPtr<FJsonObject> effectObject = MakeShareable (new FJsonObject);
 				Effects[i].to_json(*effectObject);
@@ -619,7 +619,7 @@ namespace bhaptics
 			{
 				TArray<TSharedPtr<FJsonValue>> jVec;
 
-				for (int i = 0; i < l.second.size(); i++)
+				for (size_t i = 0; i < l.second.size(); i++)
 				{
 					TSharedPtr<FJsonObject> layoutTemp = MakeShareable(new FJsonObject);
 					l.second[i].to_json(*layoutTemp);
@@ -667,7 +667,7 @@ namespace bhaptics
 			TArray<TSharedPtr<FJsonValue>> trackValues;
 			TSharedPtr<FJsonObject> layoutObject = MakeShareable(new FJsonObject);
 
-			for (int i = 0; i < Tracks.size(); i++)
+			for (size_t i = 0; i < Tracks.size(); i++)
 			{
 				TSharedPtr<FJsonObject> trackObject = MakeShareable(new FJsonObject);
 				Tracks[i].to_json(*trackObject);
@@ -792,6 +792,7 @@ namespace bhaptics
 		string Type;
 		string Key;
 		Frame Frame;
+		map<string, float> Parameters;
 
 		void to_json(FJsonObject& j)
 		{
@@ -802,6 +803,16 @@ namespace bhaptics
 			j.SetStringField("Type", Type.c_str());
 			j.SetStringField("Key", Key.c_str());
 			j.SetObjectField("Frame", frameObject);
+
+						TSharedPtr<FJsonObject> parameterObject = MakeShareable(new FJsonObject);
+			for (auto& p : Parameters)
+			{
+				parameterObject->SetNumberField(p.first.c_str(), p.second);
+			}
+			if (parameterObject->Values.Num() > 0)
+			{
+				j.SetObjectField("Parameters", parameterObject);
+			}
 		}
 	};
 
@@ -821,7 +832,7 @@ namespace bhaptics
 			TArray<TSharedPtr<FJsonValue>> registerValues;
 			TArray<TSharedPtr<FJsonValue>> submitValues;
 
-			for (int i = 0; i < Register.size(); i++)
+			for (size_t i = 0; i < Register.size(); i++)
 			{
 				TSharedPtr<FJsonObject> registerObject = MakeShareable(new FJsonObject);
 				Register[i].to_json(*registerObject);
@@ -829,7 +840,7 @@ namespace bhaptics
 				registerValues.Add(JsonValue);
 			}
 
-			for (int i = 0; i < Submit.size(); i++)
+			for (size_t i = 0; i < Submit.size(); i++)
 			{
 				TSharedPtr<FJsonObject> submitObject = MakeShareable(new FJsonObject);
 				Submit[i].to_json(*submitObject);
@@ -1000,13 +1011,13 @@ namespace bhaptics
 
 				vector<HapticFeedbackFrame> feedbackFrames(feed.size());
 
-				for (int i = 0; i < feed.size(); i++)
+				for (size_t i = 0; i < feed.size(); i++)
 				{
 					if (feed[i].mode == DOT_MODE)
 					{
 						vector<DotPoint> points = vector<DotPoint>();
 						auto values = feed[i].values;
-						for (int index = 0; index < values.size(); index++)
+						for (size_t index = 0; index < values.size(); index++)
 						{
 							if (values[index] > 0)
 							{

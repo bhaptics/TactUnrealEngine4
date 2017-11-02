@@ -1,6 +1,6 @@
 //Copyright bHaptics Inc. 2017
 
-#include "HapticsManagerPrivatePCH.h"
+//#include "HapticsManagerPrivatePCH.h"
 #include "HapticsManagerActor.h"
 #include "AllowWindowsPlatformTypes.h"
 #include "SDK/hapticsManager.hpp"
@@ -150,6 +150,7 @@ void AHapticsManagerActor::Tick( float DeltaTime )
 		}
 	}
 	ChangedFeedbacks.Empty();
+	bhaptics::HapticPlayer::instance()->checkMessage();
 	m_Mutex.Unlock();
 }
 
@@ -354,7 +355,7 @@ void AHapticsManagerActor::UpdateDisplayedFeedback(const char *ReceivedMessage)
 		for (auto& Device : DeviceMotors)
 		{
 			TArray<uint8_t> ValuesArray;
-			EPosition Position;
+			EPosition Position = EPosition::Left;
 
 			if (Device.first == "Left")
 			{
@@ -381,19 +382,16 @@ void AHapticsManagerActor::UpdateDisplayedFeedback(const char *ReceivedMessage)
 				Position = EPosition::Racket;
 			}
 
-			for (int Index = 0; Index < Device.second.size(); Index++)
+			for (size_t Index = 0; Index < Device.second.size(); Index++)
 			{
 				ValuesArray.Add(Device.second[Index]);
 			}
-			//ValuesArray.Add(FCString::Atoi(**RightValues));
 
 			FHapticFeedback Feedback(Position,ValuesArray , EFeedbackMode::DOT_MODE);
 			m_Mutex.Lock();
 			ChangedFeedbacks.Add(Feedback);
 			m_Mutex.Unlock();
 		}
-
-
 	}//*/
 
 }
