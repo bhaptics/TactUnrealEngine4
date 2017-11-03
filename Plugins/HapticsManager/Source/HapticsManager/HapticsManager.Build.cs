@@ -1,4 +1,4 @@
-// Copyright 1998-2016 Epic Games, Inc. All Rights Reserved.
+﻿// Copyright 1998-2016 Epic Games, Inc. All Rights Reserved.
 
 using System;
 using System.IO;
@@ -6,8 +6,9 @@ using UnrealBuildTool;
 
 public class HapticsManager : ModuleRules
 {
-    public HapticsManager(ReadOnlyTargetRules Target) : base(Target)
-    {
+    public HapticsManager(ReadOnlyTargetRules Target): base(Target)
+	{
+        PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
         PublicIncludePaths.AddRange(
 			new string[] {
                 "HapticsManager/Public"
@@ -15,7 +16,6 @@ public class HapticsManager : ModuleRules
 			}
 			);
 				
-		
 		PrivateIncludePaths.AddRange(
 			new string[] {
                 "HapticsManager/Private",
@@ -57,7 +57,5 @@ public class HapticsManager : ModuleRules
 			}
 			);
 
-        //PublicAdditionalLibraries.Add(ModuleDirectory + "/bHapticUtility.dll");
-        //RuntimeDependencies.Add(new RunTimeDependency(ModuleDirectory + "/bHapticUtility.dll"));
 	}
 }

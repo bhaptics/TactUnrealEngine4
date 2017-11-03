@@ -8,7 +8,7 @@ public class bHapticsManagerTarget : TargetRules
 	public bHapticsManagerTarget(TargetInfo Target) : base(Target)
 	{
 		Type = TargetType.Game;
-        UEBuildConfiguration.bForceEnableExceptions = true;
+        //UEBuildConfiguration.bForceEnableExceptions = true;
         ExtraModuleNames.AddRange( new string[] { "bHapticsManager" } );
 	}
 }

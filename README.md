@@ -12,12 +12,12 @@ This template project demonstrates how to integrate the bHaptics plugin into an 
 * HapticsManager_BP - Blueprint to access the functionality of the bHaptics plugin.
 * FPSHapticsPawn - A simple FPS pawn with raycasting to 'shoot' objects, and is an example on how to map haptic feedback to user input.
 * 3 Dummy blueprints - Examples of how to incorporate feedback into objects using collision detection.
-   * BP_Dummy - Demonstrates the use of the DotPoint structure in making haptic feedback, using separate colliders for each motor.
-   * BP_DummySimple - Demonstrates the use of the PathPoint structure is making haptic feedback, and uses collision detection to generate the feedback.
-   * BP_DummyExplosion - Demonstated the implementation of more advanced effects beyond single motor calls, by creating a moving spreading effect, which fades as it moves. 
+   * DotDummy - Demonstrates the use of the DotPoint structure in making haptic feedback, calculating which dot was hit based on the collision.
+   * Dummy - Demonstrates the use of the PathPoint structure is making haptic feedback, and uses collision detection to generate the feedback.
+   * UIHitBox - Another collider to calculate hits on the UI and deliver the appropriate feedback.
 
 ### Feedback Files
-* Designated folder for storing preset haptic feedback effects created using the bHaptics Designer located in Contents/bHapticsManager/Feedbacks.
+* Designated folder for storing preset haptic feedback effects created using the bHaptics Designer located in Contents/HapticsManager/Feedback.
 * All feedback files stored here are loaded automatically by the bHapticsManager_BP to be called used during gameplay.
 
 ### Maps

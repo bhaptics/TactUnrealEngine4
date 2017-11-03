@@ -35,8 +35,14 @@ namespace bhaptics
 			else if (_index > 19)
 				index = 19;
             intensity = _intensity;
-
         }
+
+		void to_json(FJsonObject& j)
+		{
+			j.SetNumberField("Index", index);
+			j.SetNumberField("Intensity", intensity);
+		}
+
     };
 
     struct PathPoint
@@ -56,6 +62,14 @@ namespace bhaptics
 
 			}
         }
+
+		void to_json(FJsonObject& j)
+		{
+			j.SetNumberField("X", x);
+			j.SetNumberField("Y", y);
+			j.SetNumberField("Intensity", intensity);
+		}
+
     };
 
 	struct HapticFeedbackFrame
@@ -118,14 +132,7 @@ namespace bhaptics
         }
     };
 
-    struct HapticFile
-    {
-        int intervalMillis;
-        int size;
-        int durationMillis;
-        map<int, vector<HapticFeedback>> feedback;
 
-    };
 
     class Common
     {
@@ -137,13 +144,761 @@ namespace bhaptics
         }
     };
 
-    class BufferedHapticFeedback
-    {
-    public:
-        BufferedHapticFeedback() {}
-        map<int, vector<HapticFeedbackFrame>> feedbackMap;
-        int StartTime;
-        int EndTime;
+    	
+	////////*********
+
+	enum PlaybackType
+	{
+		NONE,
+		FADE_IN,
+		FADE_OUT,
+		FADE_IN_OUT
+	};
+
+	enum PathMovingPattern
+	{
+		CONST_SPEED,
+		CONST_TDM
+	};
+
+	struct DotModeObject
+	{
+		int index;
+		float intensity;
+
+		void to_json(FJsonObject& j)
+		{
+			j.SetNumberField("Index", index);
+			j.SetNumberField("Intensity", intensity);
+		}
+
+		void from_json(FJsonObject& j)
+		{
+			index = j.GetNumberField("index");
+			intensity = j.GetNumberField("intensity");
+		}
+	};
+
+	struct DotModeObjectCollection
+	{
+		int StartTime;
+		int EndTime;
+		PlaybackType PlaybackType = PlaybackType::NONE;
+		std::vector<DotModeObject> PointList;
+
+		void to_json(FJsonObject& j)
+		{
+			string playbackValue = "";
+			TArray <TSharedPtr<FJsonValue>> pointValues;
+
+			switch (PlaybackType)
+			{
+			case PlaybackType::NONE:
+				playbackValue = "NONE";
+				break;
+			case PlaybackType::FADE_IN:
+				playbackValue = "FADE_IN";
+				break;
+			case PlaybackType::FADE_OUT:
+				playbackValue = "FADE_OUT";
+				break;
+			case PlaybackType::FADE_IN_OUT:
+				playbackValue = "FADE_IN_OUT";
+				break;
+			default:
+				playbackValue = "ERROR";
+				break;
+			}
+
+			for (size_t i = 0; i < PointList.size(); i++)
+			{
+				TSharedPtr<FJsonObject> pointTemp = MakeShareable(new FJsonObject);
+				PointList[i].to_json(*pointTemp);
+				TSharedRef<FJsonValueObject> JsonValue = MakeShareable(new FJsonValueObject(pointTemp));
+				pointValues.Add(JsonValue);
+			}
+
+			j.SetNumberField("StartTime", StartTime);
+			j.SetNumberField("EndTime", EndTime);
+			j.SetStringField("PlaybackType", playbackValue.c_str());
+			j.SetArrayField("PointList", pointValues);
+		}
+
+		void from_json(FJsonObject& j)
+		{
+			TArray<TSharedPtr<FJsonValue>> dotObj = j.GetArrayField("pointList");
+			string playbackType = (TCHAR_TO_UTF8(*j.GetStringField(TEXT("playbackType"))));
+
+			StartTime = j.GetIntegerField("startTime");
+			EndTime = j.GetIntegerField("endTime");
+			
+			if (playbackType == "NONE")
+			{
+				PlaybackType = NONE;
+			}
+			else if (playbackType == "FADE_IN")
+			{
+				PlaybackType = FADE_IN;
+			}
+			else if (playbackType == "FADE_OUT")
+			{
+				PlaybackType = FADE_OUT;
+			}
+			else
+			{
+				PlaybackType = FADE_IN_OUT;
+			}
+
+			for (int i = 0; i < dotObj.Num(); i++)
+			{
+				DotModeObject tempDot;
+				tempDot.from_json(*dotObj[i]->AsObject());
+				PointList.push_back(tempDot);
+			}
+			
+		}
+	};
+
+	struct DotMode
+	{
+		bool DotConnected;
+		std::vector<DotModeObjectCollection> Feedback;
+
+		void to_json(FJsonObject& j)
+		{
+			TArray<TSharedPtr<FJsonValue>> feedbackValues;
+
+			for (size_t i = 0; i < Feedback.size(); i++)
+			{
+				TSharedPtr<FJsonObject> dotObjectTemp = MakeShareable(new FJsonObject);
+				Feedback[i].to_json(*dotObjectTemp);
+				TSharedRef<FJsonValueObject> JsonValue = MakeShareable(new FJsonValueObject(dotObjectTemp));
+				feedbackValues.Add(JsonValue);
+			}
+
+			j.SetBoolField("DotConnected", DotConnected);
+			j.SetArrayField("Feedback", feedbackValues);
+		}
+
+		void from_json(FJsonObject& j)
+		{
+			TArray<TSharedPtr<FJsonValue>> feedbackObj = j.GetArrayField("feedback");
+
+			DotConnected = j.GetBoolField("dotConnected");
+
+			for (int i = 0; i < feedbackObj.Num(); i++)
+			{
+				DotModeObjectCollection dotCollectionTemp;
+				dotCollectionTemp.from_json(*feedbackObj[i]->AsObject());
+				Feedback.push_back(dotCollectionTemp);
+			}
+		}
+
+	};
+
+	struct PathModeObject
+	{
+		float X;
+		float Y;
+		float Intensity;
+		int Time;
+
+		void to_json(FJsonObject& j)
+		{
+			j.SetNumberField("X",X);
+			j.SetNumberField("Y", Y);
+			j.SetNumberField("Intensity", Intensity);
+			j.SetNumberField("Time", Time);
+		}
+
+		void from_json(FJsonObject& j)
+		{
+			X = j.GetNumberField("x");
+			Y = j.GetNumberField("y");
+			Intensity = j.GetNumberField("intensity");
+			Time = j.GetIntegerField("time");
+		}
+	};
+
+	struct PathModeObjectCollection
+	{
+		PlaybackType PlaybackType = PlaybackType::NONE;
+		PathMovingPattern MovingPattern = PathMovingPattern::CONST_TDM;
+		std::vector<PathModeObject> PointList;
+		
+
+		void to_json(FJsonObject& j)
+		{
+			string playbackValue = "";
+			string patternValue = "";
+			TArray<TSharedPtr<FJsonValue>> pointValues;
+
+			switch (PlaybackType)
+			{
+			case PlaybackType::NONE:
+				playbackValue = "NONE";
+				break;
+			case PlaybackType::FADE_IN:
+				playbackValue = "FADE_IN";
+				break;
+			case PlaybackType::FADE_OUT:
+				playbackValue = "FADE_OUT";
+				break;
+			case PlaybackType::FADE_IN_OUT:
+				playbackValue = "FADE_IN_OUT";
+				break;
+			default:
+				playbackValue = "ERROR";
+				break;
+			}
+
+			switch (MovingPattern)
+			{
+			case PathMovingPattern::CONST_TDM:
+				patternValue = "CONST_TDM";
+				break;
+			case PathMovingPattern::CONST_SPEED:
+				patternValue = "CONST_SPEED";
+				break;
+			default:
+				patternValue = "ERROR";
+				break;
+			}
+
+			j.SetStringField("PlaybackType",playbackValue.c_str());
+			j.SetStringField("MovingPattern", patternValue.c_str());
+
+			for (size_t i = 0; i < PointList.size(); i++)
+			{
+				TSharedPtr<FJsonObject> pointTemp = MakeShareable(new FJsonObject);
+				PointList[i].to_json(*pointTemp);
+				TSharedRef<FJsonValueObject> JsonValue = MakeShareable(new FJsonValueObject(pointTemp));
+				pointValues.Add(JsonValue);
+			}
+
+			j.SetArrayField("PointList", pointValues);
+
+		}
+
+		void from_json(FJsonObject& j)
+		{
+			string playbackType = (TCHAR_TO_UTF8(*j.GetStringField(TEXT("playbackType"))));
+			string movingPattern = (TCHAR_TO_UTF8(*j.GetStringField(TEXT("movingPattern"))));
+
+			if (playbackType == "NONE")
+			{
+				PlaybackType = NONE;
+			}
+			else if (playbackType == "FADE_IN")
+			{
+				PlaybackType = FADE_IN;
+			}
+			else if (playbackType == "FADE_OUT")
+			{
+				PlaybackType = FADE_OUT;
+			}
+			else
+			{
+				PlaybackType = FADE_IN_OUT;
+			}
+
+			if (movingPattern == "CONST_SPEED")
+			{
+				MovingPattern = CONST_SPEED;
+			}
+			else
+			{
+				MovingPattern = CONST_TDM;
+			}
+
+			TArray<TSharedPtr<FJsonValue>> pathObj = j.GetArrayField("pointList");
+			for (int l = 0; l < pathObj.Num(); l++)
+			{
+				PathModeObject tempDot;
+				tempDot.from_json(*pathObj[l]->AsObject());
+				PointList.push_back(tempDot);
+			}
+		}
+	};
+
+	struct PathMode
+	{
+		vector<PathModeObjectCollection> Feedback;
+
+		void to_json(FJsonObject& j)
+		{
+			TArray<TSharedPtr<FJsonValue>> feedbackValues;
+
+			for (size_t i = 0; i < Feedback.size(); i++)
+			{
+				TSharedPtr<FJsonObject> pathmodeTemp= MakeShareable(new FJsonObject);
+				Feedback[i].to_json(*pathmodeTemp);
+				TSharedRef<FJsonValueObject> JsonValue = MakeShareable(new FJsonValueObject(pathmodeTemp));
+				
+				feedbackValues.Add(JsonValue);
+			}
+			j.SetArrayField("Feedback", feedbackValues);
+		}
+
+		void from_json(FJsonObject& j)
+		{
+			TArray<TSharedPtr<FJsonValue>> feedbackObj = j.GetArrayField("feedback");
+
+			for (int i = 0; i < feedbackObj.Num(); i++)
+			{
+				PathModeObjectCollection pathCollectionTemp;
+				pathCollectionTemp.from_json(*feedbackObj[i]->AsObject());
+				Feedback.push_back(pathCollectionTemp);
+			}
+		}
+	};
+
+	struct HapticEffectMode
+	{
+		int Texture;
+		FeedbackMode Mode;
+		DotMode DotMode;
+		PathMode PathMode;
+
+		void to_json(FJsonObject& j)
+		{
+			string modeValue ="";
+			TSharedPtr<FJsonObject> dotModeValue = MakeShareable(new FJsonObject);
+			TSharedPtr<FJsonObject> pathModeValue = MakeShareable(new FJsonObject);
+
+			switch (Mode)
+			{
+			case bhaptics::PATH_MODE:
+				modeValue = "PATH_MODE";
+				break;
+			case bhaptics::DOT_MODE:
+				modeValue = "DOT_MODE";
+				break;
+			default:
+				modeValue = "ERROR";
+				break;
+			}
+
+			DotMode.to_json(*dotModeValue);
+			PathMode.to_json(*pathModeValue);
+
+			j.SetNumberField("Texture", Texture);
+			j.SetStringField("Mode", modeValue.c_str());
+			j.SetObjectField("DotMode", dotModeValue);
+			j.SetObjectField("PathMode", pathModeValue);
+		}
+
+		void from_json(FJsonObject& j)
+		{
+			string modeEnum = (TCHAR_TO_UTF8(*j.GetStringField(TEXT("mode"))));
+			
+			if (modeEnum == "PATH_MODE")
+			{
+				Mode = PATH_MODE;
+			}
+			else if (modeEnum == "DOT_MODE")
+			{
+				Mode = DOT_MODE;
+			}
+			
+
+			Texture = j.GetNumberField("texture");
+			DotMode.from_json(*j.GetObjectField("dotMode"));
+			PathMode.from_json(*j.GetObjectField("pathMode"));
+
+		}
+	};
+
+	struct HapticEffect
+	{
+		int StartTime;
+		int OffsetTime;
+		std::map<std::string, HapticEffectMode> Modes;
+		
+		void to_json(FJsonObject& j)
+		{
+			TSharedPtr<FJsonObject> modeObject = MakeShareable(new FJsonObject);
+			
+			for (auto& m : Modes)
+			{
+				TSharedPtr<FJsonObject> effectObject = MakeShareable(new FJsonObject);
+
+				m.second.to_json(*effectObject);
+				modeObject->SetObjectField(m.first.c_str(), effectObject);
+			}
+			
+			j.SetNumberField("StartTime", StartTime);
+			j.SetNumberField("OffsetTime", OffsetTime);
+			j.SetObjectField("Modes", modeObject);
+		}
+
+		void from_json(FJsonObject& j)
+		{
+			TMap<FString, TSharedPtr<FJsonValue>> modeValues = j.GetObjectField("modes")->Values;
+
+			for (auto& kv : modeValues)
+			{
+				string key = TCHAR_TO_UTF8(*kv.Key);
+				HapticEffectMode tempMode;
+				tempMode.from_json(*kv.Value->AsObject());
+				Modes[key] = tempMode;
+			}
+
+			StartTime = j.GetIntegerField("startTime");
+			OffsetTime = j.GetIntegerField("offsetTime");
+			
+		}
+
+	};
+
+	struct Track
+	{
+		std::vector<HapticEffect> Effects;
+
+		void to_json(FJsonObject& j)
+		{
+
+			TArray<TSharedPtr<FJsonValue>> effectValues;
+			
+			for (size_t i = 0; i < Effects.size(); i++)
+			{
+				TSharedPtr<FJsonObject> effectObject = MakeShareable (new FJsonObject);
+				Effects[i].to_json(*effectObject);
+				TSharedRef<FJsonValueObject> JsonValue = MakeShareable(new FJsonValueObject(effectObject));
+				effectValues.Add(JsonValue);
+			}
+
+			j.SetArrayField("Effects", effectValues);
+		}
+
+		void from_json(FJsonObject& j)
+		{
+			TArray<TSharedPtr<FJsonValue>> effectObject = j.GetArrayField("effects");
+
+			for (int i = 0; i < effectObject.Num(); i++)
+			{
+				HapticEffect tempEffect;
+				tempEffect.from_json(*effectObject[i]->AsObject());
+				Effects.push_back(tempEffect);
+			}
+		}
+	};
+
+	struct LayoutObject
+	{
+		int Index;
+		float X;
+		float Y;
+
+		void to_json(FJsonObject& j)
+		{
+			j.SetNumberField("Index", Index);
+			j.SetNumberField("X", X);
+			j.SetNumberField("X", Y);
+		}
+
+		void from_json(FJsonObject& j)
+		{
+			Index = j.GetIntegerField("index");
+			X = j.GetNumberField("x");
+			Y = j.GetNumberField("y");
+		}
+		
+	};
+
+	struct Layout
+	{
+		string Type;
+		std::map<std::string, std::vector<LayoutObject>> Layouts;
+
+		void to_json(FJsonObject& j)
+		{
+			TSharedPtr<FJsonObject> layout = MakeShareable(new FJsonObject);
+			
+			for (auto& l : Layouts)
+			{
+				TArray<TSharedPtr<FJsonValue>> jVec;
+
+				for (size_t i = 0; i < l.second.size(); i++)
+				{
+					TSharedPtr<FJsonObject> layoutTemp = MakeShareable(new FJsonObject);
+					l.second[i].to_json(*layoutTemp);
+					TSharedRef<FJsonValueObject> JsonValue = MakeShareable(new FJsonValueObject(layoutTemp));
+					jVec.Add(JsonValue);
+				}
+
+				layout->SetArrayField(l.first.c_str(), jVec);
+			}
+			j.SetStringField("Type", FString(Type.c_str()));
+			j.SetObjectField("Layouts", layout);
+		}
+
+		void from_json(FJsonObject& j)
+		{
+
+			TMap<FString, TSharedPtr<FJsonValue>> layoutsObj = j.GetObjectField("layouts")->Values;
+			Type = TCHAR_TO_UTF8(*j.GetStringField(TEXT("type")));
+
+			for (auto& kv : layoutsObj)
+			{
+				string key = TCHAR_TO_UTF8(*kv.Key);
+				TArray<TSharedPtr<FJsonValue>> layoutObjectValues = kv.Value->AsArray();
+				vector<LayoutObject> tempLayoutObject;
+
+				for (int i = 0; i < layoutObjectValues.Num(); i++)
+				{
+					LayoutObject tempLayout;
+					tempLayout.from_json(*layoutObjectValues[i]->AsObject());
+					tempLayoutObject.push_back(tempLayout);
+				}
+				Layouts[key] = tempLayoutObject;
+			}
+
+		}
+	};
+
+	struct HapticProject
+	{
+		std::vector<Track> Tracks;
+		Layout Layout;
+
+		void to_json(FJsonObject& j)
+		{
+			TArray<TSharedPtr<FJsonValue>> trackValues;
+			TSharedPtr<FJsonObject> layoutObject = MakeShareable(new FJsonObject);
+
+			for (size_t i = 0; i < Tracks.size(); i++)
+			{
+				TSharedPtr<FJsonObject> trackObject = MakeShareable(new FJsonObject);
+				Tracks[i].to_json(*trackObject);
+				TSharedRef<FJsonValueObject> JsonValue = MakeShareable(new FJsonValueObject(trackObject));
+				trackValues.Add(JsonValue);
+			}
+
+			Layout.to_json(*layoutObject);
+
+			j.SetArrayField("Tracks", trackValues);
+			j.SetObjectField("Layout", layoutObject);
+		}
+
+		void from_json(FJsonObject& j)
+		{
+			TArray<TSharedPtr<FJsonValue>> trackObjs = j.GetArrayField(TEXT("Tracks"));
+
+			for (int i = 0; i < trackObjs.Num(); i++)
+			{
+				Track tempTrack;
+				tempTrack.from_json(*trackObjs[i]->AsObject());
+				Tracks.push_back(tempTrack);
+			}
+			Layout.from_json(*j.GetObjectField("layout"));
+		}
+	};
+
+	struct HapticFile//change to project - done
+	{
+		int intervalMillis;
+		int size;
+		int durationMillis;
+		map<int, vector<HapticFeedback>> feedback;
+		HapticProject project;
+
+		void from_json (FJsonObject& j)
+		{
+			intervalMillis = j.GetIntegerField(TEXT("intervalMillis"));
+			size = j.GetIntegerField(TEXT("size"));
+			durationMillis = j.GetIntegerField(TEXT("durationMillis"));
+			project.from_json(*j.GetObjectField("project"));
+		}
+	};
+
+	class Frame
+	{
+	public:
+		int DurationMillis = 0;
+		Position Position;
+		vector<PathPoint> PathPoints;
+		vector<DotPoint> DotPoints;
+		int Texture;
+
+		static Frame AsPathPointFrame(vector<PathPoint> points, bhaptics::Position position, int durationMillis, int texture = 0)
+		{
+			Frame frame;
+			frame.Position = position;
+			frame.PathPoints = points;
+			frame.Texture = texture;
+			frame.DurationMillis = durationMillis;
+			return frame;
+		}
+
+		static Frame AsDotPointFrame(vector<DotPoint> points, bhaptics::Position position, int durationMillis, int texture = 0)
+		{
+			Frame frame;
+			frame.Position = position;
+			frame.DotPoints = points;
+			frame.Texture = texture;
+			frame.DurationMillis = durationMillis;
+			return frame;
+		}
+
+		void to_json(FJsonObject& jsonObject)
+		{
+			vector<string> tempVec1, tempVec2;
+
+			TArray<TSharedPtr<FJsonValue>> jVec1, jVec2;
+
+			for (size_t i = 0; i < PathPoints.size(); i++)
+			{
+				TSharedPtr<FJsonObject> jTemp = MakeShareable(new FJsonObject);
+				PathPoints[i].to_json(*jTemp);
+				TSharedRef<FJsonValueObject> JsonValue = MakeShareable(new FJsonValueObject(jTemp));
+				jVec1.Add(JsonValue);
+
+			}
+
+			for (size_t i = 0; i < DotPoints.size(); i++)
+			{
+				TSharedPtr<FJsonObject> jTemp = MakeShareable(new FJsonObject);
+				DotPoints[i].to_json(*jTemp);
+				TSharedRef<FJsonValueObject> JsonValue = MakeShareable(new FJsonValueObject(jTemp));
+				jVec2.Add(JsonValue);
+			}
+
+			jsonObject.SetNumberField("Position", Position);
+			jsonObject.SetNumberField("Texture", Texture);
+			jsonObject.SetArrayField("PathPoints", jVec1);
+			jsonObject.SetArrayField("DotPoints", jVec2);
+			jsonObject.SetNumberField("DurationMillis", DurationMillis);
+		}
+	};
+
+	struct RegisterRequest
+	{
+		string Key;
+		HapticProject Project;
+
+		void to_json(FJsonObject& j)
+		{
+			TSharedPtr<FJsonObject> projectObject = MakeShareable(new FJsonObject);
+
+			Project.to_json(*projectObject);
+			j.SetStringField("Key", Key.c_str());
+			j.SetObjectField("Project", projectObject);
+		}
+	};
+
+	struct SubmitRequest
+	{
+		string Type;
+		string Key;
+		Frame Frame;
+		map<string, float> Parameters;
+
+		void to_json(FJsonObject& j)
+		{
+			TSharedPtr<FJsonObject> frameObject = MakeShareable(new FJsonObject);
+
+			Frame.to_json(*frameObject);
+
+			j.SetStringField("Type", Type.c_str());
+			j.SetStringField("Key", Key.c_str());
+			j.SetObjectField("Frame", frameObject);
+
+						TSharedPtr<FJsonObject> parameterObject = MakeShareable(new FJsonObject);
+			for (auto& p : Parameters)
+			{
+				parameterObject->SetNumberField(p.first.c_str(), p.second);
+			}
+			if (parameterObject->Values.Num() > 0)
+			{
+				j.SetObjectField("Parameters", parameterObject);
+			}
+		}
+	};
+
+	class PlayerRequest
+	{
+	public:
+		vector<RegisterRequest> Register;
+		vector<SubmitRequest> Submit;
+
+		static PlayerRequest* Create()
+		{
+			return new PlayerRequest();
+		}
+
+		void to_json(FJsonObject& j)
+		{
+			TArray<TSharedPtr<FJsonValue>> registerValues;
+			TArray<TSharedPtr<FJsonValue>> submitValues;
+
+			for (size_t i = 0; i < Register.size(); i++)
+			{
+				TSharedPtr<FJsonObject> registerObject = MakeShareable(new FJsonObject);
+				Register[i].to_json(*registerObject);
+				TSharedRef<FJsonValueObject> JsonValue = MakeShareable(new FJsonValueObject(registerObject));
+				registerValues.Add(JsonValue);
+			}
+
+			for (size_t i = 0; i < Submit.size(); i++)
+			{
+				TSharedPtr<FJsonObject> submitObject = MakeShareable(new FJsonObject);
+				Submit[i].to_json(*submitObject);
+				TSharedRef<FJsonValueObject> JsonValue = MakeShareable(new FJsonValueObject(submitObject));
+				submitValues.Add(JsonValue);
+			}
+
+			j.SetArrayField("Register", registerValues);
+			j.SetArrayField("Submit", submitValues);
+		}
+	};
+
+	struct PlayerResponse
+	{
+		vector<string> RegisteredKeys;
+		vector<string> ActiveKeys;
+		int ConnectedDeviceCount;
+		map<string, vector<int>> Status;
+
+		void from_json(FJsonObject& j)
+		{
+			TArray<TSharedPtr<FJsonValue>> regKeyValues = j.GetArrayField("RegisteredKeys");
+			TArray<TSharedPtr<FJsonValue>> activeKeyValues = j.GetArrayField("ActiveKeys");
+			TMap<FString,TSharedPtr<FJsonValue>> statusValues = j.GetObjectField("Status")->Values;
+
+			for (int i = 0; i < regKeyValues.Num(); i++)
+			{
+				RegisteredKeys.push_back(TCHAR_TO_UTF8(*regKeyValues[i]->AsString()));
+			}
+
+			for (int i = 0; i < activeKeyValues.Num(); i++)
+			{
+				ActiveKeys.push_back(TCHAR_TO_UTF8(*activeKeyValues[i]->AsString()));
+			}
+
+			for (auto& s : statusValues)
+			{
+				string key = TCHAR_TO_UTF8(*s.Key);
+				TArray<TSharedPtr<FJsonValue>> motorValues = s.Value->AsArray();
+				vector<int> motors;
+				for (int i = 0; i < motorValues.Num(); i++)
+				{
+					motors.push_back(motorValues[i]->AsNumber());
+				}
+				Status[key] = motors;
+			}
+
+			ConnectedDeviceCount = j.GetIntegerField("connectedDeviceCount");
+		}
+	};
+
+	class BufferedHapticFeedback
+	{
+	public:
+		BufferedHapticFeedback() {}
+		map<int, vector<HapticFeedbackFrame>> feedbackMap;
+		int StartTime;
+		int EndTime;
 
 		BufferedHapticFeedback(Position position, vector<DotPoint> points, int durationMillis, int interval)
 		{
@@ -237,10 +992,10 @@ namespace bhaptics
 			EndTime = i * interval;
 		}
 
-        BufferedHapticFeedback(HapticFile hapticFile)
-        {
+		BufferedHapticFeedback(HapticFile hapticFile)
+		{
 			Initialise(hapticFile);
-        }
+		}
 
 		void Initialise(HapticFile hapticFeedbackFile)
 		{
@@ -256,13 +1011,13 @@ namespace bhaptics
 
 				vector<HapticFeedbackFrame> feedbackFrames(feed.size());
 
-				for (int i = 0; i < feed.size(); i++)
+				for (size_t i = 0; i < feed.size(); i++)
 				{
 					if (feed[i].mode == DOT_MODE)
 					{
 						vector<DotPoint> points = vector<DotPoint>();
 						auto values = feed[i].values;
-						for (int index = 0; index < values.size(); index++)
+						for (size_t index = 0; index < values.size(); index++)
 						{
 							if (values[index] > 0)
 							{
@@ -287,7 +1042,6 @@ namespace bhaptics
 						}
 
 						feedbackFrames[i] = HapticFeedbackFrame(feed[i].position, points);
-
 					}
 				}
 
@@ -295,29 +1049,29 @@ namespace bhaptics
 			}
 		}
 
-        static BufferedHapticFeedback Copy(const BufferedHapticFeedback &signal, int interval, float intensityRatio, float durationRatio)
-        {
-            BufferedHapticFeedback feedbackSignal;
-            feedbackSignal.EndTime = static_cast<int>(signal.EndTime * durationRatio / interval * interval) + interval;
-            feedbackSignal.StartTime = -1;
+		static BufferedHapticFeedback Copy(const BufferedHapticFeedback &signal, int interval, float intensityRatio, float durationRatio)
+		{
+			BufferedHapticFeedback feedbackSignal;
+			feedbackSignal.EndTime = static_cast<int>(signal.EndTime * durationRatio / interval * interval) + interval;
+			feedbackSignal.StartTime = -1;
 
-            int time;
-            for (time = 0; time < feedbackSignal.EndTime; time += interval)
-            {
-                int keyTime = static_cast<int>(time / durationRatio) / interval*interval;
+			int time;
+			for (time = 0; time < feedbackSignal.EndTime; time += interval)
+			{
+				int keyTime = static_cast<int>(time / durationRatio) / interval*interval;
 
-                if (Common::containsKey(keyTime, signal.feedbackMap)) // contains
-                {
-                    vector<HapticFeedbackFrame> hapticFeedbacks = signal.feedbackMap.at(keyTime);
+				if (Common::containsKey(keyTime, signal.feedbackMap)) // contains
+				{
+					vector<HapticFeedbackFrame> hapticFeedbacks = signal.feedbackMap.at(keyTime);
 
-                    vector<HapticFeedbackFrame> copiedFeedbacks(hapticFeedbacks.size());
+					vector<HapticFeedbackFrame> copiedFeedbacks(hapticFeedbacks.size());
 
-                    for (size_t i = 0; i < hapticFeedbacks.size(); i++)
-                    {
-                        HapticFeedbackFrame hapticFeedback = hapticFeedbacks[i];
+					for (size_t i = 0; i < hapticFeedbacks.size(); i++)
+					{
+						HapticFeedbackFrame hapticFeedback = hapticFeedbacks[i];
 						vector<DotPoint> emptyDots;
 						HapticFeedbackFrame feedback = HapticFeedbackFrame(hapticFeedback.position,emptyDots);
-						
+
 						for (auto point = hapticFeedback.dotPoints.begin(); point != hapticFeedback.dotPoints.end(); point++)
 						{
 							int val = (int)(point->intensity*intensityRatio);
@@ -347,64 +1101,17 @@ namespace bhaptics
 							PathPoint pt(point->x, point->y, val);
 							feedback.pathPoints.push_back(pt);
 						}
-                        
-                        copiedFeedbacks[i] = feedback;
-                        feedbackSignal.feedbackMap[time] = copiedFeedbacks;
-                    }
-                }
-            }
 
-            return feedbackSignal;
-        }
+						copiedFeedbacks[i] = feedback;
+						feedbackSignal.feedbackMap[time] = copiedFeedbacks;
+					}
+				}
+			}
 
-    };
-
-	void to_json(FJsonObject& j, const PathPoint& point)
-	{
-		j.SetNumberField("X", point.x);
-		j.SetNumberField("Y", point.y);
-		j.SetNumberField("Intensity", point.intensity);
-	}
-
-	void to_json(FJsonObject& j, const DotPoint& point)
-	{
-		j.SetNumberField("Index", point.index);
-		j.SetNumberField("Intensity", point.intensity);
-	}
-
-	void to_json(FJsonObject& jsonObject, const HapticFeedbackFrame& feedback)
-	{
-		vector<std::string> tempVec1, tempVec2;
-
-		//vector<json> jVec1, jVec2;
-		TArray<TSharedPtr<FJsonValue>> jVec1, jVec2;
-
-		for (size_t i = 0; i < feedback.pathPoints.size(); i++)
-		{
-			TSharedPtr<FJsonObject> jTemp = MakeShareable(new FJsonObject);
-			to_json(*jTemp, feedback.pathPoints[i]);
-			TSharedRef<FJsonValueObject> JsonValue = MakeShareable(new FJsonValueObject(jTemp));
-			jVec1.Add(JsonValue);
-
+			return feedbackSignal;
 		}
 
-		for (size_t i = 0; i < feedback.dotPoints.size(); i++)
-		{
-			//json jTemp;
-			TSharedPtr<FJsonObject> jTemp = MakeShareable(new FJsonObject);
-			to_json(*jTemp, feedback.dotPoints[i]);
-			//jVec2.push_back(jTemp);
-			TSharedRef<FJsonValueObject> JsonValue = MakeShareable(new FJsonValueObject(jTemp));
-			jVec2.Add(JsonValue);
-			//tempVec2.push_back(jTemp.dump());
-		}
-
-		jsonObject.SetNumberField("Position", feedback.position);
-		jsonObject.SetNumberField("Texture", feedback.texture);
-		jsonObject.SetArrayField("PathPoints", jVec1);
-		jsonObject.SetArrayField("DotPoints", jVec2);
-		//j = json{ { "Position",feedback.position },{ "Texture",feedback.texture },{ "PathPoints",jVec1 } ,{ "DotPoints", jVec2 } };
-	}
+	};
 		
 }
 
