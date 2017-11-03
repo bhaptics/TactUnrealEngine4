@@ -176,9 +176,6 @@ namespace bhaptics
         void doRepeat()
         {
             reconnect();
-			mtx.lock();
-			checkMessage();
-			mtx.unlock();
 
             _currentTime += _interval;
         }
