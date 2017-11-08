@@ -227,6 +227,21 @@ void AHapticsManagerActor::SubmitBytes(const FString &Key, EPosition PositionEnu
 	case EPosition::VestBack:
 		HapticPosition = bhaptics::Position::VestBack;
 		break;
+	case EPosition::HandL:
+		HapticPosition = bhaptics::Position::HandL;
+		break;
+	case EPosition::HandR:
+		HapticPosition = bhaptics::Position::HandR;
+		break;
+	case EPosition::FootL:
+		HapticPosition = bhaptics::Position::FootL;
+		break;
+	case EPosition::FootR:
+		HapticPosition = bhaptics::Position::FootR;
+		break;
+	case EPosition::Racket:
+		HapticPosition = bhaptics::Position::Racket;
+		break;
 	default:
 		break;
 	}
@@ -267,6 +282,21 @@ void AHapticsManagerActor::SubmitDots(const FString &Key, EPosition PositionEnum
 		break;
 	case EPosition::VestBack:
 		HapticPosition = bhaptics::Position::VestBack;
+		break;
+	case EPosition::HandL:
+		HapticPosition = bhaptics::Position::HandL;
+		break;
+	case EPosition::HandR:
+		HapticPosition = bhaptics::Position::HandR;
+		break;
+	case EPosition::FootL:
+		HapticPosition = bhaptics::Position::FootL;
+		break;
+	case EPosition::FootR:
+		HapticPosition = bhaptics::Position::FootR;
+		break;
+	case EPosition::Racket:
+		HapticPosition = bhaptics::Position::Racket;
 		break;
 	default:
 		break;
@@ -310,6 +340,21 @@ void AHapticsManagerActor::SubmitPath(const FString &Key, EPosition PositionEnum
 		break;
 	case EPosition::VestBack:
 		HapticPosition = bhaptics::Position::VestBack;
+		break;
+	case EPosition::HandL:
+		HapticPosition = bhaptics::Position::HandL;
+		break;
+	case EPosition::HandR:
+		HapticPosition = bhaptics::Position::HandR;
+		break;
+	case EPosition::FootL:
+		HapticPosition = bhaptics::Position::FootL;
+		break;
+	case EPosition::FootR:
+		HapticPosition = bhaptics::Position::FootR;
+		break;
+	case EPosition::Racket:
+		HapticPosition = bhaptics::Position::Racket;
 		break;
 	default:
 		break;

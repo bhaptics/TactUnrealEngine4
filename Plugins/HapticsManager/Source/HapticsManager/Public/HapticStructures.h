@@ -12,6 +12,8 @@ enum class EPosition : uint8
 	Vest = 3,
 	Head = 4,
 	Racket = 5,
+	HandL = 6, HandR = 7,
+	FootL = 8, FootR = 9,
 	VestFront = 201, VestBack = 202,
 	GloveLeft = 203, GloveRight = 204,
 	Custom1 = 251, Custom2 = 252, Custom3 = 253, Custom4 = 254

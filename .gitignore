@@ -76,8 +76,12 @@ DerivedDataCache/*
 
 #Packaged Folder
 Packaged/*
+Package/*
 
 #Plugin Folders
 Plugins/*/Intermediate/*
 
 Plugins/*/Binaries/*
+
+#zip files
+*.zip
