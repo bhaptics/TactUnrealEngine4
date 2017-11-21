@@ -40,7 +40,7 @@ void AHapticsManagerActor::OnConstruction(const FTransform & Transform)
 			FilePath.Append(FileName);
 			FString Key = FileName.Left(index);
 
-			RegisterFeeback(Key, FilePath);
+			//RegisterFeeback(Key, FilePath);
 			HapticFileNames.AddUnique(*Key);
 		}
 	}

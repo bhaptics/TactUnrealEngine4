@@ -80,6 +80,13 @@ namespace bhaptics
                 }
 	            ws.reset(WebSocket::create(host, port, path));
                 prevReconnect = current;
+
+				PlayerRequest* request = getActiveRequest();
+				for (size_t i = 0; i < _registered.size(); i++)
+				{
+					request->Register.push_back(_registered[i]);
+				}
+				send();
             }
         }
 
@@ -345,8 +352,7 @@ namespace bhaptics
         void destroy()
         {
 			_enable = false;
-			
-            if (!ws)
+			if (!ws)
             {
                 return;
             }
