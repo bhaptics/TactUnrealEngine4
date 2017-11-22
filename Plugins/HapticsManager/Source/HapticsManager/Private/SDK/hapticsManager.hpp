@@ -32,6 +32,10 @@ namespace bhaptics
 		vector<string> _activeKeys;
 
         mutex mtx;
+		mutex sendMtx;
+		mutex registerMtx;
+		mutex pollMtx;
+
         int _currentTime = 0;
         int _interval = 20;
         int _motorSize = 20;
@@ -47,6 +51,8 @@ namespace bhaptics
         std::chrono::steady_clock::time_point prevReconnect;
 
 		HapticPlayer() {}
+
+		bool isRegisterSent = true;
 
         void reconnect()
         {
@@ -71,24 +77,38 @@ namespace bhaptics
 
             if (values > reconnectSec)
             {
-                auto tried = unique_ptr<WebSocket>(WebSocket::create(host, port, path));
-                if (tried)
-                {
-					tried->close();
-					tried->poll();
-                    ws.reset(WebSocket::create(host, port, path));
-                }
-	            ws.reset(WebSocket::create(host, port, path));
-                prevReconnect = current;
+     
+				ws.reset(WebSocket::create(host, port, path));
 
-				PlayerRequest* request = getActiveRequest();
-				for (size_t i = 0; i < _registered.size(); i++)
-				{
-					request->Register.push_back(_registered[i]);
-				}
-				send();
+				isRegisterSent = false;
+				
+                prevReconnect = current;
             }
+
+
         }
+
+		void resendRegistered()
+		{
+			
+			if (connectionCheck() && _registered.size()>0)
+			{
+				
+				PlayerRequest* request = getActiveRequest();
+
+				vector<RegisterRequest> tempRegister = _registered;
+				//request->Register = tempRegister;
+				
+				for (size_t i = 0; i < tempRegister.size(); i++)
+				{
+					request->Register.push_back(tempRegister[i]);
+				}
+				
+				send();
+
+				isRegisterSent = true;
+			}
+		}
 
 		PlayerRequest* getActiveRequest()
 		{
@@ -106,12 +126,14 @@ namespace bhaptics
                 return false;
             }
 
-            if (ws->getReadyState() == WebSocket::CLOSED)
+			WebSocket::readyStateValues isClosed = ws->getReadyState();
+            
+			if (isClosed == WebSocket::CLOSED)
             {
-                ws.reset();
+                ws.reset(nullptr);
                 return false;
             }
-
+			
             return true;
         }
 
@@ -121,7 +143,6 @@ namespace bhaptics
             {
                 return;
             }
-
 			TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject);
 			getActiveRequest()->to_json(*JsonObject);
 
@@ -129,40 +150,46 @@ namespace bhaptics
 			TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&OutputString);
 			FJsonSerializer::Serialize(JsonObject.ToSharedRef(), Writer);
 			std::string jStr(TCHAR_TO_UTF8(*OutputString));
-			mtx.lock();
-            ws->send(jStr);
+			
+			pollMtx.lock();
+			ws->send(jStr);
             ws->poll();
+			pollMtx.unlock();
+
 			_activeRequest = nullptr;
-			mtx.unlock();
         }
 
         void updateActive(const string &key, const Frame& signal)
         {
-			if (!_enable)
+			if (!_enable || !connectionCheck())
 			{
 				return;
 			}
+			sendMtx.lock();
 			SubmitRequest req;
 			req.Frame = signal;
 			req.Key = key;
 			req.Type = "frame";
 			getActiveRequest()->Submit.push_back(req);
+			
 			send();
+			sendMtx.unlock();
         }
 
         void remove(const string &key)
         {
-			if (!_enable)
+			if (!_enable || !connectionCheck())
 			{
 				return;
 			}
-			
+			sendMtx.lock();
 			SubmitRequest req;
 			req.Key = key;
 			req.Type = "turnOff";
 			getActiveRequest()->Submit.push_back(req);
 
 			send();
+			sendMtx.unlock();
         }
 
         void removeAll()
@@ -171,18 +198,28 @@ namespace bhaptics
 			{
 				return;
 			}
-
+			sendMtx.lock();
 			SubmitRequest req;
 			req.Type = "turnOffAll";
 
 			getActiveRequest()->Submit.push_back(req);
 
 			send();
+			sendMtx.unlock();
         }
 
         void doRepeat()
         {
             reconnect();
+
+			registerMtx.lock();
+			if (!isRegisterSent)
+			{
+				resendRegistered();
+			}
+			registerMtx.unlock();
+
+			checkMessage();
 
             _currentTime += _interval;
         }
@@ -199,15 +236,21 @@ namespace bhaptics
         int registerFeedback(const string &key, const string &filePath)
         {
             HapticFile file = Util::parse(filePath);
+			sendMtx.lock();
 			RegisterRequest req;
 			req.Key = key;
 			req.Project = file.project;
+
+			registerMtx.lock();
 			_registered.push_back(req);
+			
 
 			PlayerRequest* request = getActiveRequest();
 			request->Register.push_back(req);
 
 			send();
+			registerMtx.unlock();
+			sendMtx.unlock();
             return 0;
         }
 
@@ -229,7 +272,6 @@ namespace bhaptics
                 return;
             }
 #endif
-
             ws = unique_ptr<WebSocket>(WebSocket::create(host, port, path));
 
             connectionCheck();
@@ -239,7 +281,7 @@ namespace bhaptics
 
         void submit(const string &key, Position position, const vector<uint8_t> &motorBytes, int durationMillis)//change to submit - done
         {
-			if (!_enable)
+			if (!_enable|| !connectionCheck())
 			{
 				return;
 			}
@@ -282,7 +324,7 @@ namespace bhaptics
                 printf("not allowed intensity %f\n", duration);
                 return;
             }
-
+			sendMtx.lock();
 			SubmitRequest req;
 			req.Key = key;
 			req.Type = "key";
@@ -292,15 +334,17 @@ namespace bhaptics
 			getActiveRequest()->Submit.push_back(req);
 
 			send();
+			sendMtx.unlock();
         }
 
         void submitRegistered(const string &key)//change to submitRegistered - done
         {
-			if (!_enable)
+			if (!_enable|| !connectionCheck())
 			{
 				return;
 			}
-            
+
+			sendMtx.lock();
 			SubmitRequest req;
 			req.Key = key;
 			req.Type = "key";
@@ -308,6 +352,7 @@ namespace bhaptics
 			getActiveRequest()->Submit.push_back(req);
 
 			send();
+			sendMtx.unlock();
         }
 
         bool isPlaying()
@@ -342,11 +387,14 @@ namespace bhaptics
 				return;
 			}
 
-			if (dispatchFunctionVar != NULL)
+			if (dispatchFunctionVar != NULL && _enable)
 			{
+				pollMtx.lock();
 				ws->dispatchChar(dispatchFunctionVar);
+				ws->poll();
+				pollMtx.unlock();
 			}
-			ws->poll();
+			
 		}
 
         void destroy()
@@ -357,8 +405,10 @@ namespace bhaptics
                 return;
             }
 
+			pollMtx.lock();
 			ws->close();
 			ws->poll();
+			pollMtx.unlock();
 			ws.reset();
         }
 

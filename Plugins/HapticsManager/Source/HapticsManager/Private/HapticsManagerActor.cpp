@@ -18,7 +18,7 @@ AHapticsManagerActor::AHapticsManagerActor()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	bhaptics::HapticPlayer::instance()->destroy();
+	//bhaptics::HapticPlayer::instance()->destroy();
 
 }
 
@@ -150,7 +150,7 @@ void AHapticsManagerActor::Tick( float DeltaTime )
 		}
 	}
 	ChangedFeedbacks.Empty();
-	bhaptics::HapticPlayer::instance()->checkMessage();
+	//bhaptics::HapticPlayer::instance()->checkMessage();
 	m_Mutex.Unlock();
 }
 

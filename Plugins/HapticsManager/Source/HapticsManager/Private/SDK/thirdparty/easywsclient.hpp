@@ -243,7 +243,7 @@ namespace easywsclient {
         readyStateValues readyState;
         bool useMask;
 
-        _RealWebSocket(socket_t sockfd) : sockfd(sockfd), readyState(OPEN), useMask(useMask) {
+        _RealWebSocket(socket_t sockfd, bool useMask) : sockfd(sockfd), readyState(OPEN), useMask(useMask) {
         }
 
         readyStateValues getReadyState() const {
@@ -638,7 +638,7 @@ namespace easywsclient {
         fcntl(sockfd, F_SETFL, O_NONBLOCK);
 #endif
         fprintf(stderr, "Connected to: ws://%s:%d/%s\n", host, port, path);
-        return pointer(new _RealWebSocket(sockfd));
+        return pointer(new _RealWebSocket(sockfd,true));
     }
 } // namespace easywsclient
 
