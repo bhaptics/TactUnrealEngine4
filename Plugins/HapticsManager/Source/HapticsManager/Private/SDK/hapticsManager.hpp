@@ -440,7 +440,9 @@ namespace bhaptics
 		{
 			PlayerResponse response;
 			response.from_json(j);
+			mtx.lock();
 			_activeKeys = response.ActiveKeys;
+			mtx.unlock();
 			return response.Status;
 		}
 
