@@ -597,7 +597,7 @@ namespace bhaptics
 		{
 			j.SetNumberField("Index", Index);
 			j.SetNumberField("X", X);
-			j.SetNumberField("X", Y);
+			j.SetNumberField("Y", Y);
 		}
 
 		void from_json(FJsonObject& j)
