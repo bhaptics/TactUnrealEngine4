@@ -144,6 +144,18 @@ void AHapticsManagerActor::Tick( float DeltaTime )
 		case EPosition::Head:
 			VisualiseFeedback(Feedback, Tactal);
 			break;
+		case EPosition::HandL:
+			VisualiseFeedback(Feedback, TactGloveLeft);
+			break;
+		case EPosition::HandR:
+			VisualiseFeedback(Feedback, TactGloveRight);
+			break;
+		case EPosition::FootL:
+			VisualiseFeedback(Feedback, TactShoeLeft);
+			break;
+		case EPosition::FootR:
+			VisualiseFeedback(Feedback, TactShoeRight);
+			break;
 		default:
 			printf("Position not found.");
 			break;
@@ -426,6 +438,22 @@ void AHapticsManagerActor::UpdateDisplayedFeedback(const char *ReceivedMessage)
 			{
 				Position = EPosition::Racket;
 			}
+			else if (Device.first == "HandL")
+			{
+				Position = EPosition::HandL;
+			}
+			else if (Device.first == "HandR")
+			{
+				Position = EPosition::HandR;
+			}
+			else if (Device.first == "FootL")
+			{
+				Position = EPosition::FootL;
+			}
+			else if (Device.first == "FootR")
+			{
+				Position = EPosition::FootR;
+			}
 
 			for (size_t Index = 0; Index < Device.second.size(); Index++)
 			{
@@ -477,13 +505,18 @@ void AHapticsManagerActor::VisualiseFeedback(FHapticFeedback Feedback, TArray<US
 	}
 }
 
-void AHapticsManagerActor::SetTactoSuit(USceneComponent* SleeveLeft, USceneComponent* SleeveRight, USceneComponent* Head, USceneComponent* VestFront, USceneComponent* VestBack)
+void AHapticsManagerActor::SetTactoSuit(USceneComponent * SleeveLeft, USceneComponent * SleeveRight, USceneComponent * Head, USceneComponent * VestFront,
+	USceneComponent * VestBack, USceneComponent * GloveLeft, USceneComponent * GloveRight, USceneComponent * ShoeLeft, USceneComponent * ShoeRight)
 {
 	SleeveLeft->GetChildrenComponents(false,TactosyLeft);
 	SleeveRight->GetChildrenComponents(false, TactosyRight);
 	Head->GetChildrenComponents(false, Tactal);
 	VestFront->GetChildrenComponents(false, TactotFront);
 	VestBack->GetChildrenComponents(false, TactotBack);
+	GloveLeft->GetChildrenComponents(false, TactGloveLeft);
+	GloveRight->GetChildrenComponents(false, TactGloveRight);
+	ShoeLeft->GetChildrenComponents(false, TactShoeLeft);
+	ShoeRight->GetChildrenComponents(false, TactShoeRight);
 }
 
 void AHapticsManagerActor::Reset()
@@ -495,6 +528,10 @@ void AHapticsManagerActor::Reset()
 	VisualiseFeedback(BlankFeedback, TactosyRight);
 	VisualiseFeedback(BlankFeedback, TactotFront);
 	VisualiseFeedback(BlankFeedback, TactotBack);
+	VisualiseFeedback(BlankFeedback, TactGloveLeft);
+	VisualiseFeedback(BlankFeedback, TactGloveRight);
+	VisualiseFeedback(BlankFeedback, TactShoeLeft);
+	VisualiseFeedback(BlankFeedback, TactShoeRight);
 
 	bhaptics::HapticPlayer::instance()->destroy();
 	bhaptics::HapticPlayer::instance()->init();

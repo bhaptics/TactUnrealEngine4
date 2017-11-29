@@ -51,6 +51,18 @@ public:
 		TArray<USceneComponent*> Tactal;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Haptics")
+		TArray<USceneComponent*> TactGloveLeft;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Haptics")
+		TArray<USceneComponent*> TactGloveRight;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Haptics")
+		TArray<USceneComponent*> TactShoeLeft;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Haptics")
+		TArray<USceneComponent*> TactShoeRight;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Haptics")
 		bool UseProjectFeedbackFolder = false;
 
 	UFUNCTION(BlueprintCallable,
@@ -127,7 +139,8 @@ public:
 		 meta = (DisplayName = "Set the TactSuit Variables",
 			 Keywords = "bHaptics"),
 		 Category = "bHaptics")
-		 void SetTactoSuit(USceneComponent* SleeveLeft, USceneComponent* SleeveRight, USceneComponent* Head, USceneComponent* VestFront, USceneComponent* VestBack);
+		 void SetTactoSuit(USceneComponent* SleeveLeft, USceneComponent* SleeveRight, USceneComponent* Head, USceneComponent* VestFront, USceneComponent* VestBack,
+							USceneComponent* GloveLeft, USceneComponent* GloveRight, USceneComponent* ShoeLeft, USceneComponent* ShoeRight);
 
 	 UFUNCTION(BlueprintCallable,
 		 meta = (DisplayName = "Reset Player Connection",

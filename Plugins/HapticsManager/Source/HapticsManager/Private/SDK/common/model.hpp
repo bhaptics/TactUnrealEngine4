@@ -56,20 +56,40 @@ namespace bhaptics
 
         PathPoint(float _x, float _y, int _intensity)
         {
-			x = _x;
-			y = _y;
+			int xRnd = _x * 1000;
+			int yRnd = _y * 1000;
             intensity = _intensity;
 
 			if (_x < 0)
 			{
-
+				xRnd = 0;
 			}
+			else if (_x > 1)
+			{
+				xRnd = 1000;
+			}
+
+			if (_y < 0)
+			{
+				yRnd = 0;
+			}
+			else if (_y > 1)
+			{
+				yRnd = 1000;
+			}
+			
+			x = (float)(xRnd) / 1000;
+			y = (float)(yRnd) / 1000;
         }
 
 		void to_json(FJsonObject& j)
 		{
-			j.SetNumberField("X", x);
-			j.SetNumberField("Y", y);
+			double doubX = x;
+			double doubY = y;
+			/*j.SetNumberField("X", doubX);
+			j.SetNumberField("Y", doubY);*/
+			j.SetStringField("X", FString::SanitizeFloat(x));
+			j.SetStringField("Y", FString::SanitizeFloat(y));
 			j.SetNumberField("Intensity", intensity);
 		}
 
@@ -172,7 +192,11 @@ namespace bhaptics
 		void to_json(FJsonObject& j)
 		{
 			j.SetNumberField("Index", index);
-			j.SetNumberField("Intensity", intensity);
+
+			int intenseConvert = intensity * 1000;
+			double doubintensity = (double)(intenseConvert) / 1000;
+			//j.SetNumberField("Intensity", intensity);
+			j.SetStringField("Intensity", FString::SanitizeFloat(intensity));
 		}
 
 		void from_json(FJsonObject& j)
@@ -308,9 +332,23 @@ namespace bhaptics
 
 		void to_json(FJsonObject& j)
 		{
-			j.SetNumberField("X",X);
-			j.SetNumberField("Y", Y);
-			j.SetNumberField("Intensity", Intensity);
+
+			int intX = X*1000;
+			int intY = Y * 1000;
+			int intIntensity = Intensity*1000;
+
+			double doubX = (double)(intX) / 1000;
+			double doubY = (double)(intY) / 1000;
+			double doubIntensity = (double)(intIntensity) / 1000;
+/*
+			j.SetNumberField("X",doubX);
+			j.SetNumberField("Y", doubY);
+			j.SetNumberField("Intensity", doubIntensity);*/
+
+			j.SetStringField("X", FString::SanitizeFloat(doubX));
+			j.SetStringField("Y", FString::SanitizeFloat(doubY));
+			j.SetStringField("Intensity", FString::SanitizeFloat(doubIntensity));
+
 			j.SetNumberField("Time", Time);
 		}
 
@@ -595,9 +633,17 @@ namespace bhaptics
 
 		void to_json(FJsonObject& j)
 		{
+			int intX = X*1000;
+			int intY = Y*1000;
+
+			double doubX = (double)(intX) / 1000;
+			double doubY = (double)(intY) / 1000;
+
 			j.SetNumberField("Index", Index);
-			j.SetNumberField("X", X);
-			j.SetNumberField("Y", Y);
+			j.SetStringField("X", FString::SanitizeFloat(X));
+			j.SetStringField("Y", FString::SanitizeFloat(Y));
+			//j.SetNumberField("X", doubX);
+			//j.SetNumberField("Y", doubY);
 		}
 
 		void from_json(FJsonObject& j)
@@ -810,7 +856,10 @@ namespace bhaptics
 						TSharedPtr<FJsonObject> parameterObject = MakeShareable(new FJsonObject);
 			for (auto& p : Parameters)
 			{
-				parameterObject->SetNumberField(p.first.c_str(), p.second);
+				int intParam = p.second * 1000;
+				double param = (double)(intParam) / 1000;
+				//parameterObject->SetNumberField(p.first.c_str(), param);
+				parameterObject->SetStringField(p.first.c_str(), FString::SanitizeFloat(p.second));
 			}
 			if (parameterObject->Values.Num() > 0)
 			{
