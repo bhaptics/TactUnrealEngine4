@@ -7,6 +7,7 @@
 #include "HapticStructures.h"
 #include "HideWindowsPlatformTypes.h"
 #include "BhapticsUtilities.h"
+//#include "Utility/Include/HapticUtility.h"
 
 bhaptics::HapticPlayer *bhaptics::HapticPlayer::hapticManager = 0;
 
@@ -51,19 +52,25 @@ void AHapticsManagerActor::BeginPlay()
 {
 	Super::BeginPlay();
 
-	BhapticsUtilities::Init();
+	BhapticsUtilities::Initialise();
 	FString temp = BhapticsUtilities::GetExecutablePath();
+	//FString temp = FString(getExePath());
 
 	UE_LOG(LogTemp, Log, TEXT("%s"),*temp);
+	UE_LOG(LogTemp, Log, TEXT("Passed the executable path"));
 
+	
+	//if(!isPlayerRunning())
 	if (!BhapticsUtilities::IsPlayerRunning())
 	{
 		UE_LOG(LogTemp, Log, TEXT("Player is not running"));
 
+		//if (isPlayerInstalled())
 		if (BhapticsUtilities::IsPlayerInstalled())
 		{
 			UE_LOG(LogTemp, Log, TEXT("Player is installed - launching"));
 			BhapticsUtilities::LaunchPlayer();
+			//launchPlayer();
 		}
 		else
 		{
@@ -75,7 +82,7 @@ void AHapticsManagerActor::BeginPlay()
 		UE_LOG(LogTemp, Log, TEXT("Player is running"));
 	}
 
-	BhapticsUtilities::Free();
+	//BhapticsUtilities::Free();
 
 	bhaptics::HapticPlayer::instance()->dispatchFunctionVar = UpdateDisplayedFeedback;
 	bhaptics::HapticPlayer::instance()->init();
@@ -86,6 +93,11 @@ void AHapticsManagerActor::BeginPlay()
 	InitialiseDots(TactosyRight);
 	InitialiseDots(TactotBack);
 	InitialiseDots(TactotFront);
+	InitialiseDots(TactGloveLeft);
+	InitialiseDots(TactGloveRight);
+	InitialiseDots(TactShoeLeft);
+	InitialiseDots(TactShoeRight);
+	InitialiseDots(TactRacket);
 	//*/
 
 	TArray<FString> HapticFiles;
@@ -156,6 +168,8 @@ void AHapticsManagerActor::Tick( float DeltaTime )
 		case EPosition::FootR:
 			VisualiseFeedback(Feedback, TactShoeRight);
 			break;
+		case EPosition::Racket:
+			VisualiseFeedback(Feedback, TactRacket);
 		default:
 			printf("Position not found.");
 			break;
@@ -454,6 +468,10 @@ void AHapticsManagerActor::UpdateDisplayedFeedback(const char *ReceivedMessage)
 			{
 				Position = EPosition::FootR;
 			}
+			else
+			{
+
+			}
 
 			for (size_t Index = 0; Index < Device.second.size(); Index++)
 			{
@@ -480,7 +498,7 @@ void AHapticsManagerActor::InitialiseDots(TArray<USceneComponent*> TactSuitItem)
 		}
 
 		UMaterialInstanceDynamic* DotMaterial = DotMesh->CreateAndSetMaterialInstanceDynamicFromMaterial(0,DotMesh->GetMaterial(0));
-		DotMesh->SetRelativeScale3D(FVector(0.2, 0.2, 0.2));
+		//DotMesh->SetRelativeScale3D(FVector(0.2, 0.2, 0.2));
 	}
 }
 
@@ -500,23 +518,61 @@ void AHapticsManagerActor::VisualiseFeedback(FHapticFeedback Feedback, TArray<US
 		}
 		
 		UMaterialInstanceDynamic* DotMaterial = Cast<UMaterialInstanceDynamic>(DotMesh->GetMaterial(0));
-		DotMaterial->SetVectorParameterValue("Base Color", FLinearColor(0.8 + Scale*0.2, 0.8 + Scale*0.01, 0.8 - Scale*0.79, 0.2 - 0.2*Scale));
-		DotMesh->SetRelativeScale3D(FVector(0.2 + 0.15*(Scale*0.8), 0.2 + 0.15*(Scale*0.8), 0.2 + 0.15*(Scale*0.8)));
+		DotMaterial->SetVectorParameterValue("Base Color", FLinearColor(0.8 + Scale*0.2, 0.8 + Scale*0.01, 0.8 - Scale*0.8, 1.0));
+		DotMesh->SetRelativeScale3D(FVector(0.3 + 0.15*(Scale*0.8), 0.3 + 0.15*(Scale*0.8), 0.5 + 0.15*(Scale*0.8)));
 	}
 }
 
 void AHapticsManagerActor::SetTactoSuit(USceneComponent * SleeveLeft, USceneComponent * SleeveRight, USceneComponent * Head, USceneComponent * VestFront,
-	USceneComponent * VestBack, USceneComponent * GloveLeft, USceneComponent * GloveRight, USceneComponent * ShoeLeft, USceneComponent * ShoeRight)
+	USceneComponent * VestBack, USceneComponent * GloveLeft, USceneComponent * GloveRight, USceneComponent * ShoeLeft, USceneComponent * ShoeRight, USceneComponent * Racket)
 {
-	SleeveLeft->GetChildrenComponents(false,TactosyLeft);
-	SleeveRight->GetChildrenComponents(false, TactosyRight);
-	Head->GetChildrenComponents(false, Tactal);
-	VestFront->GetChildrenComponents(false, TactotFront);
-	VestBack->GetChildrenComponents(false, TactotBack);
-	GloveLeft->GetChildrenComponents(false, TactGloveLeft);
-	GloveRight->GetChildrenComponents(false, TactGloveRight);
-	ShoeLeft->GetChildrenComponents(false, TactShoeLeft);
-	ShoeRight->GetChildrenComponents(false, TactShoeRight);
+	if (SleeveLeft != NULL)
+	{
+		SleeveLeft->GetChildrenComponents(false, TactosyLeft);
+	}
+
+	if (SleeveRight != NULL)
+	{
+		SleeveRight->GetChildrenComponents(false, TactosyRight);
+	}
+
+	if(Head != NULL)
+	{
+		Head->GetChildrenComponents(false, Tactal);
+	}
+	if(VestFront != NULL)
+	{
+		VestFront->GetChildrenComponents(false, TactotFront);
+	}
+	if (VestBack != NULL)
+	{
+		VestBack->GetChildrenComponents(false, TactotBack);
+	}
+
+	if (GloveLeft!=NULL)
+	{
+		GloveLeft->GetChildrenComponents(false, TactGloveLeft);
+	}	
+
+	if (GloveRight!= NULL)
+	{
+		GloveRight->GetChildrenComponents(false, TactGloveRight);
+	}
+
+	if (ShoeLeft != NULL)
+	{
+		ShoeLeft->GetChildrenComponents(false, TactShoeLeft);
+	}
+
+	if (ShoeRight != NULL)
+	{
+		ShoeRight->GetChildrenComponents(false, TactShoeRight);
+	}
+	
+	if(Racket!=NULL)
+	{
+		Racket->GetChildrenComponents(false, TactRacket);
+	}
 }
 
 void AHapticsManagerActor::Reset()
@@ -532,6 +588,7 @@ void AHapticsManagerActor::Reset()
 	VisualiseFeedback(BlankFeedback, TactGloveRight);
 	VisualiseFeedback(BlankFeedback, TactShoeLeft);
 	VisualiseFeedback(BlankFeedback, TactShoeRight);
+	VisualiseFeedback(BlankFeedback, TactRacket);
 
 	bhaptics::HapticPlayer::instance()->destroy();
 	bhaptics::HapticPlayer::instance()->init();

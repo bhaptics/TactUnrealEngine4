@@ -44,13 +44,19 @@ public class HapticsManager : ModuleRules
                 "HapticsManager",
                 "Json",
                 "JsonUtilities",
+                "Projects"
                 //"Sockets",
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);
-		
-		
-		DynamicallyLoadedModuleNames.AddRange(
+
+        //string BinaryLocation = Directory.GetParent(ModuleDirectory).ToString();
+        //PublicIncludePaths.Add(BinaryLocation + @"DLLs\Include");
+        //PublicIncludePaths.Add(BinaryLocation + @"Utility\Include");
+        
+        //PublicAdditionalLibraries.Add(BinaryLocation + @"\Utility\Libraries\bHapticUtility.lib");//D:\bHapticsManager\bHapticsRelease - Gitlab\Plugins\HapticsManager\Binaries\Win64\bHapticUtility.lib
+        
+        DynamicallyLoadedModuleNames.AddRange(
 			new string[]
 			{
 				// ... add any modules that your module loads dynamically here ...

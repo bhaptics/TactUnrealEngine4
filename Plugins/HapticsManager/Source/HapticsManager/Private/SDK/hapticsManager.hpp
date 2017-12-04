@@ -31,10 +31,10 @@ namespace bhaptics
 		
 		vector<string> _activeKeys;
 
-        mutex mtx;
-		mutex sendMtx;
-		mutex registerMtx;
-		mutex pollMtx;
+        mutex mtx;// mutex for _activeKeys variable
+		mutex sendMtx; //mutex for _activeRequest
+		mutex registerMtx; //mutex for _registered variable
+		mutex pollMtx; //mutex to synchronise poll() methods.
 
         int _currentTime = 0;
         int _interval = 20;
@@ -85,7 +85,6 @@ namespace bhaptics
                 prevReconnect = current;
             }
 
-
         }
 
 		void resendRegistered()
@@ -93,11 +92,8 @@ namespace bhaptics
 			
 			if (connectionCheck() && _registered.size()>0)
 			{
-				
 				PlayerRequest* request = getActiveRequest();
-
 				vector<RegisterRequest> tempRegister = _registered;
-				//request->Register = tempRegister;
 				
 				for (size_t i = 0; i < tempRegister.size(); i++)
 				{
@@ -337,7 +333,7 @@ namespace bhaptics
 			sendMtx.unlock();
         }
 
-        void submitRegistered(const string &key)//change to submitRegistered - done
+        void submitRegistered(const string &key)
         {
 			if (!_enable|| !connectionCheck())
 			{
@@ -440,7 +436,9 @@ namespace bhaptics
 		{
 			PlayerResponse response;
 			response.from_json(j);
+			mtx.lock();
 			_activeKeys = response.ActiveKeys;
+			mtx.unlock();
 			return response.Status;
 		}
 

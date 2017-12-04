@@ -63,6 +63,9 @@ public:
 		TArray<USceneComponent*> TactShoeRight;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Haptics")
+		TArray<USceneComponent*> TactRacket;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Haptics")
 		bool UseProjectFeedbackFolder = false;
 
 	UFUNCTION(BlueprintCallable,
@@ -140,7 +143,7 @@ public:
 			 Keywords = "bHaptics"),
 		 Category = "bHaptics")
 		 void SetTactoSuit(USceneComponent* SleeveLeft, USceneComponent* SleeveRight, USceneComponent* Head, USceneComponent* VestFront, USceneComponent* VestBack,
-							USceneComponent* GloveLeft, USceneComponent* GloveRight, USceneComponent* ShoeLeft, USceneComponent* ShoeRight);
+							USceneComponent* GloveLeft, USceneComponent* GloveRight, USceneComponent* ShoeLeft, USceneComponent* ShoeRight, USceneComponent* Racket);
 
 	 UFUNCTION(BlueprintCallable,
 		 meta = (DisplayName = "Reset Player Connection",

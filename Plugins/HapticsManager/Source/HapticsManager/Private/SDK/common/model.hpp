@@ -84,10 +84,6 @@ namespace bhaptics
 
 		void to_json(FJsonObject& j)
 		{
-			double doubX = x;
-			double doubY = y;
-			/*j.SetNumberField("X", doubX);
-			j.SetNumberField("Y", doubY);*/
 			j.SetStringField("X", FString::SanitizeFloat(x));
 			j.SetStringField("Y", FString::SanitizeFloat(y));
 			j.SetNumberField("Intensity", intensity);
@@ -193,9 +189,6 @@ namespace bhaptics
 		{
 			j.SetNumberField("Index", index);
 
-			int intenseConvert = intensity * 1000;
-			double doubintensity = (double)(intenseConvert) / 1000;
-			//j.SetNumberField("Intensity", intensity);
 			j.SetStringField("Intensity", FString::SanitizeFloat(intensity));
 		}
 
@@ -332,22 +325,9 @@ namespace bhaptics
 
 		void to_json(FJsonObject& j)
 		{
-
-			int intX = X*1000;
-			int intY = Y * 1000;
-			int intIntensity = Intensity*1000;
-
-			double doubX = (double)(intX) / 1000;
-			double doubY = (double)(intY) / 1000;
-			double doubIntensity = (double)(intIntensity) / 1000;
-/*
-			j.SetNumberField("X",doubX);
-			j.SetNumberField("Y", doubY);
-			j.SetNumberField("Intensity", doubIntensity);*/
-
-			j.SetStringField("X", FString::SanitizeFloat(doubX));
-			j.SetStringField("Y", FString::SanitizeFloat(doubY));
-			j.SetStringField("Intensity", FString::SanitizeFloat(doubIntensity));
+			j.SetStringField("X", FString::SanitizeFloat(X));
+			j.SetStringField("Y", FString::SanitizeFloat(Y));
+			j.SetStringField("Intensity", FString::SanitizeFloat(Intensity));
 
 			j.SetNumberField("Time", Time);
 		}
@@ -633,17 +613,9 @@ namespace bhaptics
 
 		void to_json(FJsonObject& j)
 		{
-			int intX = X*1000;
-			int intY = Y*1000;
-
-			double doubX = (double)(intX) / 1000;
-			double doubY = (double)(intY) / 1000;
-
 			j.SetNumberField("Index", Index);
 			j.SetStringField("X", FString::SanitizeFloat(X));
 			j.SetStringField("Y", FString::SanitizeFloat(Y));
-			//j.SetNumberField("X", doubX);
-			//j.SetNumberField("Y", doubY);
 		}
 
 		void from_json(FJsonObject& j)
@@ -744,7 +716,7 @@ namespace bhaptics
 		}
 	};
 
-	struct HapticFile//change to project - done
+	struct HapticFile
 	{
 		int intervalMillis;
 		int size;
@@ -846,6 +818,7 @@ namespace bhaptics
 		void to_json(FJsonObject& j)
 		{
 			TSharedPtr<FJsonObject> frameObject = MakeShareable(new FJsonObject);
+			TSharedPtr<FJsonObject> parameterObject = MakeShareable(new FJsonObject);
 
 			Frame.to_json(*frameObject);
 
@@ -853,14 +826,12 @@ namespace bhaptics
 			j.SetStringField("Key", Key.c_str());
 			j.SetObjectField("Frame", frameObject);
 
-						TSharedPtr<FJsonObject> parameterObject = MakeShareable(new FJsonObject);
+			
 			for (auto& p : Parameters)
 			{
-				int intParam = p.second * 1000;
-				double param = (double)(intParam) / 1000;
-				//parameterObject->SetNumberField(p.first.c_str(), param);
 				parameterObject->SetStringField(p.first.c_str(), FString::SanitizeFloat(p.second));
 			}
+
 			if (parameterObject->Values.Num() > 0)
 			{
 				j.SetObjectField("Parameters", parameterObject);
