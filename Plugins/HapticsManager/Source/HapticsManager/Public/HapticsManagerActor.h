@@ -68,10 +68,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Haptics")
 		bool UseProjectFeedbackFolder = false;
 
-	UFUNCTION(BlueprintCallable,
-		Category = "bHaptics")
-	FString LoadFeedbackFiles(TArray<FString>& FilesOut);
-
     UFUNCTION(BlueprintCallable, 
         meta = (DisplayName = "Submit registered feedback with key", 
             Keywords = "bHaptics"), 
@@ -113,12 +109,18 @@ public:
 			 Keywords = "bHaptics"),
 		 Category = "bHaptics")
 	 bool IsAnythingPlaying();
-
+	 
 	 UFUNCTION(BlueprintPure,
 		 meta = (DisplayName = "Is the specified registered feedback currently playing",
 			 Keywords = "bHaptics"),
 		 Category = "bHaptics")
 	 bool IsRegisteredPlaying(const FString &Key);
+
+	 UFUNCTION(BlueprintPure,
+		 meta = (DisplayName = "Is the device connected",
+			 Keywords = "bHaptics"),
+		 Category = "bHaptics")
+		 bool IsDeviceConnected(EPosition device);
 
 	 UFUNCTION(BlueprintCallable,
 		 meta = (DisplayName = "Turn off all feedback",
@@ -172,4 +174,5 @@ public:
 	 private:
 		 static FCriticalSection m_Mutex;
 		 bool MessagePlayed = false;
+		 FString LoadFeedbackFiles(TArray<FString>& FilesOut);
 };

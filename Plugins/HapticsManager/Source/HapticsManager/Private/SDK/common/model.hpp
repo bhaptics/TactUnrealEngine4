@@ -53,12 +53,25 @@ namespace bhaptics
         float x;
         float y;
         int intensity;
+		int MotorCount;
 
-        PathPoint(float _x, float _y, int _intensity)
+        PathPoint(float _x, float _y, int _intensity, int motorCount =3)
         {
 			int xRnd = _x * 1000;
 			int yRnd = _y * 1000;
             intensity = _intensity;
+			if (motorCount < 1)
+			{
+				MotorCount = 1;
+			}
+			else if (motorCount > 3)
+			{
+				MotorCount = 3;
+			}
+			else
+			{
+				MotorCount = motorCount;
+			}
 
 			if (_x < 0)
 			{
@@ -87,6 +100,7 @@ namespace bhaptics
 			j.SetStringField("X", FString::SanitizeFloat(x));
 			j.SetStringField("Y", FString::SanitizeFloat(y));
 			j.SetNumberField("Intensity", intensity);
+			j.SetNumberField("MotorCount", MotorCount);
 		}
 
     };
@@ -881,14 +895,16 @@ namespace bhaptics
 		vector<string> RegisteredKeys;
 		vector<string> ActiveKeys;
 		int ConnectedDeviceCount;
+		vector<Position> ConnectedPositions;
 		map<string, vector<int>> Status;
 
 		void from_json(FJsonObject& j)
 		{
 			TArray<TSharedPtr<FJsonValue>> regKeyValues = j.GetArrayField("RegisteredKeys");
 			TArray<TSharedPtr<FJsonValue>> activeKeyValues = j.GetArrayField("ActiveKeys");
-			TMap<FString,TSharedPtr<FJsonValue>> statusValues = j.GetObjectField("Status")->Values;
-
+			TMap<FString, TSharedPtr<FJsonValue>> statusValues = j.GetObjectField("Status")->Values;
+			const TArray<TSharedPtr<FJsonValue>> *connectedKeyValues;
+			
 			for (int i = 0; i < regKeyValues.Num(); i++)
 			{
 				RegisteredKeys.push_back(TCHAR_TO_UTF8(*regKeyValues[i]->AsString()));
@@ -898,6 +914,56 @@ namespace bhaptics
 			{
 				ActiveKeys.push_back(TCHAR_TO_UTF8(*activeKeyValues[i]->AsString()));
 			}
+			
+			if (j.TryGetArrayField("ConnectedPositions", connectedKeyValues))
+			{
+				for (int i = 0; i < connectedKeyValues->Num(); i++)
+				{
+					string DeviceValue = (TCHAR_TO_UTF8(*(*connectedKeyValues)[i]->AsString()));
+
+					if (DeviceValue == "Left")
+					{
+						ConnectedPositions.push_back(Position::Left);
+					}
+					else if (DeviceValue == "Right")
+					{
+						ConnectedPositions.push_back(Position::Right);
+					}
+					else if (DeviceValue == "VestFront")
+					{
+						ConnectedPositions.push_back(Position::VestFront);
+					}
+					else if (DeviceValue == "VestBack")
+					{
+						ConnectedPositions.push_back(Position::VestBack);
+					}
+					else if (DeviceValue == "Head")
+					{
+						ConnectedPositions.push_back(Position::Head);
+					}
+					else if (DeviceValue == "Racket")
+					{
+						ConnectedPositions.push_back(Position::Racket);
+					}
+					else if (DeviceValue == "HandL")
+					{
+						ConnectedPositions.push_back(Position::HandL);
+					}
+					else if (DeviceValue == "HandR")
+					{
+						ConnectedPositions.push_back(Position::HandR);
+					}
+					else if (DeviceValue == "FootL")
+					{
+						ConnectedPositions.push_back(Position::FootL);
+					}
+					else if (DeviceValue == "FootR")
+					{
+						ConnectedPositions.push_back(Position::FootR);
+					}
+				}
+			}
+		
 
 			for (auto& s : statusValues)
 			{

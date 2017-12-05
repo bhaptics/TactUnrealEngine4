@@ -29,13 +29,12 @@ void BhapticsUtilities::Initialise()
 {
 	FString FilePath = IPluginManager::Get().FindPlugin("HapticsManager")->GetBaseDir();//*FPaths::EnginePluginsDir();
 	FString FilePathProject = *FPaths::GameContentDir();
-	//FString PluginPath = IPluginManager::Get().FindPlugin("HapticsManager")->GetBaseDir();
 	
 #ifdef USEDLL64
 	FilePath.Append("/DLLs/bHapticUtility64.dll");
 	FilePathProject.Append("HapticsManager/DLLs/bHapticUtility64.dll");
 #else
-	FilePath.Append("MarketPlace/HapticsManager/DLLs/bHapticUtility32.dll");
+	FilePath.Append("/DLLs/bHapticUtility64.dll");
 #endif
 	
 	if (FPaths::FileExists(FilePath))
@@ -62,7 +61,6 @@ void BhapticsUtilities::Initialise()
 	{
 		UE_LOG(LogTemp, Log, TEXT("Could not find dll in %s"), *FilePath);
 	}
-	
 
 }
 

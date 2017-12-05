@@ -50,11 +50,6 @@ public class HapticsManager : ModuleRules
 			}
 			);
 
-        //string BinaryLocation = Directory.GetParent(ModuleDirectory).ToString();
-        //PublicIncludePaths.Add(BinaryLocation + @"DLLs\Include");
-        //PublicIncludePaths.Add(BinaryLocation + @"Utility\Include");
-        
-        //PublicAdditionalLibraries.Add(BinaryLocation + @"\Utility\Libraries\bHapticUtility.lib");//D:\bHapticsManager\bHapticsRelease - Gitlab\Plugins\HapticsManager\Binaries\Win64\bHapticUtility.lib
         
         DynamicallyLoadedModuleNames.AddRange(
 			new string[]

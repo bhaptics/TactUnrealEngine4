@@ -30,6 +30,7 @@ namespace bhaptics
 		unique_ptr<PlayerRequest> _activeRequest;
 		
 		vector<string> _activeKeys;
+		vector<Position> _activeDevices;
 
         mutex mtx;// mutex for _activeKeys variable
 		mutex sendMtx; //mutex for _activeRequest
@@ -438,8 +439,17 @@ namespace bhaptics
 			response.from_json(j);
 			mtx.lock();
 			_activeKeys = response.ActiveKeys;
+			_activeDevices = response.ConnectedPositions;
 			mtx.unlock();
 			return response.Status;
+		}
+
+		bool isDevicePlaying(Position device)
+		{
+			mtx.lock();
+			bool ret = std::find(_activeDevices.begin(), _activeDevices.end(), device) != _activeDevices.end();
+			mtx.unlock();
+			return ret;
 		}
 
 		HapticPlayer(HapticPlayer const&) = delete;

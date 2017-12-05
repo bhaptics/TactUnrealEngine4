@@ -7,7 +7,6 @@
 #include "HapticStructures.h"
 #include "HideWindowsPlatformTypes.h"
 #include "BhapticsUtilities.h"
-//#include "Utility/Include/HapticUtility.h"
 
 bhaptics::HapticPlayer *bhaptics::HapticPlayer::hapticManager = 0;
 
@@ -54,23 +53,19 @@ void AHapticsManagerActor::BeginPlay()
 
 	BhapticsUtilities::Initialise();
 	FString temp = BhapticsUtilities::GetExecutablePath();
-	//FString temp = FString(getExePath());
 
 	UE_LOG(LogTemp, Log, TEXT("%s"),*temp);
 	UE_LOG(LogTemp, Log, TEXT("Passed the executable path"));
 
 	
-	//if(!isPlayerRunning())
 	if (!BhapticsUtilities::IsPlayerRunning())
 	{
 		UE_LOG(LogTemp, Log, TEXT("Player is not running"));
 
-		//if (isPlayerInstalled())
 		if (BhapticsUtilities::IsPlayerInstalled())
 		{
 			UE_LOG(LogTemp, Log, TEXT("Player is installed - launching"));
 			BhapticsUtilities::LaunchPlayer();
-			//launchPlayer();
 		}
 		else
 		{
@@ -82,7 +77,7 @@ void AHapticsManagerActor::BeginPlay()
 		UE_LOG(LogTemp, Log, TEXT("Player is running"));
 	}
 
-	//BhapticsUtilities::Free();
+	BhapticsUtilities::Free();
 
 	bhaptics::HapticPlayer::instance()->dispatchFunctionVar = UpdateDisplayedFeedback;
 	bhaptics::HapticPlayer::instance()->init();
@@ -470,7 +465,7 @@ void AHapticsManagerActor::UpdateDisplayedFeedback(const char *ReceivedMessage)
 			}
 			else
 			{
-
+				continue;
 			}
 
 			for (size_t Index = 0; Index < Device.second.size(); Index++)
@@ -609,3 +604,46 @@ void AHapticsManagerActor::ToggleFeedback()
 	bhaptics::HapticPlayer::instance()->toggleFeedback();
 }
 
+bool AHapticsManagerActor::IsDeviceConnected(EPosition device)
+{
+	bhaptics::Position pos = bhaptics::Position::All;
+
+	switch (device)
+	{
+	case EPosition::Left:
+		pos = bhaptics::Position::Left;
+		break;
+	case EPosition::Right:
+		pos = bhaptics::Position::Right;
+		break;
+	case EPosition::Head:
+		pos = bhaptics::Position::Head;
+		break;
+	case EPosition::Racket:
+		pos = bhaptics::Position::Racket;
+		break;
+	case EPosition::HandL:
+		pos = bhaptics::Position::HandL;
+		break;
+	case EPosition::HandR:
+		pos = bhaptics::Position::HandR;
+		break;
+	case EPosition::FootL:
+		pos = bhaptics::Position::FootL;
+		break;
+	case EPosition::FootR:
+		pos = bhaptics::Position::FootR;
+		break;
+	case EPosition::VestFront:
+		pos = bhaptics::Position::VestFront;
+		break;
+	case EPosition::VestBack:
+		pos = bhaptics::Position::VestBack;
+		break;
+	default:
+		return false;
+		break;
+	}
+
+	return bhaptics::HapticPlayer::instance()->isDevicePlaying(pos);
+}
