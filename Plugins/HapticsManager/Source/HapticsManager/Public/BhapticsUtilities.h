@@ -18,7 +18,7 @@ public:
 
 	static void LaunchPlayer();
 
-	static void Init();
+	static void Initialise();
 
 	static void Free();
 

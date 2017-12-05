@@ -51,11 +51,13 @@ void AHapticsManagerActor::BeginPlay()
 {
 	Super::BeginPlay();
 
-	BhapticsUtilities::Init();
+	BhapticsUtilities::Initialise();
 	FString temp = BhapticsUtilities::GetExecutablePath();
 
 	UE_LOG(LogTemp, Log, TEXT("%s"),*temp);
+	UE_LOG(LogTemp, Log, TEXT("Passed the executable path"));
 
+	
 	if (!BhapticsUtilities::IsPlayerRunning())
 	{
 		UE_LOG(LogTemp, Log, TEXT("Player is not running"));
@@ -86,6 +88,11 @@ void AHapticsManagerActor::BeginPlay()
 	InitialiseDots(TactosyRight);
 	InitialiseDots(TactotBack);
 	InitialiseDots(TactotFront);
+	InitialiseDots(TactGloveLeft);
+	InitialiseDots(TactGloveRight);
+	InitialiseDots(TactShoeLeft);
+	InitialiseDots(TactShoeRight);
+	InitialiseDots(TactRacket);
 	//*/
 
 	TArray<FString> HapticFiles;
@@ -144,6 +151,20 @@ void AHapticsManagerActor::Tick( float DeltaTime )
 		case EPosition::Head:
 			VisualiseFeedback(Feedback, Tactal);
 			break;
+		case EPosition::HandL:
+			VisualiseFeedback(Feedback, TactGloveLeft);
+			break;
+		case EPosition::HandR:
+			VisualiseFeedback(Feedback, TactGloveRight);
+			break;
+		case EPosition::FootL:
+			VisualiseFeedback(Feedback, TactShoeLeft);
+			break;
+		case EPosition::FootR:
+			VisualiseFeedback(Feedback, TactShoeRight);
+			break;
+		case EPosition::Racket:
+			VisualiseFeedback(Feedback, TactRacket);
 		default:
 			printf("Position not found.");
 			break;
@@ -426,6 +447,26 @@ void AHapticsManagerActor::UpdateDisplayedFeedback(const char *ReceivedMessage)
 			{
 				Position = EPosition::Racket;
 			}
+			else if (Device.first == "HandL")
+			{
+				Position = EPosition::HandL;
+			}
+			else if (Device.first == "HandR")
+			{
+				Position = EPosition::HandR;
+			}
+			else if (Device.first == "FootL")
+			{
+				Position = EPosition::FootL;
+			}
+			else if (Device.first == "FootR")
+			{
+				Position = EPosition::FootR;
+			}
+			else
+			{
+				continue;
+			}
 
 			for (size_t Index = 0; Index < Device.second.size(); Index++)
 			{
@@ -452,7 +493,7 @@ void AHapticsManagerActor::InitialiseDots(TArray<USceneComponent*> TactSuitItem)
 		}
 
 		UMaterialInstanceDynamic* DotMaterial = DotMesh->CreateAndSetMaterialInstanceDynamicFromMaterial(0,DotMesh->GetMaterial(0));
-		DotMesh->SetRelativeScale3D(FVector(0.2, 0.2, 0.2));
+		//DotMesh->SetRelativeScale3D(FVector(0.2, 0.2, 0.2));
 	}
 }
 
@@ -472,18 +513,61 @@ void AHapticsManagerActor::VisualiseFeedback(FHapticFeedback Feedback, TArray<US
 		}
 		
 		UMaterialInstanceDynamic* DotMaterial = Cast<UMaterialInstanceDynamic>(DotMesh->GetMaterial(0));
-		DotMaterial->SetVectorParameterValue("Base Color", FLinearColor(0.8 + Scale*0.2, 0.8 + Scale*0.01, 0.8 - Scale*0.79, 0.2 - 0.2*Scale));
-		DotMesh->SetRelativeScale3D(FVector(0.2 + 0.15*(Scale*0.8), 0.2 + 0.15*(Scale*0.8), 0.2 + 0.15*(Scale*0.8)));
+		DotMaterial->SetVectorParameterValue("Base Color", FLinearColor(0.8 + Scale*0.2, 0.8 + Scale*0.01, 0.8 - Scale*0.8, 1.0));
+		DotMesh->SetRelativeScale3D(FVector(0.3 + 0.15*(Scale*0.8), 0.3 + 0.15*(Scale*0.8), 0.5 + 0.15*(Scale*0.8)));
 	}
 }
 
-void AHapticsManagerActor::SetTactoSuit(USceneComponent* SleeveLeft, USceneComponent* SleeveRight, USceneComponent* Head, USceneComponent* VestFront, USceneComponent* VestBack)
+void AHapticsManagerActor::SetTactoSuit(USceneComponent * SleeveLeft, USceneComponent * SleeveRight, USceneComponent * Head, USceneComponent * VestFront,
+	USceneComponent * VestBack, USceneComponent * GloveLeft, USceneComponent * GloveRight, USceneComponent * ShoeLeft, USceneComponent * ShoeRight, USceneComponent * Racket)
 {
-	SleeveLeft->GetChildrenComponents(false,TactosyLeft);
-	SleeveRight->GetChildrenComponents(false, TactosyRight);
-	Head->GetChildrenComponents(false, Tactal);
-	VestFront->GetChildrenComponents(false, TactotFront);
-	VestBack->GetChildrenComponents(false, TactotBack);
+	if (SleeveLeft != NULL)
+	{
+		SleeveLeft->GetChildrenComponents(false, TactosyLeft);
+	}
+
+	if (SleeveRight != NULL)
+	{
+		SleeveRight->GetChildrenComponents(false, TactosyRight);
+	}
+
+	if(Head != NULL)
+	{
+		Head->GetChildrenComponents(false, Tactal);
+	}
+	if(VestFront != NULL)
+	{
+		VestFront->GetChildrenComponents(false, TactotFront);
+	}
+	if (VestBack != NULL)
+	{
+		VestBack->GetChildrenComponents(false, TactotBack);
+	}
+
+	if (GloveLeft!=NULL)
+	{
+		GloveLeft->GetChildrenComponents(false, TactGloveLeft);
+	}	
+
+	if (GloveRight!= NULL)
+	{
+		GloveRight->GetChildrenComponents(false, TactGloveRight);
+	}
+
+	if (ShoeLeft != NULL)
+	{
+		ShoeLeft->GetChildrenComponents(false, TactShoeLeft);
+	}
+
+	if (ShoeRight != NULL)
+	{
+		ShoeRight->GetChildrenComponents(false, TactShoeRight);
+	}
+	
+	if(Racket!=NULL)
+	{
+		Racket->GetChildrenComponents(false, TactRacket);
+	}
 }
 
 void AHapticsManagerActor::Reset()
@@ -495,6 +579,11 @@ void AHapticsManagerActor::Reset()
 	VisualiseFeedback(BlankFeedback, TactosyRight);
 	VisualiseFeedback(BlankFeedback, TactotFront);
 	VisualiseFeedback(BlankFeedback, TactotBack);
+	VisualiseFeedback(BlankFeedback, TactGloveLeft);
+	VisualiseFeedback(BlankFeedback, TactGloveRight);
+	VisualiseFeedback(BlankFeedback, TactShoeLeft);
+	VisualiseFeedback(BlankFeedback, TactShoeRight);
+	VisualiseFeedback(BlankFeedback, TactRacket);
 
 	bhaptics::HapticPlayer::instance()->destroy();
 	bhaptics::HapticPlayer::instance()->init();
@@ -515,3 +604,46 @@ void AHapticsManagerActor::ToggleFeedback()
 	bhaptics::HapticPlayer::instance()->toggleFeedback();
 }
 
+bool AHapticsManagerActor::IsDeviceConnected(EPosition device)
+{
+	bhaptics::Position pos = bhaptics::Position::All;
+
+	switch (device)
+	{
+	case EPosition::Left:
+		pos = bhaptics::Position::Left;
+		break;
+	case EPosition::Right:
+		pos = bhaptics::Position::Right;
+		break;
+	case EPosition::Head:
+		pos = bhaptics::Position::Head;
+		break;
+	case EPosition::Racket:
+		pos = bhaptics::Position::Racket;
+		break;
+	case EPosition::HandL:
+		pos = bhaptics::Position::HandL;
+		break;
+	case EPosition::HandR:
+		pos = bhaptics::Position::HandR;
+		break;
+	case EPosition::FootL:
+		pos = bhaptics::Position::FootL;
+		break;
+	case EPosition::FootR:
+		pos = bhaptics::Position::FootR;
+		break;
+	case EPosition::VestFront:
+		pos = bhaptics::Position::VestFront;
+		break;
+	case EPosition::VestBack:
+		pos = bhaptics::Position::VestBack;
+		break;
+	default:
+		return false;
+		break;
+	}
+
+	return bhaptics::HapticPlayer::instance()->isDevicePlaying(pos);
+}

@@ -51,11 +51,22 @@ public:
 		TArray<USceneComponent*> Tactal;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Haptics")
-		bool UseProjectFeedbackFolder = false;
+		TArray<USceneComponent*> TactGloveLeft;
 
-	UFUNCTION(BlueprintCallable,
-		Category = "bHaptics")
-	FString LoadFeedbackFiles(TArray<FString>& FilesOut);
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Haptics")
+		TArray<USceneComponent*> TactGloveRight;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Haptics")
+		TArray<USceneComponent*> TactShoeLeft;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Haptics")
+		TArray<USceneComponent*> TactShoeRight;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Haptics")
+		TArray<USceneComponent*> TactRacket;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Haptics")
+		bool UseProjectFeedbackFolder = false;
 
     UFUNCTION(BlueprintCallable, 
         meta = (DisplayName = "Submit registered feedback with key", 
@@ -98,12 +109,18 @@ public:
 			 Keywords = "bHaptics"),
 		 Category = "bHaptics")
 	 bool IsAnythingPlaying();
-
+	 
 	 UFUNCTION(BlueprintPure,
 		 meta = (DisplayName = "Is the specified registered feedback currently playing",
 			 Keywords = "bHaptics"),
 		 Category = "bHaptics")
 	 bool IsRegisteredPlaying(const FString &Key);
+
+	 UFUNCTION(BlueprintPure,
+		 meta = (DisplayName = "Is the device connected",
+			 Keywords = "bHaptics"),
+		 Category = "bHaptics")
+		 bool IsDeviceConnected(EPosition device);
 
 	 UFUNCTION(BlueprintCallable,
 		 meta = (DisplayName = "Turn off all feedback",
@@ -127,7 +144,8 @@ public:
 		 meta = (DisplayName = "Set the TactSuit Variables",
 			 Keywords = "bHaptics"),
 		 Category = "bHaptics")
-		 void SetTactoSuit(USceneComponent* SleeveLeft, USceneComponent* SleeveRight, USceneComponent* Head, USceneComponent* VestFront, USceneComponent* VestBack);
+		 void SetTactoSuit(USceneComponent* SleeveLeft, USceneComponent* SleeveRight, USceneComponent* Head, USceneComponent* VestFront, USceneComponent* VestBack,
+							USceneComponent* GloveLeft, USceneComponent* GloveRight, USceneComponent* ShoeLeft, USceneComponent* ShoeRight, USceneComponent* Racket);
 
 	 UFUNCTION(BlueprintCallable,
 		 meta = (DisplayName = "Reset Player Connection",
@@ -156,4 +174,5 @@ public:
 	 private:
 		 static FCriticalSection m_Mutex;
 		 bool MessagePlayed = false;
+		 FString LoadFeedbackFiles(TArray<FString>& FilesOut);
 };

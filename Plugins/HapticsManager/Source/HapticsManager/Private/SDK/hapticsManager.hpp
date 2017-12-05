@@ -30,11 +30,12 @@ namespace bhaptics
 		unique_ptr<PlayerRequest> _activeRequest;
 		
 		vector<string> _activeKeys;
+		vector<Position> _activeDevices;
 
-        mutex mtx;
-		mutex sendMtx;
-		mutex registerMtx;
-		mutex pollMtx;
+        mutex mtx;// mutex for _activeKeys variable
+		mutex sendMtx; //mutex for _activeRequest
+		mutex registerMtx; //mutex for _registered variable
+		mutex pollMtx; //mutex to synchronise poll() methods.
 
         int _currentTime = 0;
         int _interval = 20;
@@ -85,7 +86,6 @@ namespace bhaptics
                 prevReconnect = current;
             }
 
-
         }
 
 		void resendRegistered()
@@ -93,11 +93,8 @@ namespace bhaptics
 			
 			if (connectionCheck() && _registered.size()>0)
 			{
-				
 				PlayerRequest* request = getActiveRequest();
-
 				vector<RegisterRequest> tempRegister = _registered;
-				//request->Register = tempRegister;
 				
 				for (size_t i = 0; i < tempRegister.size(); i++)
 				{
@@ -337,7 +334,7 @@ namespace bhaptics
 			sendMtx.unlock();
         }
 
-        void submitRegistered(const string &key)//change to submitRegistered - done
+        void submitRegistered(const string &key)
         {
 			if (!_enable|| !connectionCheck())
 			{
@@ -442,8 +439,17 @@ namespace bhaptics
 			response.from_json(j);
 			mtx.lock();
 			_activeKeys = response.ActiveKeys;
+			_activeDevices = response.ConnectedPositions;
 			mtx.unlock();
 			return response.Status;
+		}
+
+		bool isDevicePlaying(Position device)
+		{
+			mtx.lock();
+			bool ret = std::find(_activeDevices.begin(), _activeDevices.end(), device) != _activeDevices.end();
+			mtx.unlock();
+			return ret;
 		}
 
 		HapticPlayer(HapticPlayer const&) = delete;

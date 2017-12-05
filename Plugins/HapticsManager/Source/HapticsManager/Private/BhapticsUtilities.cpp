@@ -1,8 +1,8 @@
 //Copyright bHaptics Inc. 2017
 
 #include "BhapticsUtilities.h"
+#include "IPluginManager.h"
 #include "HapticsManager.h"
-
 
 #if _WIN64
 #define USEDLL64
@@ -25,16 +25,18 @@ BhapticsUtilities::BhapticsUtilities()
 
 }
 
-void BhapticsUtilities::Init()
+void BhapticsUtilities::Initialise()
 {
-
-	FString FilePath = *FPaths::EnginePluginsDir();
+	FString FilePath = IPluginManager::Get().FindPlugin("HapticsManager")->GetBaseDir();//*FPaths::EnginePluginsDir();
+	FString FilePathProject = *FPaths::GameContentDir();
+	
 #ifdef USEDLL64
-	FilePath.Append("MarketPlace/HapticsManager/DLLs/bHapticUtility64.dll");
+	FilePath.Append("/DLLs/bHapticUtility64.dll");
+	FilePathProject.Append("HapticsManager/DLLs/bHapticUtility64.dll");
 #else
-	FilePath.Append("MarketPlace/HapticsManager/DLLs/bHapticUtility32.dll");
-#endif 
-
+	FilePath.Append("/DLLs/bHapticUtility64.dll");
+#endif
+	
 	if (FPaths::FileExists(FilePath))
 	{
 		v_dllHandle = FPlatformProcess::GetDllHandle(*FilePath);
@@ -45,11 +47,20 @@ void BhapticsUtilities::Init()
 		}
 		UE_LOG(LogTemp, Log, TEXT("Loading %s failed."), *FilePath);
 	}
+	else if (FPaths::FileExists(FilePathProject))
+	{
+		v_dllHandle = FPlatformProcess::GetDllHandle(*FilePathProject);
+
+		if (v_dllHandle != NULL)
+		{
+			return;
+		}
+		UE_LOG(LogTemp, Log, TEXT("Loading %s failed."), *FilePathProject);
+	}
 	else
 	{
 		UE_LOG(LogTemp, Log, TEXT("Could not find dll in %s"), *FilePath);
 	}
-	
 
 }
 
