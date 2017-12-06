@@ -70,15 +70,19 @@ struct FPathPoint
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Vars)
 	int32 Intensity;
 
-	FPathPoint(float _x, float _y, int32 _intensity)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Vars)
+		int32 MotorCount;
+
+	FPathPoint(float _x, float _y, int32 _intensity, int32 _motorCount = 3)
 	{
 		int XRound = _x * 1000;
 		int YRound = _y * 1000;
-		X = XRound/1000;
+		X = XRound / 1000;
 		Y = YRound / 1000;
 		X = FMath::Clamp(X, 0.0f, 1.0f);
 		Y = FMath::Clamp(Y, 0.0f, 1.0f);
 		Intensity = FMath::Clamp(_intensity, 0, 100);
+		MotorCount = FMath::Clamp(_motorCount, 1, 3);
 	}
 };
 

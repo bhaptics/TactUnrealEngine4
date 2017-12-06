@@ -341,7 +341,7 @@ void AHapticsManagerActor::SubmitPath(const FString &Key, EPosition PositionEnum
 
 	for (int32 i = 0; i < PathPoints.Num(); i++)
 	{
-		bhaptics::PathPoint Point(PathPoints[i].X, PathPoints[i].Y, PathPoints[i].Intensity);
+		bhaptics::PathPoint Point(PathPoints[i].X, PathPoints[i].Y, PathPoints[i].Intensity,PathPoints[i].MotorCount);
 		PathVector.push_back(Point);
 	}
 
