@@ -6,9 +6,9 @@ using UnrealBuildTool;
 
 public class HapticsManager : ModuleRules
 {
-    public HapticsManager(ReadOnlyTargetRules Target): base(Target)
+    public HapticsManager(TargetInfo Target)
 	{
-        PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
+        //PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
         PublicIncludePaths.AddRange(
 			new string[] {
                 "HapticsManager/Public"

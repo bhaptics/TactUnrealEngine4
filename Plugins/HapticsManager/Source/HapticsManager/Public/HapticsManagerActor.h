@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "Engine.h"
 #include "HapticStructures.h"
 #include "GameFramework/Actor.h"
@@ -66,7 +65,7 @@ public:
 		TArray<USceneComponent*> TactRacket;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Haptics")
-		bool UseProjectFeedbackFolder = false;
+		bool UseProjectFeedbackFolder = true;
 
     UFUNCTION(BlueprintCallable, 
         meta = (DisplayName = "Submit registered feedback with key", 
@@ -79,6 +78,12 @@ public:
             Keywords = "bHaptics"), 
                 Category = "bHaptics")
     void SubmitRegisteredIntesityDuration(const FString &Key, float Intensity, float Duration);
+
+	 UFUNCTION(BlueprintCallable,
+		 meta = (DisplayName = "Submit registered feedback with Transform",
+			 Keywords = "bHaptics"),
+		 Category = "bHaptics")
+		 void SubmitRegisteredTransform(const FString &Key, float DeltaX, float DeltaY, bool IsValueRotate);
 
     UFUNCTION(BlueprintCallable,
         meta = (DisplayName = "Register Haptic feedback",

@@ -1,6 +1,6 @@
 # bHaptics haptic devices Unreal Engine C++ plugin
 This project helps to utilize haptic devices in Unreal Engine 4
-Current version is 1.0.2
+Current version is 1.1.1
 
 ## Prerequisite
 * bHaptics Player has to be installed (Windows)
@@ -24,9 +24,10 @@ Current version is 1.0.2
 ### Presets
 * Presets can be constructed through using the bHaptics designer at https://designer.bhaptics.com
 * After signing in, you can create a new project and design a certain feedback effect for use in the game.
-* In order to use the feedback effect in Unreal, export the feedback file from the Designer and place the new file into the HapticsManager/Feedback folder in the Contents folder. Create these folder if they do not exist already.
+* In order to use the feedback effect in Unreal, export the feedback file from the Designer and place the new file into the HapticsManager/Feedback folder in the Contents folder. Create these folders if they do not exist already.
 * The files are automatically loaded by the HapticsManager blueprint on play, and are stored using the file name as a key.
 * To play the feedback effect, merely call the SubmitFeedback function from the Haptics Manager, using the specified feedback file's name as a key.
+* Example feedback files are given in the HapticsManager/Feedback folder in the Plugins directory. You can choose whether to access the feedback files from either the Plugins directory or the Project's contents directory through the UseProjectFeedbackFolder boolean variable. If true, it will use the files in the Project's Contents directory. It is set to true by default.
 
 ### Dots
 * You can also access each individual motor using the SubmitFeedbackUsingDots function, which takes in an array of DotPoints as an input.
@@ -69,7 +70,7 @@ Current version is 1.0.2
 * Official Website: http://www.bhaptics.com/
 * E-mail: contact@bhaptics.com
 
-Last update of README.md: Dec. 1st, 2017.
+Last update of README.md: Dec. 8th, 2017.
 
 
 ###### Copyright (c) 2017 bHaptics Inc. All rights reserved.

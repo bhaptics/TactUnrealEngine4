@@ -32,7 +32,7 @@ namespace bhaptics
 		vector<string> _activeKeys;
 		vector<Position> _activeDevices;
 
-        mutex mtx;// mutex for _activeKeys variable
+        mutex mtx;// mutex for _activeKeys and _activeDevices variable
 		mutex sendMtx; //mutex for _activeRequest
 		mutex registerMtx; //mutex for _registered variable
 		mutex pollMtx; //mutex to synchronise poll() methods.
@@ -325,8 +325,8 @@ namespace bhaptics
 			SubmitRequest req;
 			req.Key = key;
 			req.Type = "key";
-			req.Parameters["intensityRatio"] = intensity;
-			req.Parameters["durationRatio"] = duration;
+			req.Parameters["intensityRatio"] = std::to_string(intensity);
+			req.Parameters["durationRatio"] = std::to_string(duration);
 
 			getActiveRequest()->Submit.push_back(req);
 
@@ -351,6 +351,30 @@ namespace bhaptics
 			send();
 			sendMtx.unlock();
         }
+
+		void submitRegistered(const string &key, double deltaX, double deltaY, bool isValueRotate = true)
+		{
+			if (!_enable || !connectionCheck())
+			{
+				return;
+			}
+
+			sendMtx.lock();
+			TransformOption option;// = TransformOption(deltaX, deltaY, isRotateValue);
+			option.DeltaX = deltaX;
+			option.DeltaY = deltaY;
+			option.IsValueRotate = isValueRotate;
+			SubmitRequest req;
+			req.Key = key;
+			req.Type = "key";
+			req.Parameters["transformOption"] = option.to_string();
+			//req.Option = option;
+
+			getActiveRequest()->Submit.push_back(req);
+
+			send();
+			sendMtx.unlock();
+		}
 
         bool isPlaying()
         {

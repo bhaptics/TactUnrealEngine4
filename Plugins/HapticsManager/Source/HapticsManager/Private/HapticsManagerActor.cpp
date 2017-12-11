@@ -1,6 +1,6 @@
 //Copyright bHaptics Inc. 2017
 
-//#include "HapticsManagerPrivatePCH.h"
+#include "HapticsManagerPrivatePCH.h"
 #include "HapticsManagerActor.h"
 #include "AllowWindowsPlatformTypes.h"
 #include "SDK/hapticsManager.hpp"
@@ -39,7 +39,6 @@ void AHapticsManagerActor::OnConstruction(const FTransform & Transform)
 			FilePath.Append("/");
 			FilePath.Append(FileName);
 			FString Key = FileName.Left(index);
-
 			//RegisterFeeback(Key, FilePath);
 			HapticFileNames.AddUnique(*Key);
 		}
@@ -56,7 +55,6 @@ void AHapticsManagerActor::BeginPlay()
 
 	UE_LOG(LogTemp, Log, TEXT("%s"),*temp);
 	UE_LOG(LogTemp, Log, TEXT("Passed the executable path"));
-
 	
 	if (!BhapticsUtilities::IsPlayerRunning())
 	{
@@ -106,7 +104,6 @@ void AHapticsManagerActor::BeginPlay()
 		FilePath.Append("/");
 		FilePath.Append(FileName);
 		FString Key = FileName.Left(index);
-
 		RegisterFeeback(Key, FilePath);
 		HapticFileNames.AddUnique(*Key);
 	}
@@ -115,7 +112,6 @@ void AHapticsManagerActor::BeginPlay()
 
 void AHapticsManagerActor::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	//Super::End
 	bhaptics::HapticPlayer::instance()->destroy();
 }
 
@@ -187,6 +183,12 @@ void AHapticsManagerActor::SubmitRegisteredIntesityDuration(const FString &Key, 
 	bhaptics::HapticPlayer::instance()->submitRegistered(StandardKey, Intensity, Duration);
 }
 
+void AHapticsManagerActor::SubmitRegisteredTransform(const FString &Key, float DeltaX, float DeltaY, bool IsValueRotate)
+{
+	std::string StandardKey(TCHAR_TO_UTF8(*Key));
+	bhaptics::HapticPlayer::instance()->submitRegistered(StandardKey, DeltaX, DeltaY, IsValueRotate);
+}
+
 void AHapticsManagerActor::RegisterFeeback(const FString &Key, const FString &FilePath)
 {
     std::string stdKey(TCHAR_TO_UTF8(*Key));
@@ -205,11 +207,11 @@ void AHapticsManagerActor::RegisterFeeback(const FString &Key, const FString &Fi
 
 FString AHapticsManagerActor::LoadFeedbackFiles(TArray<FString>& FilesOut)
 {
-
 	FString RootFolderFullPath = FPaths::GameContentDir() + "HapticsManager/Feedback";
-	if (!FPaths::DirectoryExists(RootFolderFullPath) && !UseProjectFeedbackFolder)
+	if (!FPaths::DirectoryExists(RootFolderFullPath) || !UseProjectFeedbackFolder)
 	{
-		RootFolderFullPath = FPaths::ConvertRelativePathToFull(FPaths::EnginePluginsDir()) + "Marketplace/HapticsManager/Feedback";
+		//RootFolderFullPath = FPaths::ConvertRelativePathToFull(FPaths::EnginePluginsDir()) + "Marketplace/HapticsManager/Feedback";
+		RootFolderFullPath = IPluginManager::Get().FindPlugin("HapticsManager")->GetBaseDir()+ "/Feedback";
 	}
 	UE_LOG(LogTemp, Log, TEXT("Looking in dir : %s"), *RootFolderFullPath);
 
@@ -264,6 +266,7 @@ void AHapticsManagerActor::SubmitBytes(const FString &Key, EPosition PositionEnu
 		HapticPosition = bhaptics::Position::Racket;
 		break;
 	default:
+		//return;
 		break;
 	}
 	
@@ -320,6 +323,7 @@ void AHapticsManagerActor::SubmitDots(const FString &Key, EPosition PositionEnum
 		HapticPosition = bhaptics::Position::Racket;
 		break;
 	default:
+		//return;
 		break;
 	}
 
@@ -341,7 +345,7 @@ void AHapticsManagerActor::SubmitPath(const FString &Key, EPosition PositionEnum
 
 	for (int32 i = 0; i < PathPoints.Num(); i++)
 	{
-		bhaptics::PathPoint Point(PathPoints[i].X, PathPoints[i].Y, PathPoints[i].Intensity,PathPoints[i].MotorCount);
+		bhaptics::PathPoint Point(PathPoints[i].X, PathPoints[i].Y, PathPoints[i].Intensity, PathPoints[i].MotorCount);
 		PathVector.push_back(Point);
 	}
 
@@ -378,9 +382,9 @@ void AHapticsManagerActor::SubmitPath(const FString &Key, EPosition PositionEnum
 		HapticPosition = bhaptics::Position::Racket;
 		break;
 	default:
+		//return;
 		break;
 	}
-
 	
 	bhaptics::HapticPlayer::instance()->submit(StandardKey, HapticPosition, PathVector, DurationInMilliSecs);
 }

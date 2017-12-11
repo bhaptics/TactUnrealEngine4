@@ -807,6 +807,42 @@ namespace bhaptics
 		}
 	};
 
+	struct TransformOption
+	{
+		double DeltaX;
+		double DeltaY;
+		bool IsValueRotate;
+
+		//TransformOption(double deltaX, double deltaY, bool isValueRotate)
+		//{
+		//	DeltaX = deltaX;
+		//	DeltaY = deltaY;
+		//	IsValueRotate = isValueRotate;
+		//}
+
+		void to_json(FJsonObject& j)
+		{
+			j.SetNumberField("DeltaX", DeltaX);
+			j.SetNumberField("DeltaY", DeltaY);
+			j.SetBoolField("IsValueRotate", IsValueRotate);
+		}
+
+		string to_string()
+		{
+			string valRot = "";
+			if (IsValueRotate)
+			{
+				valRot = "true";
+			}
+			else
+			{
+				valRot = "false";
+			}
+			string ret = "{ \"DeltaX\" : " + std::to_string(DeltaX) + ", \"DeltaY\" : "+ std::to_string(DeltaY)+ ", \"IsValueRotate\" : "+ valRot +"}";
+			return ret;
+		}
+	};
+
 	struct RegisterRequest
 	{
 		string Key;
@@ -827,7 +863,7 @@ namespace bhaptics
 		string Type;
 		string Key;
 		Frame Frame;
-		map<string, float> Parameters;
+		map<string, string> Parameters;
 
 		void to_json(FJsonObject& j)
 		{
@@ -843,7 +879,7 @@ namespace bhaptics
 			
 			for (auto& p : Parameters)
 			{
-				parameterObject->SetStringField(p.first.c_str(), FString::SanitizeFloat(p.second));
+				parameterObject->SetStringField(p.first.c_str(), p.second.c_str());
 			}
 
 			if (parameterObject->Values.Num() > 0)

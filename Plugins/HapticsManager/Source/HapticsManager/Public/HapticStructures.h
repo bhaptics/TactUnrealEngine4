@@ -1,7 +1,6 @@
 //Copyright bHaptics Inc. 2017
 
 #pragma once
-#include "CoreMinimal.h"
 #include "Engine.h"
 #include "HapticStructures.generated.h"
 
@@ -59,6 +58,7 @@ struct FPathPoint
 		X = 0;
 		Y = 0;
 		Intensity = 0;
+		MotorCount = 3;
 	}
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Vars)
@@ -71,7 +71,7 @@ struct FPathPoint
 	int32 Intensity;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Vars)
-		int32 MotorCount;
+	int32 MotorCount;
 
 	FPathPoint(float _x, float _y, int32 _intensity, int32 _motorCount = 3)
 	{
