@@ -57,10 +57,10 @@ namespace bhaptics
 
         void reconnect()
         {
-			if (!_enable)
-			{
-				return;
-			}
+			//if (!_enable)
+			//{
+			//	return;
+			//}
 
             if (!retryConnection)
             {
@@ -435,10 +435,6 @@ namespace bhaptics
 
 		void enableFeedback()
 		{
-			if (!ws)
-			{
-				return;
-			}
 			_enable = true;
 		}
 

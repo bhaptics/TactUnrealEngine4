@@ -1,9 +1,9 @@
 {
-	"FileVersion": 3,
-	"Version": 2,
-	"VersionName": "1.1.1",
+  "FileVersion": 3,
+	"Version": 3,
+  "VersionName": "1.1.2",
 	"FriendlyName": "HapticsManager",
-	"Description": "bHaptics haptic library",
+	"Description": "bHaptics Haptic Library",
 	"Category": "Haptic",
 	"CreatedBy": "bHaptics Inc.",
 	"CreatedByURL": "http://bhaptics.com",

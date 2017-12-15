@@ -25,6 +25,7 @@ enum class EFeedbackMode: uint8
 	DOT_MODE	UMETA(DisplayName = "DOTMODE")
 };
 
+//Structure used to play individual motors on each device.
 USTRUCT(BlueprintType)
 struct FDotPoint
 {
@@ -42,13 +43,16 @@ struct FDotPoint
 		Intensity = FMath::Clamp(_intensity,0,100);
 	}
 	
+	//Index of the motor to be activated.
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = Vars)
 	int32 Index;
 
+	//Intensity of the vibration from 0 to 100
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Vars)
 	int32 Intensity;
 };
 
+//Structure to allow for continuous haptic feedback anywhere on the device, interpolating which motors are played.
 USTRUCT(BlueprintType)
 struct FPathPoint
 {
@@ -61,15 +65,19 @@ struct FPathPoint
 		MotorCount = 3;
 	}
 
+	//X-value position on the device from 0.0 to 1.0
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Vars)
 	float X;
 
+	//Y-value position on the device from 0.0 to 1.0
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Vars)
 	float Y;
 
+	//Intensity of the vibration from 0 to 100
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Vars)
 	int32 Intensity;
 
+	//Number of motors activated when interpolating the point from 1 to 3.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Vars)
 	int32 MotorCount;
 

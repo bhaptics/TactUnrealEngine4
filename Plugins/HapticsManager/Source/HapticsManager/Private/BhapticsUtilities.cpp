@@ -35,7 +35,7 @@ void BhapticsUtilities::Initialise()
 	FilePath.Append("/DLLs/bHapticUtility64.dll");
 	FilePathProject.Append("HapticsManager/DLLs/bHapticUtility64.dll");
 #else
-	FilePath.Append("/DLLs/bHapticUtility64.dll");
+	FilePath.Append("/DLLs/bHapticUtility32.dll");
 #endif
 	
 	if (FPaths::FileExists(FilePath))

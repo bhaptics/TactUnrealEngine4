@@ -42,6 +42,8 @@ void AHapticsManagerActor::OnConstruction(const FTransform & Transform)
 			//RegisterFeeback(Key, FilePath);
 			HapticFileNames.AddUnique(*Key);
 		}
+
+		HapticFileRootFolder = FileDirectory;
 	}
 }
 
@@ -108,6 +110,7 @@ void AHapticsManagerActor::BeginPlay()
 		HapticFileNames.AddUnique(*Key);
 	}
 
+	HapticFileRootFolder = FileDirectory;
 }
 
 void AHapticsManagerActor::EndPlay(const EEndPlayReason::Type EndPlayReason)
