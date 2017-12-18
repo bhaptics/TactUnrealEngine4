@@ -31,10 +31,13 @@ public:
 
     virtual void Destroyed() override;
 
+	TMap<FString, FString> FilePathMap;
+
 	//Names of files currently loaded by the HapticsManager
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Haptics")
 		TArray<FName> HapticFileNames;
 
+	//Root folder storing the files saved in the HapticFileNames Array.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Haptics")
 		FString HapticFileRootFolder;
 
@@ -68,36 +71,35 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Haptics")
 		TArray<USceneComponent*> TactRacket;
 
-
 	//Boolean to determine whether to load feedback files from the contents folder or the plugins directory.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Haptics")
 		bool UseProjectFeedbackFolder = true;
 
 	//Submit a registered feedback using the file name as a key
     UFUNCTION(BlueprintCallable, 
-        meta = (DisplayName = "Submit key", 
+        meta = (DisplayName = "Submit Key", 
             Keywords = "bHaptics"), 
                 Category = "bHaptics")
-    void SubmitRegistered(const FString &Key);
+    void SubmitKey(const FString &Key);
 
 	//Submit a registered feedback using the file name as a key, and scale the intensity and duration by given scales.
 	 UFUNCTION(BlueprintCallable,
-		meta = (DisplayName = "Submit key with Intensity and Duration",
+		meta = (DisplayName = "Submit Key with Intensity and Duration",
             Keywords = "bHaptics"), 
                 Category = "bHaptics")
-    void SubmitRegisteredIntesityDuration(const FString &Key, float Intensity, float Duration);
+    void SubmitKeyWithIntesityDuration(const FString &Key, float Intensity, float Duration);
 
 	 //Submit a registered feedback using the file name as a key and transform by the given deltaX and deltaY.
 	 //Also state if the feedback should continue when hitting an edge of the device or not.
 	 UFUNCTION(BlueprintCallable,
-		 meta = (DisplayName = "Submit key with Transform",
+		 meta = (DisplayName = "Submit Key with Transform",
 			 Keywords = "bHaptics"),
 		 Category = "bHaptics")
-		 void SubmitRegisteredTransform(const FString &Key, float DeltaX, float DeltaY, bool IsValueRotate);
+		 void SubmitKeyWithTransform(const FString &Key, float DeltaX, float DeltaY, bool IsValueRotated);
 
 	//Register a given feedback file from the given file path with the given key.
     UFUNCTION(BlueprintCallable,
-        meta = (DisplayName = "Register feedback",
+        meta = (DisplayName = "Register Feedback",
             Keywords = "bHaptics"),
         Category = "bHaptics")
     void RegisterFeeback(const FString &Key, const FString &FilePath);
@@ -158,12 +160,6 @@ public:
 		 Category = "bHaptics")
 	 void TurnOffRegisteredFeedback(const FString &Key);
 
-	 static void UpdateDisplayedFeedback(const char *ReceivedMessage);
-
-	 void InitialiseDots(TArray<USceneComponent*> TactoSuitItem);
-
-	 void VisualiseFeedback(FHapticFeedback Feedback, TArray<USceneComponent*> TactoSuitItem);
-
 	 //For use in the UI to set the dots used in visualisation.
 	 UFUNCTION(BlueprintCallable,
 		 meta = (DisplayName = "Set TactSuit Variables",
@@ -171,12 +167,6 @@ public:
 		 Category = "bHaptics")
 		 void SetTactoSuit(USceneComponent* SleeveLeft, USceneComponent* SleeveRight, USceneComponent* Head, USceneComponent* VestFront, USceneComponent* VestBack,
 							USceneComponent* GloveLeft, USceneComponent* GloveRight, USceneComponent* ShoeLeft, USceneComponent* ShoeRight, USceneComponent* Racket);
-
-	 UFUNCTION(BlueprintCallable,
-		 meta = (DisplayName = "Reset Player Connection",
-			 Keywords = "bHaptics"),
-		 Category = "bHaptics")
-		 void Reset();
 
 	 //Enable haptic feedback
 	 UFUNCTION(BlueprintCallable,
@@ -199,10 +189,14 @@ public:
 		 Category = "bHaptics")
 	 void ToggleFeedback();
 
-	 
 	  private:
 		 static FCriticalSection m_Mutex;
 		 bool MessagePlayed = false;
+
 		 FString LoadFeedbackFiles(TArray<FString>& FilesOut);
+		 void Reset();
+		 static void UpdateDisplayedFeedback(const char *ReceivedMessage);
+		 void VisualiseFeedback(FHapticFeedback Feedback, TArray<USceneComponent*> TactoSuitItem);
+		 void InitialiseDots(TArray<USceneComponent*> TactoSuitItem);
 
 };

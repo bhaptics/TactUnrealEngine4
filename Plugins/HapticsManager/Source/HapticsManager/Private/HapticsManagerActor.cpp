@@ -108,6 +108,7 @@ void AHapticsManagerActor::BeginPlay()
 		FString Key = FileName.Left(index);
 		RegisterFeeback(Key, FilePath);
 		HapticFileNames.AddUnique(*Key);
+		FilePathMap[Key] = FilePath;
 	}
 
 	HapticFileRootFolder = FileDirectory;
@@ -174,22 +175,22 @@ void AHapticsManagerActor::Tick( float DeltaTime )
 	m_Mutex.Unlock();
 }
 
-void AHapticsManagerActor::SubmitRegistered(const FString &Key)
+void AHapticsManagerActor::SubmitKey(const FString &Key)
 {
     std::string StandardKey(TCHAR_TO_UTF8(*Key));
 	bhaptics::HapticPlayer::instance()->submitRegistered(StandardKey);
 }
 
-void AHapticsManagerActor::SubmitRegisteredIntesityDuration(const FString &Key, float Intensity, float Duration)
+void AHapticsManagerActor::SubmitKeyWithIntesityDuration(const FString &Key, float Intensity, float Duration)
 {
 	std::string StandardKey(TCHAR_TO_UTF8(*Key));
 	bhaptics::HapticPlayer::instance()->submitRegistered(StandardKey, Intensity, Duration);
 }
 
-void AHapticsManagerActor::SubmitRegisteredTransform(const FString &Key, float DeltaX, float DeltaY, bool IsValueRotate)
+void AHapticsManagerActor::SubmitKeyWithTransform(const FString &Key, float DeltaX, float DeltaY, bool IsValueRotated)
 {
 	std::string StandardKey(TCHAR_TO_UTF8(*Key));
-	bhaptics::HapticPlayer::instance()->submitRegistered(StandardKey, DeltaX, DeltaY, IsValueRotate);
+	bhaptics::HapticPlayer::instance()->submitRegistered(StandardKey, DeltaX, DeltaY, IsValueRotated);
 }
 
 void AHapticsManagerActor::RegisterFeeback(const FString &Key, const FString &FilePath)

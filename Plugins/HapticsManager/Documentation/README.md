@@ -1,6 +1,6 @@
 # bHaptics haptic devices Unreal Engine C++ plugin
 This project helps to utilize haptic devices in Unreal Engine 4
-Current version is 1.1.1
+Current version is 1.1.2
 
 ## Prerequisite
 * bHaptics Player has to be installed (Windows)
@@ -26,8 +26,18 @@ Current version is 1.1.1
 * After signing in, you can create a new project and design a certain feedback effect for use in the game.
 * In order to use the feedback effect in Unreal, export the feedback file from the Designer and place the new file into the HapticsManager/Feedback folder in the Contents folder. Create these folders if they do not exist already.
 * The files are automatically loaded by the HapticsManager blueprint on play, and are stored using the file name as a key.
-* To play the feedback effect, merely call the SubmitFeedback function from the Haptics Manager, using the specified feedback file's name as a key.
+* To play the feedback effect, merely call the Submit Key function from the Haptics Manager, using the specified feedback file's name as a key.
 * Example feedback files are given in the HapticsManager/Feedback folder in the Plugins directory. You can choose whether to access the feedback files from either the Plugins directory or the Project's contents directory through the UseProjectFeedbackFolder boolean variable. If true, it will use the files in the Project's Contents directory. It is set to true by default.
+* If you wish to use feedback files outside of these folders, you can call the RegisterFeedback function to register a specific feedback file with its own Key; however, the path to the file must be manually inputted.
+* Any feedback files used will also need to be copied when packaging the game, so it is recommended to keep any feedback files relative to the Content directory, and remember to include any folders containing feedback files when packaging, otherwise the files must be manually copied after packaging.
+
+### Playing Feedback Files
+* There are three functions provided for playing the feedback from haptic feedback files: Submit Key, Submit Key with Intensity and Duration, and Submit Key with Transform.
+* For haptic files in the HapticsManager/Feedback folder in either the plugin's folder, or the proejct's contents folder, keys are automatically generated using the file name, for ease of use. If you wish to change the key used, call the Register feedback function and provide key and feedback file to be assigned.
+* The additional two functions add additional variables to the alter the feedback file.
+	* Submitting with Intensity and Duration add two variables to scale the original feedback values by some amount. For instance an intensity and duration of 0.5 would halve the original intensity and duration of the feedback, while a value of 2.0 would double it, although the intensity will be capped at a value of 100. You can change the Intensity and Duration separately to alter feedback if necessary.
+	* Submitting with Transform adds a DeltaX and DeltaY values to move the feedback along those axes. The value of each can range from -1.0 to 1.0 with the sign determining the direction from left to right or up to down respectively. For instance a transform of (-.5, .333) moves the feedback halfway across the device to the left, and downwards by a third of the device. There is also a boolean IsValueRotated to determine whether the feedback effect is transformed and continues when crossing the boundary (true), or whether the feedback effect is cut off at that point (false).
+* The feedback file itself is not altered by either of the above two calls, so all changes to the intensity or position of the feedback effects in the file are with regards to the original feedback. This is so the same feedback file can be used for situations such as impact effects, or effects where the duration and intensity change based on other variables or conditions in the game.
 
 ### Dots
 * You can also access each individual motor using the SubmitFeedbackUsingDots function, which takes in an array of DotPoints as an input.
@@ -46,9 +56,17 @@ Current version is 1.1.1
 * Other functions are provided to help give more freedom in developing different kinds of feedback effects.
 * For example, checks for whether a specified feedback effect is playing are provided as well as functions to cease the feedback effect.
 * These can be used to add effects such as interrupting feedback effects, or even to loop a certain feedback effect.
+* All the functions for the plugin can be found in the bHaptics category in blueprints, or in the HapticsManagerActor.h file in the plugin.
+
+## Testing
+* In the HapticsManager Blueprint, some functionality has been implemented to help test and experiment with the functions outlined above.
+* To test some basic functionality, run the game in Simulate mode and click on the HapticsManager blueprint actor in the game world. The functions and their variables can be found under the Default category or under the Blutilities category (for UE4.14/15) in the details panel. While simulate is running you can call the haptic feedback functions and provide variables to alter each call.
+* The blueprint allows you to navigate any feedback files loaded already by the manager, and to play and alter the feedback using the SubmitKey, SubmitKeyWithIntensityDuration and SubmitKeyWithTransform functions, altering their respective variables under the default category in the details panel.
+* You can also test out simple DotPoint and PathPoint patterns, by creating the points using the variables in the details panel, and setting the duration and device to play the feedback on, and then calling their respective functions to play the feedback.
+* Using these functions you can get a good idea of how the haptic feedback will feel, as well as to test new ideas, especially testing any changes to existing feedback files.
 
 ## Packaging
-* Before packaging ensure that the Feedback folder in the Contents/HapticsManager folder is also copied with the packaging. You can control this in the Project Settings -> Packaging (advanced options) -> Additional Non-Asset Directories To Copy.
+* Before packaging ensure that the Feedback folder in the Contents/HapticsManager folder is also copied with the packaging. You can control this in the Project Settings -> Packaging (advanced options) -> Additional Non-Asset Directories To Copy. If you used a different directory
 * The plugin also uses a dll (bHapticUtility64.dll) to run the bHaptics Player if it is installed; however, this dll is not copied when packaging and must be done manually into the Plugins/HapticsManager/DLL directory. This functionality is optional and will not affect the haptic feedback.
 
 ## Samples 
@@ -63,14 +81,14 @@ Current version is 1.1.1
 * Be careful of naming the feedback effects, as 2 feedback effects with the same name will interrupt each other. Use the IsPlaying function to check if a specifc feedback effect is finished before sending the same feedback effect again.
 * Be aware of the duration of your effects. You may need to add delays to ensure the submitted feedback has finished playing before submitting the next, in the case of a series of feedback calls to create the effect (ie. explosion, moving feedback).
 * Some simple examples are provided in a Feedback Effect Macro Library blueprint for reference, and you can use and adapt these functions to suit your needs.
-* The ForLoops in blueprints can cause unexpected results with feedback, as it does not natively support delays. A ForLoopWithDelay macro is provided; however, if you are using loops and delays it is recommended to work in C++ for these functions.
-
+* The ForLoops in blueprints can cause unexpected results with feedback, as it does not natively support delays. A ForLoopWithDelay macro is provided; however, if you are using loops and delays heavily, it is recommended to work in C++ for these functions.
+* For further references, you can find our tutorial series at our youtube channel [here](https://www.youtube.com/channel/UCGyV7l7iZz9tUtEg4wvsOpA/playlists?shelf_id=0&sort=dd&view=1).
 
 ## Contact
 * Official Website: http://www.bhaptics.com/
 * E-mail: contact@bhaptics.com
 
-Last update of README.md: Dec. 8th, 2017.
+Last update of README.md: Dec. 18th, 2017.
 
 
 ###### Copyright (c) 2017 bHaptics Inc. All rights reserved.
