@@ -67,7 +67,7 @@ Current version is 1.1.2
 * Using these functions you can get a good idea of how the haptic feedback will feel, as well as to test new ideas, especially testing any changes to existing feedback files.
 
 ## Packaging
-* Before packaging ensure that the Feedback folder in the Contents/HapticsManager folder is also copied with the packaging. You can control this in the 'Project Settings -> Packaging (advanced options) -> Additional Non-Asset Directories To Copy' and including the folder containing the feedback files there,
+* Before packaging ensure that the Feedback folder in the Contents/HapticsManager folder is also copied with the packaging. You can control this in the `Project Settings -> Packaging (advanced options) -> Additional Non-Asset Directories To Copy` and including the folder containing the feedback files there.
 * If haptic feedback from the files are not playing in the packaged version, ensure that any additional file paths are all relative to the project directory, and that the folders are also correct in the packaged directory. 
 * The plugin also uses a dll (bHapticUtility64.dll) to run the bHaptics Player if it is installed; however, this dll is not copied when packaging and must be done manually into the Plugins/HapticsManager/DLL directory. This functionality is optional and will not affect the haptic feedback.
 
