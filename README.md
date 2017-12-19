@@ -5,7 +5,7 @@ This template project demonstrates how to integrate the bHaptics plugin into an 
 * bHaptics Player has to be installed (Windows)
    * The app can be found in
    bHaptics webpage: [http://www.bhaptics.com](http://bhaptics.com/app.html)
-* Tested on UE 4.16 and 4.17.
+* Tested on UE 4.14 to 4.18.
 
 ## Contents
 ### Blueprints

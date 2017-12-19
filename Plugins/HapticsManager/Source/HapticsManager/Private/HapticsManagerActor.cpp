@@ -211,7 +211,7 @@ void AHapticsManagerActor::RegisterFeeback(const FString &Key, const FString &Fi
 
 FString AHapticsManagerActor::LoadFeedbackFiles(TArray<FString>& FilesOut)
 {
-	FString RootFolderFullPath = FPaths::GameContentDir() + "HapticsManager/Feedback";
+	FString RootFolderFullPath = FPaths::GameContentDir() + ProjectFeedbackFolder;
 	if (!FPaths::DirectoryExists(RootFolderFullPath) || !UseProjectFeedbackFolder)
 	{
 		//RootFolderFullPath = FPaths::ConvertRelativePathToFull(FPaths::EnginePluginsDir()) + "Marketplace/HapticsManager/Feedback";

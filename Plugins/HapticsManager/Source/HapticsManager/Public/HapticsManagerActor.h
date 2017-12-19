@@ -41,39 +41,34 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Haptics")
 		FString HapticFileRootFolder;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Haptics")
-		TArray<USceneComponent*> TactotFront;
+	TArray<USceneComponent*> TactotFront;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Haptics")
-		TArray<USceneComponent*> TactotBack;
+	TArray<USceneComponent*> TactotBack;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Haptics")
-		TArray<USceneComponent*> TactosyLeft;
+	TArray<USceneComponent*> TactosyLeft;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Haptics")
-		TArray<USceneComponent*> TactosyRight;
+	TArray<USceneComponent*> TactosyRight;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Haptics")
-		TArray<USceneComponent*> Tactal;
+	TArray<USceneComponent*> Tactal;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Haptics")
-		TArray<USceneComponent*> TactGloveLeft;
+	TArray<USceneComponent*> TactGloveLeft;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Haptics")
-		TArray<USceneComponent*> TactGloveRight;
+	TArray<USceneComponent*> TactGloveRight;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Haptics")
-		TArray<USceneComponent*> TactShoeLeft;
+	TArray<USceneComponent*> TactShoeLeft;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Haptics")
-		TArray<USceneComponent*> TactShoeRight;
+	TArray<USceneComponent*> TactShoeRight;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Haptics")
-		TArray<USceneComponent*> TactRacket;
+	TArray<USceneComponent*> TactRacket;
 
-	//Boolean to determine whether to load feedback files from the contents folder or the plugins directory.
+	//Boolean to determine whether to load feedback files from the project's contents folder or the plugins directory.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Haptics")
 		bool UseProjectFeedbackFolder = true;
+
+	//Folder in the Contents directory to search for the haptic feedback files.
+	//The full path is not needed, only its location relative to the Contents directory.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Haptics")
+		FString ProjectFeedbackFolder = "HapticsManager/Feedback";
 
 	//Submit a registered feedback using the file name as a key
     UFUNCTION(BlueprintCallable, 

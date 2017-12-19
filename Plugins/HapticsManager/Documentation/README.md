@@ -8,7 +8,7 @@ Current version is 1.1.2
    bHaptics webpage: [http://www.bhaptics.com](http://bhaptics.com/app.html)
 
 ## How to integrate the plugin into existing projects
-* If you have installed from the UE4 Marketplace, you can skip this section and go to the 'How to use the plugin' section.
+* If you have installed from the UE4 Marketplace, you can skip this section and go to the ['How to use the plugin'](#How-to-use-the-plugin) section.
 * Copy the Plugins folder of the bHapticsManger project and paste it into either your project folder or into the Engine/Plugins folder.
 * You should now have the plugin source code in either Plugins folder, as well as blueprints in the Plugins/HapticsManager/Content folder.
 * For C++ projects, you may need to inclde the module in the build configuration file found in the source folder (<YourProjectName>.Build.cs). Add "HapticsManager" to the list of public dependency module names, and generate the solution files again to ensure the plugins folder is included.
@@ -16,7 +16,7 @@ Current version is 1.1.2
 
 ## How to use the plugin
 * From the editor, make sure that 'Show Plugin Content' is checked under View Options, on the bottom right of the Content Browser.
-* Browse to 'HapticsManager Content' and open the blueprints folder.
+* Browse to 'HapticsManager/Content' and open the blueprints folder.
 * Place the HapticsManager_BP into your game world. This blueprint actor will connect to the bHaptics Player and send the haptic feedback back to the devices.
 * The Haptics Manager controls all the method calls to submit the feedback, as well as providing a handy debug UI to visualise the feedback as well, which can be hidden in game when not needed.
 * The Haptic Manager has 3 different ways of submitting feedback: using preset haptic files, specifying specifc motors or 'dots' to play, or specifying a point on the device.
@@ -24,12 +24,13 @@ Current version is 1.1.2
 ### Presets
 * Presets can be constructed through using the bHaptics designer at https://designer.bhaptics.com
 * After signing in, you can create a new project and design a certain feedback effect for use in the game.
-* In order to use the feedback effect in Unreal, export the feedback file from the Designer and place the new file into the HapticsManager/Feedback folder in the Contents folder. Create these folders if they do not exist already.
-* The files are automatically loaded by the HapticsManager blueprint on play, and are stored using the file name as a key.
+* In order to use the feedback effect in Unreal, export the feedback file from the Designer, and create and place the new file into folder in the Contents directory in which to store all your feedback folders.
+* In the HapticsManager_BP object, set the ProjectFeedbackFolder to the folder directory where you store all the feedback files, relative to the Contents directory.
+* The files in this directory will be automatically loaded by the HapticsManager blueprint on play, and are stored using the file name as a key.
 * To play the feedback effect, merely call the Submit Key function from the Haptics Manager, using the specified feedback file's name as a key.
-* Example feedback files are given in the HapticsManager/Feedback folder in the Plugins directory. You can choose whether to access the feedback files from either the Plugins directory or the Project's contents directory through the UseProjectFeedbackFolder boolean variable. If true, it will use the files in the Project's Contents directory. It is set to true by default.
+* Example feedback files are given in the HapticsManager/Feedback folder in the Plugins directory. You can choose whether to access the feedback files from either the Plugins directory or the Project's contents directory through the UseProjectFeedbackFolder boolean variable. If true, it will use the files in the <Project>/Contents/<ProjectFeedbackFolder>, otherwise it will read from the Plugin's folder. It is set to true by default.
 * If you wish to use feedback files outside of these folders, you can call the RegisterFeedback function to register a specific feedback file with its own Key; however, the path to the file must be manually inputted.
-* Any feedback files used will also need to be copied when packaging the game, so it is recommended to keep any feedback files relative to the Content directory, and remember to include any folders containing feedback files when packaging, otherwise the files must be manually copied after packaging.
+* Any feedback files used will also need to be copied when packaging the game, so it is recommended to keep any feedback files relative to the Content directory, and remember to include any folders containing feedback files when packaging, otherwise the files must be manually copied after packaging. See the [Packaging](#Packaging) section for how to do this.
 
 ### Playing Feedback Files
 * There are three functions provided for playing the feedback from haptic feedback files: Submit Key, Submit Key with Intensity and Duration, and Submit Key with Transform.
@@ -88,7 +89,7 @@ Current version is 1.1.2
 * Official Website: http://www.bhaptics.com/
 * E-mail: contact@bhaptics.com
 
-Last update of README.md: Dec. 18th, 2017.
+Last update of README.md: Dec. 19th, 2017.
 
 
 ###### Copyright (c) 2017 bHaptics Inc. All rights reserved.
