@@ -8,7 +8,7 @@ Current version is 1.1.2
    bHaptics webpage: [http://www.bhaptics.com](http://bhaptics.com/app.html)
 
 ## How to integrate the plugin into existing projects
-* If you have installed from the UE4 Marketplace, you can skip this section and go to the ['How to use the plugin'](#How-to-use-the-plugin) section.
+* If you have installed from the UE4 Marketplace, you can skip this section and go to the ['How to use the plugin'](#how-to-use-the-plugin) section.
 * Copy the Plugins folder of the bHapticsManger project and paste it into either your project folder or into the Engine/Plugins folder.
 * You should now have the plugin source code in either Plugins folder, as well as blueprints in the Plugins/HapticsManager/Content folder.
 * For C++ projects, you may need to inclde the module in the build configuration file found in the source folder (<YourProjectName>.Build.cs). Add "HapticsManager" to the list of public dependency module names, and generate the solution files again to ensure the plugins folder is included.
@@ -30,9 +30,9 @@ Current version is 1.1.2
 * To play the feedback effect, merely call the Submit Key function from the Haptics Manager, using the specified feedback file's name as a key.
 * Example feedback files are given in the HapticsManager/Feedback folder in the Plugins directory. You can choose whether to access the feedback files from either the Plugins directory or the Project's contents directory through the UseProjectFeedbackFolder boolean variable. If true, it will use the files in the <Project>/Contents/<ProjectFeedbackFolder>, otherwise it will read from the Plugin's folder. It is set to true by default.
 * If you wish to use feedback files outside of these folders, you can call the RegisterFeedback function to register a specific feedback file with its own Key; however, the path to the file must be manually inputted.
-* Any feedback files used will also need to be copied when packaging the game, so it is recommended to keep any feedback files relative to the Content directory, and remember to include any folders containing feedback files when packaging, otherwise the files must be manually copied after packaging. See the [Packaging](#Packaging) section for how to do this.
+* Any feedback files used will also need to be copied when packaging the game, so it is recommended to keep any feedback files relative to the Content directory, and remember to include any folders containing feedback files when packaging, otherwise the files must be manually copied after packaging. See the [Packaging](#packaging) section for how to do this.
 
-### Playing Feedback Files
+#### Playing Feedback Files
 * There are three functions provided for playing the feedback from haptic feedback files: Submit Key, Submit Key with Intensity and Duration, and Submit Key with Transform.
 * For haptic files in the HapticsManager/Feedback folder in either the plugin's folder, or the proejct's contents folder, keys are automatically generated using the file name, for ease of use. If you wish to change the key used, call the Register feedback function and provide key and feedback file to be assigned.
 * The additional two functions add additional variables to the alter the feedback file.
@@ -67,7 +67,8 @@ Current version is 1.1.2
 * Using these functions you can get a good idea of how the haptic feedback will feel, as well as to test new ideas, especially testing any changes to existing feedback files.
 
 ## Packaging
-* Before packaging ensure that the Feedback folder in the Contents/HapticsManager folder is also copied with the packaging. You can control this in the Project Settings -> Packaging (advanced options) -> Additional Non-Asset Directories To Copy. If you used a different directory
+* Before packaging ensure that the Feedback folder in the Contents/HapticsManager folder is also copied with the packaging. You can control this in the 'Project Settings -> Packaging (advanced options) -> Additional Non-Asset Directories To Copy' and including the folder containing the feedback files there,
+* If haptic feedback from the files are not playing in the packaged version, ensure that any additional file paths are all relative to the project directory, and that the folders are also correct in the packaged directory. 
 * The plugin also uses a dll (bHapticUtility64.dll) to run the bHaptics Player if it is installed; however, this dll is not copied when packaging and must be done manually into the Plugins/HapticsManager/DLL directory. This functionality is optional and will not affect the haptic feedback.
 
 ## Samples 
