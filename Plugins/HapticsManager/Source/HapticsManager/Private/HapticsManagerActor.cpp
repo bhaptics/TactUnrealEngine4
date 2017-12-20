@@ -108,7 +108,6 @@ void AHapticsManagerActor::BeginPlay()
 		FString Key = FileName.Left(index);
 		RegisterFeeback(Key, FilePath);
 		HapticFileNames.AddUnique(*Key);
-		FilePathMap[Key] = FilePath;
 	}
 
 	HapticFileRootFolder = FileDirectory;
@@ -175,13 +174,23 @@ void AHapticsManagerActor::Tick( float DeltaTime )
 	m_Mutex.Unlock();
 }
 
+void AHapticsManagerActor::SubmitRegistered(const FString & Key)
+{
+	SubmitKey(Key);
+}
+
 void AHapticsManagerActor::SubmitKey(const FString &Key)
 {
     std::string StandardKey(TCHAR_TO_UTF8(*Key));
 	bhaptics::HapticPlayer::instance()->submitRegistered(StandardKey);
 }
 
-void AHapticsManagerActor::SubmitKeyWithIntesityDuration(const FString &Key, float Intensity, float Duration)
+void AHapticsManagerActor::SubmitRegisteredIntesityDuration(const FString & Key, float Intensity, float Duration)
+{
+	SubmitKeyWithIntensityDuration(Key, Intensity, Duration);
+}
+
+void AHapticsManagerActor::SubmitKeyWithIntensityDuration(const FString &Key, float Intensity, float Duration)
 {
 	std::string StandardKey(TCHAR_TO_UTF8(*Key));
 	bhaptics::HapticPlayer::instance()->submitRegistered(StandardKey, Intensity, Duration);

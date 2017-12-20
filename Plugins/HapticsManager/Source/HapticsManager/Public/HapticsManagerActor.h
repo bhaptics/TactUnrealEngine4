@@ -31,8 +31,6 @@ public:
 
     virtual void Destroyed() override;
 
-	TMap<FString, FString> FilePathMap;
-
 	//Names of files currently loaded by the HapticsManager
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Haptics")
 		TArray<FName> HapticFileNames;
@@ -70,19 +68,36 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Haptics")
 		FString ProjectFeedbackFolder = "HapticsManager/Feedback";
 
+	UFUNCTION(BlueprintCallable,
+		meta = (DisplayName = "Submit Registered",
+			Keywords = "bHaptics",
+			DeprecatedFunction,
+			DeprecationMessage = "Deprecated Method. Use SubmitKey instead. Will be removed in 1.1.3."),
+		Category = "bHaptics")
+		void SubmitRegistered(const FString &Key);
+
 	//Submit a registered feedback using the file name as a key
-    UFUNCTION(BlueprintCallable, 
-        meta = (DisplayName = "Submit Key", 
-            Keywords = "bHaptics"), 
-                Category = "bHaptics")
-    void SubmitKey(const FString &Key);
+	UFUNCTION(BlueprintCallable,
+		meta = (DisplayName = "Submit Key",
+			Keywords = "bHaptics"),
+		Category = "bHaptics")
+		void SubmitKey(const FString &Key);
+
+	//Deprecated function. Use SubmitKeyWithIntensityDuration instead.
+	UFUNCTION(BlueprintCallable,
+		meta = (DisplayName = "Submit Registered with Intensity and Duration",
+			Keywords = "bHaptics",
+			DeprecatedFunction,
+			DeprecationMessage = "Deprecated Method. Use SubmitKeyWithIntensityDuration instead. Will be removed in 1.1.3."),
+		Category = "bHaptics")
+		void SubmitRegisteredIntesityDuration(const FString &Key, float Intensity, float Duration);
 
 	//Submit a registered feedback using the file name as a key, and scale the intensity and duration by given scales.
 	 UFUNCTION(BlueprintCallable,
 		meta = (DisplayName = "Submit Key with Intensity and Duration",
             Keywords = "bHaptics"), 
                 Category = "bHaptics")
-    void SubmitKeyWithIntesityDuration(const FString &Key, float Intensity, float Duration);
+    void SubmitKeyWithIntensityDuration(const FString &Key, float Intensity, float Duration);
 
 	 //Submit a registered feedback using the file name as a key and transform by the given deltaX and deltaY.
 	 //Also state if the feedback should continue when hitting an edge of the device or not.
