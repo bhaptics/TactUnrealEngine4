@@ -19,266 +19,259 @@ namespace bhaptics
 {
 #define MIN(X,Y) ((X) < (Y) ? (X) : (Y))  
 #define MAX(X,Y) ((X) > (Y) ? (X) : (Y))  
-    using namespace std;
-    using easywsclient::WebSocket;
-    class HapticPlayer
-    {
+	using namespace std;
+	using easywsclient::WebSocket;
+	class HapticPlayer
+	{
 		static HapticPlayer *hapticManager;
-        unique_ptr<WebSocket> ws;
+		unique_ptr<WebSocket> ws;
 		vector<RegisterRequest> _registered;
 
-		unique_ptr<PlayerRequest> _activeRequest;
-		
 		vector<string> _activeKeys;
 		vector<Position> _activeDevices;
 
-        mutex mtx;// mutex for _activeKeys and _activeDevices variable
-		mutex sendMtx; //mutex for _activeRequest
+		mutex mtx;// mutex for _activeKeys and _activeDevices variable
 		mutex registerMtx; //mutex for _registered variable
-		mutex pollMtx; //mutex to synchronise poll() methods.
 
-        int _currentTime = 0;
-        int _interval = 20;
-        int _motorSize = 20;
-        HapticTimer timer;
+		int _currentTime = 0;
+		int _interval = 20;
+		int _motorSize = 20;
+		HapticTimer timer;
+
+		bool isRunning = false;
+		bool isPolling = false;
 
 		bool _enable = false;
 
-        string host = "127.0.0.1";
-        int port = 15881;
-		string path = "v2/feedbacks";//old: "feedbacks";//
+		string host = "127.0.0.1";
+		int port = 15881;
+		string path = "v2/feedbacks";
 
-        int reconnectSec = 5;
-        std::chrono::steady_clock::time_point prevReconnect;
+		int reconnectSec = 5;
+		std::chrono::steady_clock::time_point prevReconnect;
 
 		HapticPlayer() {}
 
 		bool isRegisterSent = true;
 
-        void reconnect()
-        {
-			//if (!_enable)
-			//{
-			//	return;
-			//}
+		void reconnect()
+		{
 
-            if (!retryConnection)
-            {
-                return;
-            }
+			if (!retryConnection)
+			{
+				return;
+			}
 
-            if (connectionCheck())
-            {
-                return;
-            }
+			if (connectionCheck())
+			{
+				return;
+			}
 
-            std::chrono::steady_clock::time_point current = std::chrono::steady_clock::now();
+			std::chrono::steady_clock::time_point current = std::chrono::steady_clock::now();
 
-            int values = std::chrono::duration_cast<std::chrono::seconds>(current - prevReconnect).count();
+			int values = std::chrono::duration_cast<std::chrono::seconds>(current - prevReconnect).count();
 
-            if (values > reconnectSec)
-            {
-     
+			if (values > reconnectSec)
+			{
+
 				ws.reset(WebSocket::create(host, port, path));
 
 				isRegisterSent = false;
-				
-                prevReconnect = current;
-            }
 
-        }
+				prevReconnect = current;
+			}
+		}
 
 		void resendRegistered()
 		{
-			
 			if (connectionCheck() && _registered.size()>0)
 			{
-				PlayerRequest* request = getActiveRequest();
+				PlayerRequest req;
+				registerMtx.lock();
 				vector<RegisterRequest> tempRegister = _registered;
-				
+				registerMtx.unlock();
+
+
 				for (size_t i = 0; i < tempRegister.size(); i++)
 				{
-					request->Register.push_back(tempRegister[i]);
+					req.Register.push_back(tempRegister[i]);
 				}
-				
-				send();
+				send(req);
 
 				isRegisterSent = true;
 			}
 		}
 
-		PlayerRequest* getActiveRequest()
+		bool connectionCheck()
 		{
-			if (!_activeRequest)
+			if (!ws)
 			{
-				_activeRequest = unique_ptr<PlayerRequest>(PlayerRequest::Create());
+				return false;
 			}
-			return _activeRequest._Myptr();
-		}
-
-        bool connectionCheck()
-        {
-            if (!ws)
-            {
-                return false;
-            }
 
 			WebSocket::readyStateValues isClosed = ws->getReadyState();
-            
+
 			if (isClosed == WebSocket::CLOSED)
-            {
-                ws.reset(nullptr);
-                return false;
-            }
-			
-            return true;
-        }
+			{
+				ws.reset(nullptr);
+				return false;
+			}
 
-        void send()
-        {
-            if (!connectionCheck())
-            {
-                return;
-            }
+			return true;
+		}
+
+		void send(PlayerRequest request)
+		{
+			if (!connectionCheck())
+			{
+				return;
+			}
 			TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject);
-			getActiveRequest()->to_json(*JsonObject);
-
+			request.to_json(*JsonObject);
 			FString OutputString;
 			TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&OutputString);
 			FJsonSerializer::Serialize(JsonObject.ToSharedRef(), Writer);
 			std::string jStr(TCHAR_TO_UTF8(*OutputString));
-			
-			pollMtx.lock();
+
 			ws->send(jStr);
-            ws->poll();
-			pollMtx.unlock();
+			if (isPolling)
+			{
+				return;
+			}
+			isPolling = true;
+			ws->poll();
+			isPolling = false;
+		}
 
-			_activeRequest = nullptr;
-        }
-
-        void updateActive(const string &key, const Frame& signal)
-        {
+		void updateActive(const string &key, const Frame& signal)
+		{
 			if (!_enable || !connectionCheck())
 			{
 				return;
 			}
-			sendMtx.lock();
+			
 			SubmitRequest req;
+			PlayerRequest playerReq;
 			req.Frame = signal;
 			req.Key = key;
 			req.Type = "frame";
-			getActiveRequest()->Submit.push_back(req);
 			
-			send();
-			sendMtx.unlock();
-        }
+			playerReq.Submit.push_back(req);
 
-        void remove(const string &key)
-        {
+			send(playerReq);
+		}
+
+		void remove(const string &key)
+		{
 			if (!_enable || !connectionCheck())
 			{
 				return;
 			}
-			sendMtx.lock();
+			
 			SubmitRequest req;
+			PlayerRequest playerReq;
 			req.Key = key;
 			req.Type = "turnOff";
-			getActiveRequest()->Submit.push_back(req);
+			
+			playerReq.Submit.push_back(req);
 
-			send();
-			sendMtx.unlock();
-        }
+			send(playerReq);
+		}
 
-        void removeAll()
-        {
+		void removeAll()
+		{
 			if (!_enable)
 			{
 				return;
 			}
-			sendMtx.lock();
+			
 			SubmitRequest req;
+			PlayerRequest playerReq;
 			req.Type = "turnOffAll";
 
-			getActiveRequest()->Submit.push_back(req);
+			playerReq.Submit.push_back(req);
 
-			send();
-			sendMtx.unlock();
-        }
+			send(playerReq);
+		}
 
-        void doRepeat()
-        {
-            reconnect();
+		void doRepeat()
+		{
+			if (isRunning)
+			{
+				return;
+			}
+			isRunning = true;
+			reconnect();
 
-			registerMtx.lock();
+			//registerMtx.lock();
 			if (!isRegisterSent)
 			{
 				resendRegistered();
 			}
-			registerMtx.unlock();
+			//registerMtx.unlock();
 
 			checkMessage();
 
-            _currentTime += _interval;
-        }
+			_currentTime += _interval;
+			isRunning = false;
+		}
 
-        void callbackFunc()
-        {
-            doRepeat();
-        }
+		void callbackFunc()
+		{
+			doRepeat();
+		}
 
+	public:
+		bool retryConnection = true;
 
-    public:
-        bool retryConnection = true;
-
-        int registerFeedback(const string &key, const string &filePath)
-        {
-            HapticFile file = Util::parse(filePath);
-			sendMtx.lock();
+		int registerFeedback(const string &key, const string &filePath)
+		{
+			HapticFile file = Util::parse(filePath);
+			
 			RegisterRequest req;
 			req.Key = key;
 			req.Project = file.project;
 
 			registerMtx.lock();
 			_registered.push_back(req);
-			
 
-			PlayerRequest* request = getActiveRequest();
-			request->Register.push_back(req);
+			PlayerRequest playerReq;
 
-			send();
+			playerReq.Register.push_back(req);
+
+			send(playerReq);
 			registerMtx.unlock();
-			sendMtx.unlock();
-            return 0;
-        }
+			return 0;
+		}
 
-        void init()
-        {
+		void init()
+		{
 			if (_enable)
 				return;
-            function<void()> callback = std::bind(&HapticPlayer::callbackFunc, this);
-            timer.addTimerHandler(callback);
-            timer.start();
+			function<void()> callback = std::bind(&HapticPlayer::callbackFunc, this);
+			timer.addTimerHandler(callback);
+			timer.start();
 
 #ifdef _WIN32
-            INT rc;
-            WSADATA wsaData;
+			INT rc;
+			WSADATA wsaData;
 
-            rc = WSAStartup(MAKEWORD(2, 2), &wsaData);
-            if (rc) {
-                printf("WSAStartup Failed.\n");
-                return;
-            }
+			rc = WSAStartup(MAKEWORD(2, 2), &wsaData);
+			if (rc) {
+				printf("WSAStartup Failed.\n");
+				return;
+			}
 #endif
-            ws = unique_ptr<WebSocket>(WebSocket::create(host, port, path));
+			ws = unique_ptr<WebSocket>(WebSocket::create(host, port, path));
 
-            connectionCheck();
+			connectionCheck();
 
 			_enable = true;
-        }
+		}
 
-        void submit(const string &key, Position position, const vector<uint8_t> &motorBytes, int durationMillis)//change to submit - done
-        {
-			if (!_enable|| !connectionCheck())
+		void submit(const string &key, Position position, const vector<uint8_t> &motorBytes, int durationMillis)//change to submit - done
+		{
+			if (!_enable || !connectionCheck())
 			{
 				return;
 			}
@@ -288,13 +281,13 @@ namespace bhaptics
 			{
 				if (motorBytes[i] > 0)
 				{
-					points.push_back(DotPoint(i,motorBytes[i]));
+					points.push_back(DotPoint(i, motorBytes[i]));
 				}
 			}
 
 			Frame submitFrame = Frame::AsDotPointFrame(points, position, durationMillis);
 			updateActive(key, submitFrame);
-        }
+		}
 
 		void submit(const string &key, Position position, const vector<DotPoint> &points, int durationMillis)
 		{
@@ -302,55 +295,54 @@ namespace bhaptics
 			updateActive(key, req);
 		}
 
-        void submit(const string &key, Position position, const vector<PathPoint> &points, int durationMillis)
-        {
+		void submit(const string &key, Position position, const vector<PathPoint> &points, int durationMillis)
+		{
 			Frame req = Frame::AsPathPointFrame(points, position, durationMillis);
-            updateActive(key, req);
-        }
+			updateActive(key, req);
+		}
 
-        void submitRegistered(const string &key, float intensity, float duration)//change to submitRegistered
-        {
-            if (duration < 0.01f || duration > 100.0f)
-            {
-                printf("not allowed duration %f\n", duration);
-                return;
-            }
+		void submitRegistered(const string &key, float intensity, float duration)//change to submitRegistered
+		{
+			if (duration < 0.01f || duration > 100.0f)
+			{
+				printf("not allowed duration %f\n", duration);
+				return;
+			}
 
-            if (intensity < 0.01f || intensity > 100.0f)
-            {
-                printf("not allowed intensity %f\n", duration);
-                return;
-            }
-			sendMtx.lock();
+			if (intensity < 0.01f || intensity > 100.0f)
+			{
+				printf("not allowed intensity %f\n", duration);
+				return;
+			}
+			
 			SubmitRequest req;
+			PlayerRequest playerReq;
 			req.Key = key;
 			req.Type = "key";
 			req.Parameters["intensityRatio"] = std::to_string(intensity);
 			req.Parameters["durationRatio"] = std::to_string(duration);
 
-			getActiveRequest()->Submit.push_back(req);
+			playerReq.Submit.push_back(req);
 
-			send();
-			sendMtx.unlock();
-        }
+			send(playerReq);
+		}
 
-        void submitRegistered(const string &key)
-        {
-			if (!_enable|| !connectionCheck())
+		void submitRegistered(const string &key)
+		{
+			if (!_enable || !connectionCheck())
 			{
 				return;
 			}
 
-			sendMtx.lock();
 			SubmitRequest req;
+			PlayerRequest playerReq;
 			req.Key = key;
 			req.Type = "key";
 
-			getActiveRequest()->Submit.push_back(req);
+			playerReq.Submit.push_back(req);
 
-			send();
-			sendMtx.unlock();
-        }
+			send(playerReq);
+		}
 
 		void submitRegistered(const string &key, double deltaX, double deltaY, bool isValueRotate = true)
 		{
@@ -359,45 +351,45 @@ namespace bhaptics
 				return;
 			}
 
-			sendMtx.lock();
 			TransformOption option;// = TransformOption(deltaX, deltaY, isRotateValue);
 			option.DeltaX = deltaX;
 			option.DeltaY = deltaY;
 			option.IsValueRotate = isValueRotate;
 			SubmitRequest req;
+			PlayerRequest playerReq;
 			req.Key = key;
 			req.Type = "key";
 			req.Parameters["transformOption"] = option.to_string();
-			//req.Option = option;
+			
+			playerReq.Submit.push_back(req);
 
-			getActiveRequest()->Submit.push_back(req);
-
-			send();
-			sendMtx.unlock();
+			send(playerReq);
 		}
 
-        bool isPlaying()
-        {
-		    return _activeKeys.size() > 0;
-        }
+		bool isPlaying()
+		{
+			return _activeKeys.size() > 0;
+		}
 
-        bool isPlaying(const string &key)
-        {
+		bool isPlaying(const string &key)
+		{
 			mtx.lock();
-			bool ret = std::find(_activeKeys.begin(), _activeKeys.end(), key) != _activeKeys.end();
+			vector<string> temp = _activeKeys;
 			mtx.unlock();
+
+			bool ret = std::find(temp.begin(), temp.end(), key) != temp.end();
 			return ret;
-        }
+		}
 
-        void turnOff()
-        {
-            removeAll();
-        }
+		void turnOff()
+		{
+			removeAll();
+		}
 
-        void turnOff(const string &key)
-        {
-            remove(key);
-        }
+		void turnOff(const string &key)
+		{
+			remove(key);
+		}
 
 		void(*dispatchFunctionVar)(const char*);
 
@@ -410,28 +402,39 @@ namespace bhaptics
 
 			if (dispatchFunctionVar != NULL && _enable)
 			{
-				pollMtx.lock();
 				ws->dispatchChar(dispatchFunctionVar);
+				if (isPolling)
+				{
+					return;
+				}
+				isPolling = true;
 				ws->poll();
-				pollMtx.unlock();
+				isPolling = false;
 			}
-			
+
 		}
 
-        void destroy()
-        {
-			_enable = false;
+		void destroy()
+		{
 			if (!ws)
-            {
-                return;
-            }
+			{
+				return;
+			}
 
-			pollMtx.lock();
+			_enable = false; //ensures no more sends when destroying
+			dispatchFunctionVar = NULL; //ensures no more dispatches when destroying
+			isPolling = true;
 			ws->close();
 			ws->poll();
-			pollMtx.unlock();
 			ws.reset();
-        }
+			isPolling = false;
+
+			_activeDevices.erase(_activeDevices.begin(), _activeDevices.end());
+			_activeKeys.erase(_activeKeys.begin(), _activeKeys.end());
+			
+			_enable = true; // allows for sending again, just in case
+
+		}
 
 		void enableFeedback()
 		{
@@ -467,8 +470,9 @@ namespace bhaptics
 		bool isDevicePlaying(Position device)
 		{
 			mtx.lock();
-			bool ret = std::find(_activeDevices.begin(), _activeDevices.end(), device) != _activeDevices.end();
+			vector<bhaptics::Position> temp = _activeDevices;
 			mtx.unlock();
+			bool ret = std::find(temp.begin(), temp.end(), device) != temp.end();
 			return ret;
 		}
 
@@ -484,7 +488,7 @@ namespace bhaptics
 
 			return hapticManager;
 		}
-    };
+	};
 }
 
 #endif

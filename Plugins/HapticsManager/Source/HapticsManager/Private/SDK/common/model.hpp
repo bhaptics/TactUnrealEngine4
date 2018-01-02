@@ -965,13 +965,9 @@ namespace bhaptics
 					{
 						ConnectedPositions.push_back(Position::Right);
 					}
-					else if (DeviceValue == "VestFront")
+					else if (DeviceValue == "Vest")
 					{
-						ConnectedPositions.push_back(Position::VestFront);
-					}
-					else if (DeviceValue == "VestBack")
-					{
-						ConnectedPositions.push_back(Position::VestBack);
+						ConnectedPositions.push_back(Position::Vest);
 					}
 					else if (DeviceValue == "Head")
 					{

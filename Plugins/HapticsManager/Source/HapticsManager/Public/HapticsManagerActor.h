@@ -29,8 +29,6 @@ public:
 	// Called every frame
 	virtual void Tick( float DeltaSeconds ) override;
 
-    virtual void Destroyed() override;
-
 	//Names of files currently loaded by the HapticsManager
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Haptics")
 		TArray<FName> HapticFileNames;

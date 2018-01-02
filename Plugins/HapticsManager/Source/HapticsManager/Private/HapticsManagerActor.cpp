@@ -118,11 +118,6 @@ void AHapticsManagerActor::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	bhaptics::HapticPlayer::instance()->destroy();
 }
 
-void AHapticsManagerActor::Destroyed()
-{
-	bhaptics::HapticPlayer::instance()->destroy();
-}
-
 // Called every frame
 void AHapticsManagerActor::Tick( float DeltaTime )
 {
@@ -652,10 +647,13 @@ bool AHapticsManagerActor::IsDeviceConnected(EPosition device)
 		pos = bhaptics::Position::FootR;
 		break;
 	case EPosition::VestFront:
-		pos = bhaptics::Position::VestFront;
+		pos = bhaptics::Position::Vest;
 		break;
 	case EPosition::VestBack:
-		pos = bhaptics::Position::VestBack;
+		pos = bhaptics::Position::Vest;
+		break;
+	case EPosition::Vest:
+		pos = bhaptics::Position::Vest;
 		break;
 	default:
 		return false;
