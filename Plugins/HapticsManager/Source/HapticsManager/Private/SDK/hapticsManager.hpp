@@ -32,6 +32,7 @@ namespace bhaptics
 
 		mutex mtx;// mutex for _activeKeys and _activeDevices variable
 		mutex registerMtx; //mutex for _registered variable
+		mutex pollingMtx; //mutex for _registered variable
 
 		int _currentTime = 0;
 		int _interval = 20;
@@ -133,14 +134,17 @@ namespace bhaptics
 			FJsonSerializer::Serialize(JsonObject.ToSharedRef(), Writer);
 			std::string jStr(TCHAR_TO_UTF8(*OutputString));
 
-			ws->send(jStr);
-			if (isPolling)
+
+			/*if (isPolling)
 			{
-				return;
+			return;
 			}
-			isPolling = true;
+			isPolling = true;*/
+			pollingMtx.lock();
+			ws->send(jStr);
 			ws->poll();
-			isPolling = false;
+			pollingMtx.unlock();
+			//isPolling = false;
 		}
 
 		void updateActive(const string &key, const Frame& signal)
@@ -149,13 +153,13 @@ namespace bhaptics
 			{
 				return;
 			}
-			
+
 			SubmitRequest req;
 			PlayerRequest playerReq;
 			req.Frame = signal;
 			req.Key = key;
 			req.Type = "frame";
-			
+
 			playerReq.Submit.push_back(req);
 
 			send(playerReq);
@@ -167,12 +171,12 @@ namespace bhaptics
 			{
 				return;
 			}
-			
+
 			SubmitRequest req;
 			PlayerRequest playerReq;
 			req.Key = key;
 			req.Type = "turnOff";
-			
+
 			playerReq.Submit.push_back(req);
 
 			send(playerReq);
@@ -184,7 +188,7 @@ namespace bhaptics
 			{
 				return;
 			}
-			
+
 			SubmitRequest req;
 			PlayerRequest playerReq;
 			req.Type = "turnOffAll";
@@ -227,7 +231,7 @@ namespace bhaptics
 		int registerFeedback(const string &key, const string &filePath)
 		{
 			HapticFile file = Util::parse(filePath);
-			
+
 			RegisterRequest req;
 			req.Key = key;
 			req.Project = file.project;
@@ -314,7 +318,7 @@ namespace bhaptics
 				printf("not allowed intensity %f\n", duration);
 				return;
 			}
-			
+
 			SubmitRequest req;
 			PlayerRequest playerReq;
 			req.Key = key;
@@ -360,7 +364,7 @@ namespace bhaptics
 			req.Key = key;
 			req.Type = "key";
 			req.Parameters["transformOption"] = option.to_string();
-			
+
 			playerReq.Submit.push_back(req);
 
 			send(playerReq);
@@ -402,14 +406,18 @@ namespace bhaptics
 
 			if (dispatchFunctionVar != NULL && _enable)
 			{
-				ws->dispatchChar(dispatchFunctionVar);
-				if (isPolling)
+
+				/*if (isPolling)
 				{
-					return;
+				return;
+				}*/
+				//isPolling = true;
+				if (pollingMtx.try_lock())
+				{
+					ws->dispatchChar(dispatchFunctionVar);
+					ws->poll();
+					pollingMtx.unlock();
 				}
-				isPolling = true;
-				ws->poll();
-				isPolling = false;
 			}
 
 		}
@@ -423,15 +431,17 @@ namespace bhaptics
 
 			_enable = false; //ensures no more sends when destroying
 			dispatchFunctionVar = NULL; //ensures no more dispatches when destroying
-			isPolling = true;
+										//isPolling = true;
+			pollingMtx.lock();
 			ws->close();
 			ws->poll();
 			ws.reset();
-			isPolling = false;
+			pollingMtx.unlock();
+			//isPolling = false;
 
 			_activeDevices.erase(_activeDevices.begin(), _activeDevices.end());
 			_activeKeys.erase(_activeKeys.begin(), _activeKeys.end());
-			
+
 			_enable = true; // allows for sending again, just in case
 
 		}
