@@ -1,5 +1,5 @@
 //Copyright bHaptics Inc. 2017
-
+#pragma once
 #ifndef BHAPTICS_HPP
 #define BHAPTICS_HPP
 
@@ -23,7 +23,8 @@ namespace bhaptics
 	using easywsclient::WebSocket;
 	class HapticPlayer
 	{
-		static HapticPlayer *hapticManager;
+	private:
+		//static HapticPlayer *hapticManager;
 		unique_ptr<WebSocket> ws;
 		vector<RegisterRequest> _registered;
 
@@ -51,7 +52,6 @@ namespace bhaptics
 		int reconnectSec = 5;
 		std::chrono::steady_clock::time_point prevReconnect;
 
-		HapticPlayer() {}
 
 		bool isRegisterSent = true;
 
@@ -109,9 +109,9 @@ namespace bhaptics
 			{
 				return false;
 			}
-
+			pollingMtx.lock();
 			WebSocket::readyStateValues isClosed = ws->getReadyState();
-
+			pollingMtx.unlock();
 			if (isClosed == WebSocket::CLOSED)
 			{
 				ws.reset(nullptr);
@@ -198,6 +198,16 @@ namespace bhaptics
 			send(playerReq);
 		}
 
+
+
+		void callbackFunc()
+		{
+			//doRepeat();
+		}
+
+	public:
+		bool retryConnection = true;
+
 		void doRepeat()
 		{
 			if (isRunning)
@@ -220,13 +230,7 @@ namespace bhaptics
 			isRunning = false;
 		}
 
-		void callbackFunc()
-		{
-			doRepeat();
-		}
-
-	public:
-		bool retryConnection = true;
+		HapticPlayer() {}
 
 		int registerFeedback(const string &key, const string &filePath)
 		{
@@ -252,9 +256,9 @@ namespace bhaptics
 		{
 			if (_enable)
 				return;
-			function<void()> callback = std::bind(&HapticPlayer::callbackFunc, this);
-			timer.addTimerHandler(callback);
-			timer.start();
+			//function<void()> callback = std::bind(&HapticPlayer::callbackFunc, this);
+			//timer.addTimerHandler(callback);
+			//timer.start();
 
 #ifdef _WIN32
 			INT rc;
@@ -428,7 +432,7 @@ namespace bhaptics
 			{
 				return;
 			}
-
+			//timer.stop();
 			_enable = false; //ensures no more sends when destroying
 			dispatchFunctionVar = NULL; //ensures no more dispatches when destroying
 										//isPolling = true;
@@ -442,7 +446,7 @@ namespace bhaptics
 			_activeDevices.erase(_activeDevices.begin(), _activeDevices.end());
 			_activeKeys.erase(_activeKeys.begin(), _activeKeys.end());
 
-			_enable = true; // allows for sending again, just in case
+			//_enable = false; // allows for sending again, just in case
 
 		}
 
@@ -477,6 +481,14 @@ namespace bhaptics
 			return response.Status;
 		}
 
+		void parseResponse(PlayerResponse response)
+		{
+			mtx.lock();
+			_activeKeys = response.ActiveKeys;
+			_activeDevices = response.ConnectedPositions;
+			mtx.unlock();
+		}
+
 		bool isDevicePlaying(Position device)
 		{
 			mtx.lock();
@@ -486,18 +498,18 @@ namespace bhaptics
 			return ret;
 		}
 
-		HapticPlayer(HapticPlayer const&) = delete;
-		void operator= (HapticPlayer const&) = delete;
+		//HapticPlayer(HapticPlayer const&) = delete;
+		//void operator= (HapticPlayer const&) = delete;
 
-		static HapticPlayer *instance()
-		{
-			if (!hapticManager)
-			{
-				hapticManager = new HapticPlayer();
-			}
+		//static HapticPlayer *instance()
+		//{
+		//	if (!hapticManager)
+		//	{
+		//		hapticManager = new HapticPlayer();
+		//	}
 
-			return hapticManager;
-		}
+		//	return hapticManager;
+		//}
 	};
 }
 
