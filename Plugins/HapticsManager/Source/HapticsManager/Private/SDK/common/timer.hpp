@@ -45,7 +45,7 @@ namespace bhaptics
         std::atomic<bool> started = false;
         std::function<void()> callbackFunc;
         int interval = 20;
-        int sleepTime = 1;
+        int sleepTime = 3;
 
         std::chrono::steady_clock::time_point prev;
 
@@ -63,7 +63,7 @@ namespace bhaptics
                     callbackFunc();
                 }
 
-                std::this_thread::sleep_for(std::chrono::milliseconds(sleepTime));
+                std::this_thread::sleep_for(std::chrono::seconds(sleepTime));
             }
         }
         std::thread runner;

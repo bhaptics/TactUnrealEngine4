@@ -24,12 +24,13 @@ namespace bhaptics
 	class HapticPlayer
 	{
 	private:
-		//static HapticPlayer *hapticManager;
 		unique_ptr<WebSocket> ws;
 		vector<RegisterRequest> _registered;
 
 		vector<string> _activeKeys;
 		vector<Position> _activeDevices;
+
+
 
 		mutex mtx;// mutex for _activeKeys and _activeDevices variable
 		mutex registerMtx; //mutex for _registered variable
@@ -135,16 +136,10 @@ namespace bhaptics
 			std::string jStr(TCHAR_TO_UTF8(*OutputString));
 
 
-			/*if (isPolling)
-			{
-			return;
-			}
-			isPolling = true;*/
 			pollingMtx.lock();
 			ws->send(jStr);
 			ws->poll();
 			pollingMtx.unlock();
-			//isPolling = false;
 		}
 
 		void updateActive(const string &key, const Frame& signal)
@@ -198,15 +193,15 @@ namespace bhaptics
 			send(playerReq);
 		}
 
-
-
 		void callbackFunc()
 		{
 			//doRepeat();
+			reconnect();
 		}
 
 	public:
 		bool retryConnection = true;
+		PlayerResponse CurrentResponse;
 
 		void doRepeat()
 		{
@@ -215,14 +210,12 @@ namespace bhaptics
 				return;
 			}
 			isRunning = true;
-			reconnect();
+			
 
-			//registerMtx.lock();
 			if (!isRegisterSent)
 			{
 				resendRegistered();
 			}
-			//registerMtx.unlock();
 
 			checkMessage();
 
@@ -256,10 +249,9 @@ namespace bhaptics
 		{
 			if (_enable)
 				return;
-			//function<void()> callback = std::bind(&HapticPlayer::callbackFunc, this);
-			//timer.addTimerHandler(callback);
-			//timer.start();
-
+			function<void()> callback = std::bind(&HapticPlayer::callbackFunc, this);
+			timer.addTimerHandler(callback);
+			timer.start();
 #ifdef _WIN32
 			INT rc;
 			WSADATA wsaData;
@@ -277,7 +269,7 @@ namespace bhaptics
 			_enable = true;
 		}
 
-		void submit(const string &key, Position position, const vector<uint8_t> &motorBytes, int durationMillis)//change to submit - done
+		void submit(const string &key, Position position, const vector<uint8_t> &motorBytes, int durationMillis)
 		{
 			if (!_enable || !connectionCheck())
 			{
@@ -309,28 +301,19 @@ namespace bhaptics
 			updateActive(key, req);
 		}
 
-		void submitRegistered(const string &key, float intensity, float duration)//change to submitRegistered
+		void submitRegistered(const string &key, const string &altKey, ScaleOption option, RotationOption rotOption)
 		{
-			if (duration < 0.01f || duration > 100.0f)
-			{
-				printf("not allowed duration %f\n", duration);
-				return;
-			}
-
-			if (intensity < 0.01f || intensity > 100.0f)
-			{
-				printf("not allowed intensity %f\n", duration);
-				return;
-			}
-
 			SubmitRequest req;
 			PlayerRequest playerReq;
 			req.Key = key;
 			req.Type = "key";
-			req.Parameters["intensityRatio"] = std::to_string(intensity);
-			req.Parameters["durationRatio"] = std::to_string(duration);
-
+			req.Parameters["scaleOption"] = option.to_string();
+			req.Parameters["rotationOption"] = rotOption.to_string();
 			playerReq.Submit.push_back(req);
+			if (!altKey.empty())
+			{
+				req.Parameters["altKey"] = altKey;
+			}
 
 			send(playerReq);
 		}
@@ -352,27 +335,28 @@ namespace bhaptics
 			send(playerReq);
 		}
 
-		void submitRegistered(const string &key, double deltaX, double deltaY, bool isValueRotate = true)
-		{
-			if (!_enable || !connectionCheck())
-			{
-				return;
-			}
+		//void submitRegistered(const string &key, const string &altKey, RotationOption option)
+		//{
+		//	if (!_enable || !connectionCheck())
+		//	{
+		//		return;
+		//	}
 
-			TransformOption option;// = TransformOption(deltaX, deltaY, isRotateValue);
-			option.DeltaX = deltaX;
-			option.DeltaY = deltaY;
-			option.IsValueRotate = isValueRotate;
-			SubmitRequest req;
-			PlayerRequest playerReq;
-			req.Key = key;
-			req.Type = "key";
-			req.Parameters["transformOption"] = option.to_string();
+		//	SubmitRequest req;
+		//	PlayerRequest playerReq;
+		//	req.Key = key;
+		//	req.Type = "key";
+		//	req.Parameters["rotationOption"] = option.to_string();
 
-			playerReq.Submit.push_back(req);
+		//	if (!altKey.empty())
+		//	{
+		//		req.Parameters["altKey"] = altKey;
+		//	}
 
-			send(playerReq);
-		}
+		//	playerReq.Submit.push_back(req);
+
+		//	send(playerReq);
+		//}
 
 		bool isPlaying()
 		{
@@ -399,6 +383,20 @@ namespace bhaptics
 			remove(key);
 		}
 
+		void parseReceivedMessage(const char * message)
+		{
+			TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject);
+			FString JsonString(message);
+			TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(JsonString);
+
+			if (FJsonSerializer::Deserialize(Reader, JsonObject))
+			{
+				PlayerResponse Response;
+				Response.from_json(*JsonObject);
+				CurrentResponse = Response;
+				parseResponse(Response);
+			}
+		}
 		void(*dispatchFunctionVar)(const char*);
 
 		void checkMessage()
@@ -411,14 +409,9 @@ namespace bhaptics
 			if (dispatchFunctionVar != NULL && _enable)
 			{
 
-				/*if (isPolling)
-				{
-				return;
-				}*/
-				//isPolling = true;
 				if (pollingMtx.try_lock())
 				{
-					ws->dispatchChar(dispatchFunctionVar);
+					ws->dispatchChar([this](const char* s) { this->parseReceivedMessage(s); });
 					ws->poll();
 					pollingMtx.unlock();
 				}
@@ -432,21 +425,16 @@ namespace bhaptics
 			{
 				return;
 			}
-			//timer.stop();
 			_enable = false; //ensures no more sends when destroying
 			dispatchFunctionVar = NULL; //ensures no more dispatches when destroying
-										//isPolling = true;
 			pollingMtx.lock();
 			ws->close();
 			ws->poll();
 			ws.reset();
 			pollingMtx.unlock();
-			//isPolling = false;
 
 			_activeDevices.erase(_activeDevices.begin(), _activeDevices.end());
 			_activeKeys.erase(_activeKeys.begin(), _activeKeys.end());
-
-			//_enable = false; // allows for sending again, just in case
 
 		}
 
@@ -497,19 +485,6 @@ namespace bhaptics
 			bool ret = std::find(temp.begin(), temp.end(), device) != temp.end();
 			return ret;
 		}
-
-		//HapticPlayer(HapticPlayer const&) = delete;
-		//void operator= (HapticPlayer const&) = delete;
-
-		//static HapticPlayer *instance()
-		//{
-		//	if (!hapticManager)
-		//	{
-		//		hapticManager = new HapticPlayer();
-		//	}
-
-		//	return hapticManager;
-		//}
 	};
 }
 

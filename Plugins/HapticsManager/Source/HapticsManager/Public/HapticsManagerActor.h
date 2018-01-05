@@ -5,7 +5,9 @@
 #include "Engine.h"
 #include "HapticStructures.h"
 #include "GameFramework/Actor.h"
+#include "AllowWindowsPlatformTypes.h"
 #include "SDK/hapticsManager.hpp"
+#include "HideWindowsPlatformTypes.h"
 #include "HapticsManagerActor.generated.h"
 
 
@@ -18,7 +20,7 @@ public:
 	// Sets default values for this actor's properties
 	AHapticsManagerActor();
 
-	static TArray<FHapticFeedback> ChangedFeedbacks;
+	TArray<FHapticFeedback> ChangedFeedbacks;
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -82,21 +84,12 @@ public:
 		Category = "bHaptics")
 		void SubmitKey(const FString &Key);
 
-	//Deprecated function. Use SubmitKeyWithIntensityDuration instead.
-	UFUNCTION(BlueprintCallable,
-		meta = (DisplayName = "Submit Registered with Intensity and Duration",
-			Keywords = "bHaptics",
-			DeprecatedFunction,
-			DeprecationMessage = "Deprecated Method. Use SubmitKeyWithIntensityDuration instead. Will be removed in 1.2.0."),
-		Category = "bHaptics")
-		void SubmitRegisteredIntesityDuration(const FString &Key, float Intensity, float Duration);
-
 	//Submit a registered feedback using the file name as a key, and scale the intensity and duration by given scales.
 	UFUNCTION(BlueprintCallable,
 		meta = (DisplayName = "Submit Key with Intensity and Duration",
 			Keywords = "bHaptics"),
 		Category = "bHaptics")
-		void SubmitKeyWithIntensityDuration(const FString &Key, float Intensity, float Duration);
+		void SubmitKeyWithIntensityDuration(const FString &Key, const FString &AltKey, FRotationOption RotationOption, FScaleOption ScaleOption);
 
 	//Submit a registered feedback using the file name as a key and transform by the given deltaX and deltaY.
 	//Also state if the feedback should continue when hitting an edge of the device or not.
@@ -104,7 +97,7 @@ public:
 		meta = (DisplayName = "Submit Key with Transform",
 			Keywords = "bHaptics"),
 		Category = "bHaptics")
-		void SubmitKeyWithTransform(const FString &Key, float DeltaX, float DeltaY, bool IsValueRotated);
+		void SubmitKeyWithTransform(const FString &Key, const FString &AltKey, FRotationOption Option);
 
 	//Register a given feedback file from the given file path with the given key.
 	UFUNCTION(BlueprintCallable,
@@ -200,14 +193,12 @@ public:
 
 private:
 	static FCriticalSection m_Mutex;
-	static FCriticalSection m_PlayerInitMutex;
 	static bhaptics::PlayerResponse CurrentResponse;
-	bool MessagePlayed = false;
 	bool IsTicking = false;
 
 	FString LoadFeedbackFiles(TArray<FString>& FilesOut);
 	void Reset();
-	static void UpdateDisplayedFeedback(const char *ReceivedMessage);
+	void UpdateFeedback();
 	void VisualiseFeedback(FHapticFeedback Feedback, TArray<USceneComponent*> TactoSuitItem);
 	void InitialiseDots(TArray<USceneComponent*> TactoSuitItem);
 	bhaptics::HapticPlayer* hapticPlayer;

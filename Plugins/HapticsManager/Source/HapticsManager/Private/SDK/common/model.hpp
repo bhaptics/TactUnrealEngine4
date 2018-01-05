@@ -7,38 +7,38 @@
 
 namespace bhaptics
 {
-    using namespace std;
+	using namespace std;
 
-    enum Position {
-        All = 0, Left = 1, Right = 2,
-        Vest = 3,
-        Head = 4,
+	enum Position {
+		All = 0, Left = 1, Right = 2,
+		Vest = 3,
+		Head = 4,
 		Racket = 5,
 		HandL = 6, HandR = 7,
 		FootL = 8, FootR = 9,
-        VestFront = 201, VestBack = 202,
-        GloveLeft = 203, GloveRight = 204,
-        Custom1 = 251, Custom2 = 252, Custom3 = 253, Custom4 = 254
-    };
+		VestFront = 201, VestBack = 202,
+		GloveLeft = 203, GloveRight = 204,
+		Custom1 = 251, Custom2 = 252, Custom3 = 253, Custom4 = 254
+	};
 
-    enum FeedbackMode {
-        PATH_MODE,
-        DOT_MODE
-    };
+	enum FeedbackMode {
+		PATH_MODE,
+		DOT_MODE
+	};
 
 	struct DotPoint
-    {
-        int index;
-        int intensity;
-        DotPoint(int _index, int _intensity)
-        {
+	{
+		int index;
+		int intensity;
+		DotPoint(int _index, int _intensity)
+		{
 			index = _index;
 			if (_index < 0)
 				index = 0;
 			else if (_index > 19)
 				index = 19;
-            intensity = _intensity;
-        }
+			intensity = _intensity;
+		}
 
 		void to_json(FJsonObject& j)
 		{
@@ -46,20 +46,20 @@ namespace bhaptics
 			j.SetNumberField("Intensity", intensity);
 		}
 
-    };
+	};
 
-    struct PathPoint
-    {
-        float x;
-        float y;
-        int intensity;
+	struct PathPoint
+	{
+		float x;
+		float y;
+		int intensity;
 		int MotorCount;
 
-        PathPoint(float _x, float _y, int _intensity, int motorCount =3)
-        {
+		PathPoint(float _x, float _y, int _intensity, int motorCount = 3)
+		{
 			int xRnd = _x * 1000;
 			int yRnd = _y * 1000;
-            intensity = _intensity;
+			intensity = _intensity;
 			if (motorCount < 1)
 			{
 				MotorCount = 1;
@@ -90,10 +90,10 @@ namespace bhaptics
 			{
 				yRnd = 1000;
 			}
-			
+
 			x = (float)(xRnd) / 1000;
 			y = (float)(yRnd) / 1000;
-        }
+		}
 
 		void to_json(FJsonObject& j)
 		{
@@ -103,81 +103,81 @@ namespace bhaptics
 			j.SetNumberField("MotorCount", MotorCount);
 		}
 
-    };
+	};
 
 	struct HapticFeedbackFrame
-    {
-        vector<PathPoint> pathPoints;
-        vector<DotPoint> dotPoints;
-        int texture;
-        Position position;
+	{
+		vector<PathPoint> pathPoints;
+		vector<DotPoint> dotPoints;
+		int texture;
+		Position position;
 
-        HapticFeedbackFrame(Position _pos, const vector<PathPoint> &_pathPoints)
-        {
-            position = _pos;
-            pathPoints = _pathPoints;
-            texture = 0;
-        }
+		HapticFeedbackFrame(Position _pos, const vector<PathPoint> &_pathPoints)
+		{
+			position = _pos;
+			pathPoints = _pathPoints;
+			texture = 0;
+		}
 
-        HapticFeedbackFrame(Position _pos, const vector<DotPoint> &_dotPoints)
-        {
-            position = _pos;
-            dotPoints = _dotPoints;
-            texture = 0;
-        }
+		HapticFeedbackFrame(Position _pos, const vector<DotPoint> &_dotPoints)
+		{
+			position = _pos;
+			dotPoints = _dotPoints;
+			texture = 0;
+		}
 		HapticFeedbackFrame()
 		{
-			
+
 		}
-    };
+	};
 
-    struct HapticFeedback
-    {
-        Position position;
-        FeedbackMode mode;
-        vector<uint8_t> values;
+	struct HapticFeedback
+	{
+		Position position;
+		FeedbackMode mode;
+		vector<uint8_t> values;
 
-        HapticFeedback(Position _pos, const int _val[], FeedbackMode _mod)
-        {
-            position = _pos;
-            mode = _mod;
-            values.assign(20, 0);
-            for (int i = 0; i < 20; i++)
-            {
-                values[i] = _val[i];
-            }
-        }
+		HapticFeedback(Position _pos, const int _val[], FeedbackMode _mod)
+		{
+			position = _pos;
+			mode = _mod;
+			values.assign(20, 0);
+			for (int i = 0; i < 20; i++)
+			{
+				values[i] = _val[i];
+			}
+		}
 
-        HapticFeedback(Position _pos, const vector<uint8_t> &_val, FeedbackMode _mod)
-        {
-            position = _pos;
-            mode = _mod;
-            values.assign(20, 0);
-            for (int i = 0; i < 20; i++)
-            {
-                values[i] = _val[i];
-            }
-        }
+		HapticFeedback(Position _pos, const vector<uint8_t> &_val, FeedbackMode _mod)
+		{
+			position = _pos;
+			mode = _mod;
+			values.assign(20, 0);
+			for (int i = 0; i < 20; i++)
+			{
+				values[i] = _val[i];
+			}
+		}
 
-        HapticFeedback() : position(), mode()
-        {
-            values.assign(20, 0);
-        }
-    };
+		HapticFeedback() : position(), mode()
+		{
+			values.assign(20, 0);
+		}
+	};
 
 
 
-    class Common
-    {
-    public:
-        template<class T, class V>
-        static bool containsKey(T key, const map<T, V> &mapData)
-        {
-            return mapData.find(key) != mapData.end();
-        }
-    };
+	class Common
+	{
+	public:
+		template<class T, class V>
+		static bool containsKey(T key, const map<T, V> &mapData)
+		{
+			return mapData.find(key) != mapData.end();
+		}
+	};
 
-    	
+
 	////////*********
 
 	enum PlaybackType
@@ -265,7 +265,7 @@ namespace bhaptics
 
 			StartTime = j.GetIntegerField("startTime");
 			EndTime = j.GetIntegerField("endTime");
-			
+
 			if (playbackType == "NONE")
 			{
 				PlaybackType = NONE;
@@ -289,7 +289,7 @@ namespace bhaptics
 				tempDot.from_json(*dotObj[i]->AsObject());
 				PointList.push_back(tempDot);
 			}
-			
+
 		}
 	};
 
@@ -360,7 +360,7 @@ namespace bhaptics
 		PlaybackType PlaybackType = PlaybackType::NONE;
 		PathMovingPattern MovingPattern = PathMovingPattern::CONST_TDM;
 		std::vector<PathModeObject> PointList;
-		
+
 
 		void to_json(FJsonObject& j)
 		{
@@ -400,7 +400,7 @@ namespace bhaptics
 				break;
 			}
 
-			j.SetStringField("PlaybackType",playbackValue.c_str());
+			j.SetStringField("PlaybackType", playbackValue.c_str());
 			j.SetStringField("MovingPattern", patternValue.c_str());
 
 			for (size_t i = 0; i < PointList.size(); i++)
@@ -466,10 +466,10 @@ namespace bhaptics
 
 			for (size_t i = 0; i < Feedback.size(); i++)
 			{
-				TSharedPtr<FJsonObject> pathmodeTemp= MakeShareable(new FJsonObject);
+				TSharedPtr<FJsonObject> pathmodeTemp = MakeShareable(new FJsonObject);
 				Feedback[i].to_json(*pathmodeTemp);
 				TSharedRef<FJsonValueObject> JsonValue = MakeShareable(new FJsonValueObject(pathmodeTemp));
-				
+
 				feedbackValues.Add(JsonValue);
 			}
 			j.SetArrayField("Feedback", feedbackValues);
@@ -497,7 +497,7 @@ namespace bhaptics
 
 		void to_json(FJsonObject& j)
 		{
-			string modeValue ="";
+			string modeValue = "";
 			TSharedPtr<FJsonObject> dotModeValue = MakeShareable(new FJsonObject);
 			TSharedPtr<FJsonObject> pathModeValue = MakeShareable(new FJsonObject);
 
@@ -526,7 +526,7 @@ namespace bhaptics
 		void from_json(FJsonObject& j)
 		{
 			string modeEnum = (TCHAR_TO_UTF8(*j.GetStringField(TEXT("mode"))));
-			
+
 			if (modeEnum == "PATH_MODE")
 			{
 				Mode = PATH_MODE;
@@ -535,7 +535,7 @@ namespace bhaptics
 			{
 				Mode = DOT_MODE;
 			}
-			
+
 
 			Texture = j.GetNumberField("texture");
 			DotMode.from_json(*j.GetObjectField("dotMode"));
@@ -549,11 +549,11 @@ namespace bhaptics
 		int StartTime;
 		int OffsetTime;
 		std::map<std::string, HapticEffectMode> Modes;
-		
+
 		void to_json(FJsonObject& j)
 		{
 			TSharedPtr<FJsonObject> modeObject = MakeShareable(new FJsonObject);
-			
+
 			for (auto& m : Modes)
 			{
 				TSharedPtr<FJsonObject> effectObject = MakeShareable(new FJsonObject);
@@ -561,7 +561,7 @@ namespace bhaptics
 				m.second.to_json(*effectObject);
 				modeObject->SetObjectField(m.first.c_str(), effectObject);
 			}
-			
+
 			j.SetNumberField("StartTime", StartTime);
 			j.SetNumberField("OffsetTime", OffsetTime);
 			j.SetObjectField("Modes", modeObject);
@@ -581,7 +581,7 @@ namespace bhaptics
 
 			StartTime = j.GetIntegerField("startTime");
 			OffsetTime = j.GetIntegerField("offsetTime");
-			
+
 		}
 
 	};
@@ -594,10 +594,10 @@ namespace bhaptics
 		{
 
 			TArray<TSharedPtr<FJsonValue>> effectValues;
-			
+
 			for (size_t i = 0; i < Effects.size(); i++)
 			{
-				TSharedPtr<FJsonObject> effectObject = MakeShareable (new FJsonObject);
+				TSharedPtr<FJsonObject> effectObject = MakeShareable(new FJsonObject);
 				Effects[i].to_json(*effectObject);
 				TSharedRef<FJsonValueObject> JsonValue = MakeShareable(new FJsonValueObject(effectObject));
 				effectValues.Add(JsonValue);
@@ -638,7 +638,7 @@ namespace bhaptics
 			X = j.GetNumberField("x");
 			Y = j.GetNumberField("y");
 		}
-		
+
 	};
 
 	struct Layout
@@ -649,7 +649,7 @@ namespace bhaptics
 		void to_json(FJsonObject& j)
 		{
 			TSharedPtr<FJsonObject> layout = MakeShareable(new FJsonObject);
-			
+
 			for (auto& l : Layouts)
 			{
 				TArray<TSharedPtr<FJsonValue>> jVec;
@@ -738,7 +738,7 @@ namespace bhaptics
 		map<int, vector<HapticFeedback>> feedback;
 		HapticProject project;
 
-		void from_json (FJsonObject& j)
+		void from_json(FJsonObject& j)
 		{
 			intervalMillis = j.GetIntegerField(TEXT("intervalMillis"));
 			size = j.GetIntegerField(TEXT("size"));
@@ -807,41 +807,42 @@ namespace bhaptics
 		}
 	};
 
-	struct TransformOption
+	struct ScaleOption
 	{
-		double DeltaX;
-		double DeltaY;
-		bool IsValueRotate;
-
-		//TransformOption(double deltaX, double deltaY, bool isValueRotate)
-		//{
-		//	DeltaX = deltaX;
-		//	DeltaY = deltaY;
-		//	IsValueRotate = isValueRotate;
-		//}
+		float Intensity;
+		float Duration;
 
 		void to_json(FJsonObject& j)
 		{
-			j.SetNumberField("DeltaX", DeltaX);
-			j.SetNumberField("DeltaY", DeltaY);
-			j.SetBoolField("IsValueRotate", IsValueRotate);
+			j.SetNumberField("Intensity", Intensity);
+			j.SetNumberField("Duration", Duration);
 		}
 
 		string to_string()
 		{
-			string valRot = "";
-			if (IsValueRotate)
-			{
-				valRot = "true";
-			}
-			else
-			{
-				valRot = "false";
-			}
-			string ret = "{ \"DeltaX\" : " + std::to_string(DeltaX) + ", \"DeltaY\" : "+ std::to_string(DeltaY)+ ", \"IsValueRotate\" : "+ valRot +"}";
+			string ret = "{ \"intensity\" : " + std::to_string(Intensity) + ", \"duration\" : " + std::to_string(Duration) + "}";
 			return ret;
 		}
 	};
+
+	struct RotationOption
+	{
+		float OffsetAngleX;
+		float OffsetY;
+
+		void to_json(FJsonObject& j)
+		{
+			j.SetNumberField("DeltaX", OffsetAngleX);
+			j.SetNumberField("DeltaY", OffsetY);
+		}
+
+		string to_string()
+		{
+			string ret = "{ \"offsetAngleX\" : " + std::to_string(OffsetAngleX) + ", \"offsetY\" : " + std::to_string(OffsetY) + "}";
+			return ret;
+		}
+	};
+
 
 	struct RegisterRequest
 	{
@@ -876,7 +877,7 @@ namespace bhaptics
 			j.SetStringField("Key", Key.c_str());
 			j.SetObjectField("Frame", frameObject);
 
-			
+
 			for (auto& p : Parameters)
 			{
 				parameterObject->SetStringField(p.first.c_str(), p.second.c_str());
@@ -940,7 +941,7 @@ namespace bhaptics
 			TArray<TSharedPtr<FJsonValue>> activeKeyValues = j.GetArrayField("ActiveKeys");
 			TMap<FString, TSharedPtr<FJsonValue>> statusValues = j.GetObjectField("Status")->Values;
 			const TArray<TSharedPtr<FJsonValue>> *connectedKeyValues;
-			
+
 			for (int i = 0; i < regKeyValues.Num(); i++)
 			{
 				RegisteredKeys.push_back(TCHAR_TO_UTF8(*regKeyValues[i]->AsString()));
@@ -950,7 +951,7 @@ namespace bhaptics
 			{
 				ActiveKeys.push_back(TCHAR_TO_UTF8(*activeKeyValues[i]->AsString()));
 			}
-			
+
 			if (j.TryGetArrayField("ConnectedPositions", connectedKeyValues))
 			{
 				for (int i = 0; i < connectedKeyValues->Num(); i++)
@@ -995,7 +996,7 @@ namespace bhaptics
 					}
 				}
 			}
-		
+
 
 			for (auto& s : statusValues)
 			{
@@ -1142,7 +1143,7 @@ namespace bhaptics
 						{
 							if (values[index] > 0)
 							{
-								points.push_back(DotPoint(index,values[index]));
+								points.push_back(DotPoint(index, values[index]));
 							}
 						}
 
@@ -1191,7 +1192,7 @@ namespace bhaptics
 					{
 						HapticFeedbackFrame hapticFeedback = hapticFeedbacks[i];
 						vector<DotPoint> emptyDots;
-						HapticFeedbackFrame feedback = HapticFeedbackFrame(hapticFeedback.position,emptyDots);
+						HapticFeedbackFrame feedback = HapticFeedbackFrame(hapticFeedback.position, emptyDots);
 
 						for (auto point = hapticFeedback.dotPoints.begin(); point != hapticFeedback.dotPoints.end(); point++)
 						{
@@ -1233,7 +1234,7 @@ namespace bhaptics
 		}
 
 	};
-		
+
 }
 
 #endif

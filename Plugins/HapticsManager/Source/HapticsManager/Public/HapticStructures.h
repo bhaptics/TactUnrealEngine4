@@ -19,7 +19,7 @@ enum class EPosition : uint8
 };
 
 UENUM(BlueprintType)
-enum class EFeedbackMode: uint8
+enum class EFeedbackMode : uint8
 {
 	PATH_MODE	UMETA(DisplayName = "PATHMODE"),
 	DOT_MODE	UMETA(DisplayName = "DOTMODE")
@@ -31,7 +31,7 @@ struct FDotPoint
 {
 	GENERATED_BODY()
 
-	FDotPoint()
+		FDotPoint()
 	{
 		Index = 0;
 		Intensity = 0;
@@ -39,17 +39,17 @@ struct FDotPoint
 
 	FDotPoint(int32 _index, int32 _intensity)
 	{
-		Index = FMath::Clamp(_index,0,19);
-		Intensity = FMath::Clamp(_intensity,0,100);
+		Index = FMath::Clamp(_index, 0, 19);
+		Intensity = FMath::Clamp(_intensity, 0, 100);
 	}
-	
+
 	//Index of the motor to be activated.
-	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = Vars)
-	int32 Index;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Vars)
+		int32 Index;
 
 	//Intensity of the vibration from 0 to 100
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Vars)
-	int32 Intensity;
+		int32 Intensity;
 };
 
 //Structure to allow for continuous haptic feedback anywhere on the device, interpolating which motors are played.
@@ -57,7 +57,7 @@ USTRUCT(BlueprintType)
 struct FPathPoint
 {
 	GENERATED_BODY()
-	FPathPoint()
+		FPathPoint()
 	{
 		X = 0;
 		Y = 0;
@@ -67,19 +67,19 @@ struct FPathPoint
 
 	//X-value position on the device from 0.0 to 1.0
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Vars)
-	float X;
+		float X;
 
 	//Y-value position on the device from 0.0 to 1.0
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Vars)
-	float Y;
+		float Y;
 
 	//Intensity of the vibration from 0 to 100
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Vars)
-	int32 Intensity;
+		int32 Intensity;
 
 	//Number of motors activated when interpolating the point from 1 to 3.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Vars)
-	int32 MotorCount;
+		int32 MotorCount;
 
 	FPathPoint(float _x, float _y, int32 _intensity, int32 _motorCount = 3)
 	{
@@ -98,8 +98,8 @@ USTRUCT(BlueprintType)
 struct FHapticFeedbackFrame
 {
 	GENERATED_BODY()
-	
-	FHapticFeedbackFrame()
+
+		FHapticFeedbackFrame()
 	{
 		Position = EPosition::All;
 		PathPoints.Add(FPathPoint());
@@ -108,16 +108,16 @@ struct FHapticFeedbackFrame
 	}
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Vars)
-	TArray<FPathPoint> PathPoints;
+		TArray<FPathPoint> PathPoints;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Vars)
-	TArray<FDotPoint> DotPoints;
+		TArray<FDotPoint> DotPoints;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Vars)
-	int32 Texture;
+		int32 Texture;
 
 	UPROPERTY(BlueprintReadWrite, Category = Vars)
-	EPosition Position;
+		EPosition Position;
 
 	FHapticFeedbackFrame(EPosition _pos, const TArray<FPathPoint> &_pathPoints)
 	{
@@ -139,12 +139,12 @@ struct FHapticFeedback
 {
 	GENERATED_BODY()
 
+		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Vars)
+		EPosition Position;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Vars)
-	EPosition Position;
+		EFeedbackMode Mode;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Vars)
-	EFeedbackMode Mode;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Vars)
-	TArray<uint8> Values;
+		TArray<uint8> Values;
 
 	FHapticFeedback(EPosition _pos, const int _val[], EFeedbackMode _mod)
 	{
@@ -168,6 +168,50 @@ struct FHapticFeedback
 	FHapticFeedback() : Position(), Mode()
 	{
 		Values.AddZeroed(20);
+	}
+};
+
+USTRUCT(BlueprintType)
+struct FRotationOption
+{
+	GENERATED_BODY()
+		FRotationOption()
+	{
+		OffsetAngleX = 0;
+		OffsetY = 0;
+	}
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Vars)
+		float OffsetAngleX = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Vars)
+		float OffsetY = 0;
+
+	FRotationOption(float AngleX, float Y)
+	{
+		OffsetAngleX = AngleX;
+		OffsetY = Y;
+	}
+};
+
+USTRUCT(BlueprintType)
+struct FScaleOption
+{
+	GENERATED_BODY()
+		FScaleOption()
+	{
+		Duration = 1.0;
+		Intensity = 1.0;
+	}
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Vars)
+		float Intensity = 1.0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Vars)
+		float Duration = 1.0;
+
+	FScaleOption(float intensity, float duration)
+	{
+		Intensity = intensity;
+		Duration = duration;
 	}
 };
 
