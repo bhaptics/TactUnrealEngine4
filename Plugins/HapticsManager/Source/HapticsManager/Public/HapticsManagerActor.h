@@ -69,14 +69,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Haptics")
 		FString ProjectFeedbackFolder = "HapticsManager/Feedback";
 
-	UFUNCTION(BlueprintCallable,
-		meta = (DisplayName = "Submit Registered",
-			Keywords = "bHaptics",
-			DeprecatedFunction,
-			DeprecationMessage = "Deprecated Method. Use SubmitKey instead. Will be removed in 1.2.0."),
-		Category = "bHaptics")
-		void SubmitRegistered(const FString &Key);
-
 	//Submit a registered feedback using the file name as a key
 	UFUNCTION(BlueprintCallable,
 		meta = (DisplayName = "Submit Key",
@@ -84,20 +76,20 @@ public:
 		Category = "bHaptics")
 		void SubmitKey(const FString &Key);
 
-	//Submit a registered feedback using the file name as a key, and scale the intensity and duration by given scales.
+	//Submit a registered feedback using the file name as a key and a given RotationOption.
+	//This call will only rotate vest feedback files, with other devices being kept the same.
 	UFUNCTION(BlueprintCallable,
-		meta = (DisplayName = "Submit Key with Intensity and Duration",
-			Keywords = "bHaptics"),
-		Category = "bHaptics")
-		void SubmitKeyWithIntensityDuration(const FString &Key, const FString &AltKey, FRotationOption RotationOption, FScaleOption ScaleOption);
-
-	//Submit a registered feedback using the file name as a key and transform by the given deltaX and deltaY.
-	//Also state if the feedback should continue when hitting an edge of the device or not.
-	UFUNCTION(BlueprintCallable,
-		meta = (DisplayName = "Submit Key with Transform",
+		meta = (DisplayName = "Submit Key with Rotation",
 			Keywords = "bHaptics"),
 		Category = "bHaptics")
 		void SubmitKeyWithTransform(const FString &Key, const FString &AltKey, FRotationOption Option);
+
+	//Submit a registered feedback using the file name as a key, and scale the intensity and duration by given ScaleOption.
+	UFUNCTION(BlueprintCallable,
+		meta = (DisplayName = "Submit Key with Scaled Intensity and Duration",
+			Keywords = "bHaptics"),
+		Category = "bHaptics")
+		void SubmitKeyWithIntensityDuration(const FString &Key, const FString &AltKey, FRotationOption RotationOption, FScaleOption ScaleOption);
 
 	//Register a given feedback file from the given file path with the given key.
 	UFUNCTION(BlueprintCallable,
@@ -195,7 +187,6 @@ private:
 	static FCriticalSection m_Mutex;
 	static bhaptics::PlayerResponse CurrentResponse;
 	bool IsTicking = false;
-
 	FString LoadFeedbackFiles(TArray<FString>& FilesOut);
 	void Reset();
 	void UpdateFeedback();

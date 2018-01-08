@@ -139,7 +139,7 @@ struct FHapticFeedback
 {
 	GENERATED_BODY()
 
-		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Vars)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Vars)
 		EPosition Position;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Vars)
 		EFeedbackMode Mode;
@@ -171,47 +171,61 @@ struct FHapticFeedback
 	}
 };
 
+//Stores values used in rotating and transforming a feedback file on the haptic vest.
 USTRUCT(BlueprintType)
 struct FRotationOption
 {
 	GENERATED_BODY()
-		FRotationOption()
+
+
+	FRotationOption()
 	{
 		OffsetAngleX = 0;
 		OffsetY = 0;
 	}
 
+	//Rotate the feedback file horizontally clockwise along the vest by the given angle in degrees.
+	//A value of 180 will flip the feedback to the other side of the device.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Vars)
 		float OffsetAngleX = 0;
+
+	//Vertical offset of the transformed feedback file, with negative values moving the feedback upwards.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Vars)
 		float OffsetY = 0;
 
 	FRotationOption(float AngleX, float Y)
 	{
 		OffsetAngleX = AngleX;
-		OffsetY = Y;
+		OffsetY = FMath::Clamp(Y,-1.0f,1.0f);
 	}
 };
 
+//Stores the scaled values when altering a feedback file's intensity and duration.
 USTRUCT(BlueprintType)
 struct FScaleOption
 {
 	GENERATED_BODY()
-		FScaleOption()
+
+	FScaleOption()
 	{
 		Duration = 1.0;
 		Intensity = 1.0;
 	}
 
+	//Multiplier to scale the intensity of the feedback, where 0.5 halves the intensity
+	//and a value of 2.0 doubles it. Cannot be negative.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Vars)
 		float Intensity = 1.0;
+
+	//Multiplier to scale the duration of the feedback, where 0.5 halves the duration
+	//and a value of 2.0 doubles it. Cannot be negative.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Vars)
 		float Duration = 1.0;
 
 	FScaleOption(float intensity, float duration)
 	{
-		Intensity = intensity;
-		Duration = duration;
+		Intensity = FMath::Clamp(intensity,0.01f,100.0f);
+		Duration = FMath::Clamp(duration, 0.01f, 100.0f);
 	}
 };
 

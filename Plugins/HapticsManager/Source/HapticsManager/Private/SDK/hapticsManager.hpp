@@ -30,8 +30,6 @@ namespace bhaptics
 		vector<string> _activeKeys;
 		vector<Position> _activeDevices;
 
-
-
 		mutex mtx;// mutex for _activeKeys and _activeDevices variable
 		mutex registerMtx; //mutex for _registered variable
 		mutex pollingMtx; //mutex for _registered variable
@@ -42,7 +40,6 @@ namespace bhaptics
 		HapticTimer timer;
 
 		bool isRunning = false;
-		bool isPolling = false;
 
 		bool _enable = false;
 
@@ -52,7 +49,6 @@ namespace bhaptics
 
 		int reconnectSec = 5;
 		std::chrono::steady_clock::time_point prevReconnect;
-
 
 		bool isRegisterSent = true;
 
@@ -72,8 +68,8 @@ namespace bhaptics
 			std::chrono::steady_clock::time_point current = std::chrono::steady_clock::now();
 
 			int values = std::chrono::duration_cast<std::chrono::seconds>(current - prevReconnect).count();
-
-			if (values > reconnectSec)
+			bool IsPassedInterval = (current > (prevReconnect + std::chrono::seconds(reconnectSec)));
+			if (IsPassedInterval &&_enable)
 			{
 
 				ws.reset(WebSocket::create(host, port, path));
@@ -92,7 +88,6 @@ namespace bhaptics
 				registerMtx.lock();
 				vector<RegisterRequest> tempRegister = _registered;
 				registerMtx.unlock();
-
 
 				for (size_t i = 0; i < tempRegister.size(); i++)
 				{
@@ -195,8 +190,8 @@ namespace bhaptics
 
 		void callbackFunc()
 		{
-			//doRepeat();
 			reconnect();
+			_currentTime += _interval;
 		}
 
 	public:
@@ -210,7 +205,6 @@ namespace bhaptics
 				return;
 			}
 			isRunning = true;
-			
 
 			if (!isRegisterSent)
 			{
@@ -219,7 +213,6 @@ namespace bhaptics
 
 			checkMessage();
 
-			_currentTime += _interval;
 			isRunning = false;
 		}
 
@@ -251,7 +244,6 @@ namespace bhaptics
 				return;
 			function<void()> callback = std::bind(&HapticPlayer::callbackFunc, this);
 			timer.addTimerHandler(callback);
-			timer.start();
 #ifdef _WIN32
 			INT rc;
 			WSADATA wsaData;
@@ -265,6 +257,7 @@ namespace bhaptics
 			ws = unique_ptr<WebSocket>(WebSocket::create(host, port, path));
 
 			connectionCheck();
+			timer.start();
 
 			_enable = true;
 		}
@@ -303,17 +296,21 @@ namespace bhaptics
 
 		void submitRegistered(const string &key, const string &altKey, ScaleOption option, RotationOption rotOption)
 		{
+			if (!_enable || !connectionCheck())
+			{
+				return;
+			}
 			SubmitRequest req;
 			PlayerRequest playerReq;
 			req.Key = key;
 			req.Type = "key";
 			req.Parameters["scaleOption"] = option.to_string();
 			req.Parameters["rotationOption"] = rotOption.to_string();
-			playerReq.Submit.push_back(req);
 			if (!altKey.empty())
 			{
 				req.Parameters["altKey"] = altKey;
 			}
+			playerReq.Submit.push_back(req);
 
 			send(playerReq);
 		}
@@ -334,29 +331,6 @@ namespace bhaptics
 
 			send(playerReq);
 		}
-
-		//void submitRegistered(const string &key, const string &altKey, RotationOption option)
-		//{
-		//	if (!_enable || !connectionCheck())
-		//	{
-		//		return;
-		//	}
-
-		//	SubmitRequest req;
-		//	PlayerRequest playerReq;
-		//	req.Key = key;
-		//	req.Type = "key";
-		//	req.Parameters["rotationOption"] = option.to_string();
-
-		//	if (!altKey.empty())
-		//	{
-		//		req.Parameters["altKey"] = altKey;
-		//	}
-
-		//	playerReq.Submit.push_back(req);
-
-		//	send(playerReq);
-		//}
 
 		bool isPlaying()
 		{
@@ -397,7 +371,6 @@ namespace bhaptics
 				parseResponse(Response);
 			}
 		}
-		void(*dispatchFunctionVar)(const char*);
 
 		void checkMessage()
 		{
@@ -406,17 +379,12 @@ namespace bhaptics
 				return;
 			}
 
-			if (dispatchFunctionVar != NULL && _enable)
+			if (pollingMtx.try_lock())
 			{
-
-				if (pollingMtx.try_lock())
-				{
-					ws->dispatchChar([this](const char* s) { this->parseReceivedMessage(s); });
-					ws->poll();
-					pollingMtx.unlock();
-				}
+				ws->dispatchChar([this](const char* s) { this->parseReceivedMessage(s); });
+				ws->poll();
+				pollingMtx.unlock();
 			}
-
 		}
 
 		void destroy()
@@ -426,7 +394,7 @@ namespace bhaptics
 				return;
 			}
 			_enable = false; //ensures no more sends when destroying
-			dispatchFunctionVar = NULL; //ensures no more dispatches when destroying
+			timer.stop();
 			pollingMtx.lock();
 			ws->close();
 			ws->poll();
@@ -435,7 +403,6 @@ namespace bhaptics
 
 			_activeDevices.erase(_activeDevices.begin(), _activeDevices.end());
 			_activeKeys.erase(_activeKeys.begin(), _activeKeys.end());
-
 		}
 
 		void enableFeedback()
@@ -456,17 +423,6 @@ namespace bhaptics
 			}
 
 			_enable = !_enable;
-		}
-
-		map<string, vector<int>> parseResponse(FJsonObject j)
-		{
-			PlayerResponse response;
-			response.from_json(j);
-			mtx.lock();
-			_activeKeys = response.ActiveKeys;
-			_activeDevices = response.ConnectedPositions;
-			mtx.unlock();
-			return response.Status;
 		}
 
 		void parseResponse(PlayerResponse response)

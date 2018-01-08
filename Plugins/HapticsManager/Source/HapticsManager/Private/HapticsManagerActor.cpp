@@ -8,7 +8,6 @@
 #include "BhapticsUtilities.h"
 
 
-//TArray<FHapticFeedback> AHapticsManagerActor::ChangedFeedbacks = {};
 FCriticalSection AHapticsManagerActor::m_Mutex;
 bhaptics::PlayerResponse AHapticsManagerActor::CurrentResponse;
 
@@ -50,29 +49,31 @@ void AHapticsManagerActor::BeginPlay()
 	ChangedFeedbacks = {};
 	hapticPlayer = new bhaptics::HapticPlayer();
 
-	BhapticsUtilities::Initialise();
-	FString temp = BhapticsUtilities::GetExecutablePath();
-
-	if (!BhapticsUtilities::IsPlayerRunning())
+	if (BhapticsUtilities::Initialise())
 	{
-		UE_LOG(LogTemp, Log, TEXT("Player is not running"));
+		FString temp = BhapticsUtilities::GetExecutablePath();
 
-		if (BhapticsUtilities::IsPlayerInstalled())
+		if (!BhapticsUtilities::IsPlayerRunning())
 		{
-			UE_LOG(LogTemp, Log, TEXT("Player is installed - launching"));
-			BhapticsUtilities::LaunchPlayer();
+			UE_LOG(LogTemp, Log, TEXT("Player is not running"));
+
+			if (BhapticsUtilities::IsPlayerInstalled())
+			{
+				UE_LOG(LogTemp, Log, TEXT("Player is installed - launching"));
+				BhapticsUtilities::LaunchPlayer();
+			}
+			else
+			{
+				UE_LOG(LogTemp, Log, TEXT("Player is not Installed"));
+			}
 		}
 		else
 		{
-			UE_LOG(LogTemp, Log, TEXT("Player is not Installed"));
+			UE_LOG(LogTemp, Log, TEXT("Player is running"));
 		}
-	}
-	else
-	{
-		UE_LOG(LogTemp, Log, TEXT("Player is running"));
-	}
 
-	BhapticsUtilities::Free();
+		BhapticsUtilities::Free();
+	}
 
 	hapticPlayer->init();
 
@@ -172,11 +173,6 @@ void AHapticsManagerActor::Tick(float DeltaTime)
 	ChangedFeedbacks.Empty();
 
 	IsTicking = false;
-}
-
-void AHapticsManagerActor::SubmitRegistered(const FString & Key)
-{
-	SubmitKey(Key);
 }
 
 void AHapticsManagerActor::SubmitKey(const FString &Key)
@@ -424,7 +420,6 @@ void AHapticsManagerActor::TurnOffRegisteredFeedback(const FString &Key)
 
 void AHapticsManagerActor::UpdateFeedback()
 {
-
 	bhaptics::PlayerResponse Response;
 	std::map<std::string, std::vector<int>> DeviceMotors = hapticPlayer->CurrentResponse.Status;
 
@@ -488,8 +483,6 @@ void AHapticsManagerActor::UpdateFeedback()
 		ChangedFeedbacks.Add(Feedback);
 		m_Mutex.Unlock();
 	}
-
-
 }
 
 void AHapticsManagerActor::InitialiseDots(TArray<USceneComponent*> TactSuitItem)
