@@ -2,11 +2,8 @@
 
 #include "HapticsManagerPrivatePCH.h"
 #include "HapticsManagerActor.h"
-#include "AllowWindowsPlatformTypes.h"
 #include "HapticStructures.h"
-#include "HideWindowsPlatformTypes.h"
 #include "BhapticsUtilities.h"
-
 
 FCriticalSection AHapticsManagerActor::m_Mutex;
 bhaptics::PlayerResponse AHapticsManagerActor::CurrentResponse;
