@@ -1,6 +1,6 @@
 # bHaptics haptic devices Unreal Engine C++ plugin
 This project helps to utilize haptic devices in Unreal Engine 4
-Current version is 1.1.2
+Current version is 1.2.0
 
 ## Prerequisite
 * bHaptics Player has to be installed (Windows)
@@ -11,8 +11,7 @@ Current version is 1.1.2
 * If you have installed from the UE4 Marketplace, you can skip this section and go to the ['How to use the plugin'](#how-to-use-the-plugin) section.
 * Copy the Plugins folder of the bHapticsManger project and paste it into either your project folder or into the Engine/Plugins folder.
 * You should now have the plugin source code in either Plugins folder, as well as blueprints in the Plugins/HapticsManager/Content folder.
-* For C++ projects, you may need to inclde the module in the build configuration file found in the source folder (<YourProjectName>.Build.cs). Add "HapticsManager" to the list of public dependency module names, and generate the solution files again to ensure the plugins folder is included.
-* For blueprint-only projects, in the case of compiling errors, you will need to create a C++ class to generate the solution files for your project and rebuild the plugin.
+* For blueprint-only projects, in the case of any compiling errors, you will need to create a C++ class to generate the solution files for your project and rebuild the plugin.
 
 ## How to use the plugin
 * From the editor, make sure that 'Show Plugin Content' is checked under View Options, on the bottom right of the Content Browser.
@@ -35,9 +34,10 @@ Current version is 1.1.2
 #### Playing Feedback Files
 * There are three functions provided for playing the feedback from haptic feedback files: Submit Key, Submit Key with Intensity and Duration, and Submit Key with Transform.
 * For haptic files in the HapticsManager/Feedback folder in either the plugin's folder, or the proejct's contents folder, keys are automatically generated using the file name, for ease of use. If you wish to change the key used, call the Register feedback function and provide key and feedback file to be assigned.
-* The additional two functions add additional variables to the alter the feedback file.
-	* Submitting with Intensity and Duration add two variables to scale the original feedback values by some amount. For instance an intensity and duration of 0.5 would halve the original intensity and duration of the feedback, while a value of 2.0 would double it, although the intensity will be capped at a value of 100. You can change the Intensity and Duration separately to alter feedback if necessary.
-	* Submitting with Transform adds a DeltaX and DeltaY values to move the feedback along those axes. The value of each can range from -1.0 to 1.0 with the sign determining the direction from left to right or up to down respectively. For instance a transform of (-.5, .333) moves the feedback halfway across the device to the left, and downwards by a third of the device. There is also a boolean IsValueRotated to determine whether the feedback effect is transformed and continues when crossing the boundary (true), or whether the feedback effect is cut off at that point (false).
+* The additional two functions add additional options to the alter the feedback file.
+	* Submitting with Transform adds a RotationOption consisting of an Offset AngleX and an OffsetY, and the changes will only apply to feedback files for the Tactot haptic vest. The Offset Angle rotates the file around the body counter-clockwise, horizontally, by the given degrees, switching from front to the back when leaving the boundary of the front part of the vest, or vice versa. Similarly, OffsetY transforms the feedback up or down the body. This allows for a single impact feedback to be used anywhere on the body by rotating and transforming the horizontal and vertical components.
+	* Submitting with Intensity and Duration adds a ScaleOption to the previous function, which adds scale variables to alter the original feedback's intensity and duration. For instance an intensity and/or duration scale(s) of 0.5 would halve the original intensity and duration of the feedback, while a value of 2.0 would double it, although the intensity will be capped at a value of 100, and neither value can be less than 0.
+     * Both of the above methods also include an AltKey, or Alternative Key, in the case when a submitted feedback file key is already being played. If left blank, the submission call will interrupt the playing feedback and restart it; however if an AltKey is given, the two feedback files will be played together, with the second under the AltKey. This is useful in cases such as when a character is hit twice requiring the same feedback file to be played simultaneously.
 * The feedback file itself is not altered by either of the above two calls, so all changes to the intensity or position of the feedback effects in the file are with regards to the original feedback. This is so the same feedback file can be used for situations such as impact effects, or effects where the duration and intensity change based on other variables or conditions in the game.
 
 ### Dots
@@ -80,8 +80,9 @@ Current version is 1.1.2
 * The bHaptics designer is a great tool for testing effects and trying out ideas, and can help with planning effects you want to create in-game.
 * For the PathPoint structure, it is difficult to hit the edge of objects to fully activate the outer motors. To make the outer feedback stronger, one way is to multiply the points by 1.2, so the outer edge is easier to hit. You can experiment and see what makes your feedback feel better.
 * PathPoints will automatically interpolate between motors, and the intensity will be shared between the two. If this feedback feels too weak for your situation, you can add more points clustered together to increase the feedback effect when interpolated between points.
-* Be careful of naming the feedback effects, as 2 feedback effects with the same name will interrupt each other. Use the IsPlaying function to check if a specifc feedback effect is finished before sending the same feedback effect again.
+* Be careful of naming the feedback effects, as 2 feedback effects with the same name will interrupt each other. Use the IsPlaying function to check if a specifc feedback effect is finished before sending the same feedback effect again, or submit with an AltKey so both feedback files play together.
 * Be aware of the duration of your effects. You may need to add delays to ensure the submitted feedback has finished playing before submitting the next, in the case of a series of feedback calls to create the effect (ie. explosion, moving feedback).
+* For the Submit Key With Transform, you can consider the torso as a cylinder and project the haptic feedback file onto that. You can then change the horizontal offset by finding the angle offset from the forward vector, and the OffsetY from the height on the cylinder to play. This will help the feedback feel more continuous as it moves from the front to the back or vice versa.
 * Some simple examples are provided in a Feedback Effect Macro Library blueprint for reference, and you can use and adapt these functions to suit your needs.
 * The ForLoops in blueprints can cause unexpected results with feedback, as it does not natively support delays. A ForLoopWithDelay macro is provided; however, if you are using loops and delays heavily, it is recommended to work in C++ for these functions.
 * For further references, you can find our tutorial series at our youtube channel [here](https://www.youtube.com/channel/UCGyV7l7iZz9tUtEg4wvsOpA/playlists?shelf_id=0&sort=dd&view=1).
@@ -90,7 +91,7 @@ Current version is 1.1.2
 * Official Website: http://www.bhaptics.com/
 * E-mail: contact@bhaptics.com
 
-Last update of README.md: Dec. 19th, 2017.
+Last update of README.md: Jan. 9th, 2018.
 
 
 ###### Copyright (c) 2017 bHaptics Inc. All rights reserved.

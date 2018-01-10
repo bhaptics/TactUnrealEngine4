@@ -44,8 +44,8 @@ namespace bhaptics
     private:
         std::atomic<bool> started = false;
         std::function<void()> callbackFunc;
-        int interval = 20;
-        int sleepTime = 1;
+        int interval = 100;
+        int sleepTime = 5;
 
         std::chrono::steady_clock::time_point prev;
 
@@ -56,8 +56,9 @@ namespace bhaptics
                 std::chrono::steady_clock::time_point current = std::chrono::steady_clock::now();
                 
                 int values = std::chrono::duration_cast<std::chrono::milliseconds>(current - prev).count();
-    
-                if (callbackFunc && values >= interval )
+				bool isIntervalOver = (current > (prev + std::chrono::milliseconds(interval)));
+
+				if(callbackFunc && isIntervalOver)
                 {
                     prev = current;
                     callbackFunc();

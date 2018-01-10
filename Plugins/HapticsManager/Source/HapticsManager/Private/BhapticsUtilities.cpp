@@ -19,6 +19,8 @@ _IsPlayerRunning m_IsPlayerRunning;
 _LaunchPlayer m_LaunchPlayer;
 _GetExePath m_GetExePath;
 
+bool BhapticsUtilities::IsInitialised = false;
+
 void *v_dllHandle;
 
 BhapticsUtilities::BhapticsUtilities()
@@ -26,42 +28,48 @@ BhapticsUtilities::BhapticsUtilities()
 
 }
 
-void BhapticsUtilities::Initialise()
+bool BhapticsUtilities::Initialise()
 {
-	FString FilePath = IPluginManager::Get().FindPlugin("HapticsManager")->GetBaseDir();//*FPaths::EnginePluginsDir();
-	FString FilePathProject = *FPaths::GameContentDir();
-	
+	if (!IsInitialised)
+	{
+		FString FilePath = IPluginManager::Get().FindPlugin("HapticsManager")->GetBaseDir();//*FPaths::EnginePluginsDir();
+		FString FilePathProject = *FPaths::GameContentDir();
+
 #ifdef USEDLL64
-	FilePath.Append("/DLLs/bHapticUtility64.dll");
-	FilePathProject.Append("HapticsManager/DLLs/bHapticUtility64.dll");
+		FilePath.Append("/DLLs/bHapticUtility64.dll");
+		FilePathProject.Append("HapticsManager/DLLs/bHapticUtility64.dll");
 #else
-	FilePath.Append("/DLLs/bHapticUtility32.dll");
+		FilePath.Append("/DLLs/bHapticUtility32.dll");
 #endif
-	
-	if (FPaths::FileExists(FilePath))
-	{
-		v_dllHandle = FPlatformProcess::GetDllHandle(*FilePath);
 
-		if (v_dllHandle != NULL)
+		if (FPaths::FileExists(FilePath))
 		{
-			return;
-		}
-		UE_LOG(LogTemp, Log, TEXT("Loading %s failed."), *FilePath);
-	}
-	else if (FPaths::FileExists(FilePathProject))
-	{
-		v_dllHandle = FPlatformProcess::GetDllHandle(*FilePathProject);
+			v_dllHandle = FPlatformProcess::GetDllHandle(*FilePath);
 
-		if (v_dllHandle != NULL)
-		{
-			return;
+			if (v_dllHandle != NULL)
+			{
+				IsInitialised = true;
+				return true;
+			}
+			UE_LOG(LogTemp, Log, TEXT("Loading %s failed."), *FilePath);
 		}
-		UE_LOG(LogTemp, Log, TEXT("Loading %s failed."), *FilePathProject);
+		else if (FPaths::FileExists(FilePathProject))
+		{
+			v_dllHandle = FPlatformProcess::GetDllHandle(*FilePathProject);
+
+			if (v_dllHandle != NULL)
+			{
+				IsInitialised = true;
+				return true;
+			}
+			UE_LOG(LogTemp, Log, TEXT("Loading %s failed."), *FilePathProject);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Log, TEXT("Could not find dll in %s"), *FilePath);
+		}
 	}
-	else
-	{
-		UE_LOG(LogTemp, Log, TEXT("Could not find dll in %s"), *FilePath);
-	}
+	return false;
 
 }
 
