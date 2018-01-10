@@ -79,7 +79,7 @@ public:
 	//Submit a registered feedback using the file name as a key and a given RotationOption.
 	//This call will only rotate vest feedback files, with other devices being kept the same.
 	UFUNCTION(BlueprintCallable,
-		meta = (DisplayName = "Submit Key with Rotation",
+		meta = (DisplayName = "Submit Key with Transform",
 			Keywords = "bHaptics"),
 		Category = "bHaptics")
 		void SubmitKeyWithTransform(const FString &Key, const FString &AltKey, FRotationOption Option);
