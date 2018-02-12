@@ -1,36 +1,33 @@
-//Copyright bHaptics Inc. 2017
+// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
-#include "Engine.h"
+#include "Components/ActorComponent.h"
 #include "HapticStructures.h"
-#include "GameFramework/Actor.h"
 #include "AllowWindowsPlatformTypes.h"
 #include "SDK/hapticsManager.hpp"
 #include "HideWindowsPlatformTypes.h"
-#include "HapticsManagerActor.generated.h"
+#include "HapticComponent.generated.h"
 
 
-UCLASS()
-class HAPTICSMANAGER_API AHapticsManagerActor : public AActor
+UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+class HAPTICSMANAGER_API UHapticComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
-public:
-	// Sets default values for this actor's properties
-	AHapticsManagerActor();
+public:	
+	// Sets default values for this component's properties
+	UHapticComponent();
+
+	// Called when the game starts
+	virtual void BeginPlay() override;
+	
+	// Called every frame
+	virtual void TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction ) override;
 
 	TArray<FHapticFeedback> ChangedFeedbacks;
 
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-	virtual void OnConstruction(const FTransform & Transform) override;
-
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-
-	// Called every frame
-	virtual void Tick(float DeltaSeconds) override;
 
 	//Names of files currently loaded by the HapticsManager
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Haptics")
@@ -194,5 +191,6 @@ private:
 	void VisualiseFeedback(FHapticFeedback Feedback, TArray<USceneComponent*> TactoSuitItem);
 	void InitialiseDots(TArray<USceneComponent*> TactoSuitItem);
 	bhaptics::HapticPlayer* hapticPlayer;
-
+		
+	
 };
