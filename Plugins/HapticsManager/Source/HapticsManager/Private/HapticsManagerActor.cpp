@@ -7,6 +7,7 @@
 
 FCriticalSection AHapticsManagerActor::m_Mutex;
 bhaptics::PlayerResponse AHapticsManagerActor::CurrentResponse;
+bhaptics::HapticPlayer *bhaptics::HapticPlayer::hapticManager = 0;
 
 // Sets default values
 AHapticsManagerActor::AHapticsManagerActor()
@@ -44,7 +45,6 @@ void AHapticsManagerActor::BeginPlay()
 {
 	Super::BeginPlay();
 	ChangedFeedbacks = {};
-	hapticPlayer = new bhaptics::HapticPlayer();
 
 	if (BhapticsUtilities::Initialise())
 	{
@@ -72,7 +72,7 @@ void AHapticsManagerActor::BeginPlay()
 		BhapticsUtilities::Free();
 	}
 
-	hapticPlayer->init();
+	//bhaptics::HapticPlayer::instance()->init();
 
 	InitialiseDots(Tactal);
 	InitialiseDots(TactosyLeft);
@@ -106,9 +106,9 @@ void AHapticsManagerActor::BeginPlay()
 
 void AHapticsManagerActor::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	hapticPlayer->turnOff();
-	hapticPlayer->destroy();
-	hapticPlayer = nullptr;
+	//bhaptics::HapticPlayer::instance()->turnOff();
+	//bhaptics::HapticPlayer::instance()->destroy();
+	//bhaptics::HapticPlayer::instance() = nullptr;
 }
 
 // Called every frame
@@ -128,7 +128,7 @@ void AHapticsManagerActor::Tick(float DeltaTime)
 
 	IsTicking = true;
 
-	hapticPlayer->doRepeat();
+	bhaptics::HapticPlayer::instance()->doRepeat();
 	UpdateFeedback();
 	TArray<FHapticFeedback> Visualisation = ChangedFeedbacks;
 
@@ -186,7 +186,7 @@ void AHapticsManagerActor::SubmitKey(const FString &Key)
 	}
 
 	std::string StandardKey(TCHAR_TO_UTF8(*Key));
-	hapticPlayer->submitRegistered(StandardKey);
+	bhaptics::HapticPlayer::instance()->submitRegistered(StandardKey);
 }
 
 void AHapticsManagerActor::SubmitKeyWithIntensityDuration(const FString &Key, const FString &AltKey, FRotationOption RotationOption, FScaleOption ScaleOption)
@@ -205,7 +205,7 @@ void AHapticsManagerActor::SubmitKeyWithIntensityDuration(const FString &Key, co
 
 	Option.Intensity = ScaleOption.Intensity;
 	Option.Duration = ScaleOption.Duration;
-	hapticPlayer->submitRegistered(StandardKey, StandardAltKey, Option, RotateOption);
+	bhaptics::HapticPlayer::instance()->submitRegistered(StandardKey, StandardAltKey, Option, RotateOption);
 }
 
 void AHapticsManagerActor::SubmitKeyWithTransform(const FString &Key, const FString &AltKey, FRotationOption RotationOption)
@@ -230,7 +230,7 @@ void AHapticsManagerActor::RegisterFeeback(const FString &Key, const FString &Fi
 		return;
 	}
 
-	hapticPlayer->registerFeedback(stdKey, StandardPath);
+	bhaptics::HapticPlayer::instance()->registerFeedback(stdKey, StandardPath);
 }
 
 FString AHapticsManagerActor::LoadFeedbackFiles(TArray<FString>& FilesOut)
@@ -313,7 +313,7 @@ void AHapticsManagerActor::SubmitBytes(const FString &Key, EPosition PositionEnu
 		SubmittedDots[i] = InputBytes[i];
 	}
 
-	hapticPlayer->submit(StandardKey, HapticPosition, SubmittedDots, DurationInMilliSecs);
+	bhaptics::HapticPlayer::instance()->submit(StandardKey, HapticPosition, SubmittedDots, DurationInMilliSecs);
 }
 
 void AHapticsManagerActor::SubmitDots(const FString &Key, EPosition PositionEnum, const TArray<FDotPoint> DotPoints, int32 DurationInMilliSecs)
@@ -367,7 +367,7 @@ void AHapticsManagerActor::SubmitDots(const FString &Key, EPosition PositionEnum
 		SubmittedDots.push_back(bhaptics::DotPoint(DotPoints[i].Index, DotPoints[i].Intensity));
 	}
 
-	hapticPlayer->submit(StandardKey, HapticPosition, SubmittedDots, DurationInMilliSecs);
+	bhaptics::HapticPlayer::instance()->submit(StandardKey, HapticPosition, SubmittedDots, DurationInMilliSecs);
 }
 
 void AHapticsManagerActor::SubmitPath(const FString &Key, EPosition PositionEnum, const TArray<FPathPoint>PathPoints, int32 DurationInMilliSecs)
@@ -422,18 +422,18 @@ void AHapticsManagerActor::SubmitPath(const FString &Key, EPosition PositionEnum
 		break;
 	}
 
-	hapticPlayer->submit(StandardKey, HapticPosition, PathVector, DurationInMilliSecs);
+	bhaptics::HapticPlayer::instance()->submit(StandardKey, HapticPosition, PathVector, DurationInMilliSecs);
 }
 
 bool AHapticsManagerActor::IsAnythingPlaying()
 {
-	return hapticPlayer->isPlaying();
+	return bhaptics::HapticPlayer::instance()->isPlaying();
 }
 
 bool AHapticsManagerActor::IsRegisteredPlaying(const FString &Key)
 {
 	std::string StandardKey(TCHAR_TO_UTF8(*Key));
-	return hapticPlayer->isPlaying(StandardKey);
+	return bhaptics::HapticPlayer::instance()->isPlaying(StandardKey);
 }
 
 void AHapticsManagerActor::TurnOffAllFeedback()
@@ -442,7 +442,7 @@ void AHapticsManagerActor::TurnOffAllFeedback()
 	{
 		return;
 	}
-	hapticPlayer->turnOff();
+	bhaptics::HapticPlayer::instance()->turnOff();
 }
 
 void AHapticsManagerActor::TurnOffRegisteredFeedback(const FString &Key)
@@ -453,13 +453,13 @@ void AHapticsManagerActor::TurnOffRegisteredFeedback(const FString &Key)
 	}
 
 	std::string StandardKey(TCHAR_TO_UTF8(*Key));
-	hapticPlayer->turnOff(StandardKey);
+	bhaptics::HapticPlayer::instance()->turnOff(StandardKey);
 }
 
 void AHapticsManagerActor::UpdateFeedback()
 {
 	bhaptics::PlayerResponse Response;
-	std::map<std::string, std::vector<int>> DeviceMotors = hapticPlayer->CurrentResponse.Status;
+	std::map<std::string, std::vector<int>> DeviceMotors = bhaptics::HapticPlayer::instance()->CurrentResponse.Status;
 
 	for (auto& Device : DeviceMotors)
 	{
@@ -627,8 +627,8 @@ void AHapticsManagerActor::Reset()
 	VisualiseFeedback(BlankFeedback, TactShoeRight);
 	VisualiseFeedback(BlankFeedback, TactRacket);
 
-	hapticPlayer->destroy();
-	hapticPlayer->init();
+	bhaptics::HapticPlayer::instance()->destroy();
+	bhaptics::HapticPlayer::instance()->init();
 }
 
 void AHapticsManagerActor::EnableFeedback()
@@ -637,7 +637,7 @@ void AHapticsManagerActor::EnableFeedback()
 	{
 		return;
 	}
-	hapticPlayer->enableFeedback();
+	bhaptics::HapticPlayer::instance()->enableFeedback();
 }
 
 void AHapticsManagerActor::DisableFeedback()
@@ -646,7 +646,7 @@ void AHapticsManagerActor::DisableFeedback()
 	{
 		return;
 	}
-	hapticPlayer->disableFeedback();
+	bhaptics::HapticPlayer::instance()->disableFeedback();
 }
 
 void AHapticsManagerActor::ToggleFeedback()
@@ -655,7 +655,7 @@ void AHapticsManagerActor::ToggleFeedback()
 	{
 		return;
 	}
-	hapticPlayer->toggleFeedback();
+	bhaptics::HapticPlayer::instance()->toggleFeedback();
 }
 
 bool AHapticsManagerActor::IsDeviceConnected(EPosition device)
@@ -702,5 +702,5 @@ bool AHapticsManagerActor::IsDeviceConnected(EPosition device)
 		break;
 	}
 
-	return hapticPlayer->isDevicePlaying(pos);
+	return bhaptics::HapticPlayer::instance()->isDevicePlaying(pos);
 }

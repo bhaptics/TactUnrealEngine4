@@ -35,27 +35,7 @@ public:
 
 	//Root folder storing the files saved in the HapticFileNames Array.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Haptics")
-		FString HapticFileRootFolder;
-
-	TArray<USceneComponent*> TactotFront;
-
-	TArray<USceneComponent*> TactotBack;
-
-	TArray<USceneComponent*> TactosyLeft;
-
-	TArray<USceneComponent*> TactosyRight;
-
-	TArray<USceneComponent*> Tactal;
-
-	TArray<USceneComponent*> TactGloveLeft;
-
-	TArray<USceneComponent*> TactGloveRight;
-
-	TArray<USceneComponent*> TactShoeLeft;
-
-	TArray<USceneComponent*> TactShoeRight;
-
-	TArray<USceneComponent*> TactRacket;
+	FString HapticFileRootFolder;
 
 	//Boolean to determine whether to load feedback files from the project's contents folder or the plugins directory.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Haptics")
@@ -151,14 +131,6 @@ public:
 		Category = "bHaptics")
 		void TurnOffRegisteredFeedback(const FString &Key);
 
-	//For use in the UI to set the dots used in visualisation.
-	UFUNCTION(BlueprintCallable,
-		meta = (DisplayName = "Set TactSuit Variables",
-			Keywords = "bHaptics"),
-		Category = "bHaptics")
-		void SetTactoSuit(USceneComponent* SleeveLeft, USceneComponent* SleeveRight, USceneComponent* Head, USceneComponent* VestFront, USceneComponent* VestBack,
-			USceneComponent* GloveLeft, USceneComponent* GloveRight, USceneComponent* ShoeLeft, USceneComponent* ShoeRight, USceneComponent* Racket);
-
 	//Enable haptic feedback
 	UFUNCTION(BlueprintCallable,
 		meta = (DisplayName = "Enable Feedback",
@@ -182,15 +154,10 @@ public:
 
 private:
 	static FCriticalSection m_Mutex;
-	static bhaptics::PlayerResponse CurrentResponse;
+	static FString HapticFileRootFolderStatic;
 	bool IsInitialised = false;
 	bool IsTicking = false;
 	FString LoadFeedbackFiles(TArray<FString>& FilesOut);
 	void Reset();
-	void UpdateFeedback();
-	void VisualiseFeedback(FHapticFeedback Feedback, TArray<USceneComponent*> TactoSuitItem);
-	void InitialiseDots(TArray<USceneComponent*> TactoSuitItem);
-	bhaptics::HapticPlayer* hapticPlayer;
-		
 	
 };

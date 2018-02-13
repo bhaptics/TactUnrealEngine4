@@ -24,6 +24,8 @@ namespace bhaptics
 	class HapticPlayer
 	{
 	private:
+		static HapticPlayer *hapticManager;
+
 		unique_ptr<WebSocket> ws;
 		vector<RegisterRequest> _registered;
 
@@ -240,7 +242,7 @@ namespace bhaptics
 
 		void init()
 		{
-			if (_enable)
+			if (_enable|| ws)
 				return;
 			function<void()> callback = std::bind(&HapticPlayer::callbackFunc, this);
 			timer.addTimerHandler(callback);
@@ -441,6 +443,40 @@ namespace bhaptics
 			bool ret = std::find(temp.begin(), temp.end(), device) != temp.end();
 			return ret;
 		}
+
+		bool anyFilesLoaded()
+		{
+			return  _registered.size() > 0;
+		}
+
+		vector<string> fileNames()
+		{
+			vector<string> keys;
+			registerMtx.lock();
+			vector<RegisterRequest> tempRegister = _registered;
+			registerMtx.unlock();
+
+			for (size_t i = 0; i < tempRegister.size(); i++)
+			{
+				keys.push_back(tempRegister[i].Key);
+			}
+			return keys;
+		}
+
+		HapticPlayer(HapticPlayer const&) = delete;
+		void operator= (HapticPlayer const&) = delete;
+
+		static HapticPlayer *instance()
+		{
+			if (!hapticManager)
+			{
+				hapticManager = new HapticPlayer();
+				hapticManager->init();
+			}
+
+			return hapticManager;
+		}
+
 	};
 }
 

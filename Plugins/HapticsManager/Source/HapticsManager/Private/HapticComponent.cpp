@@ -7,7 +7,8 @@
 #include "BhapticsUtilities.h"
 
 FCriticalSection UHapticComponent::m_Mutex;
-bhaptics::PlayerResponse UHapticComponent::CurrentResponse;
+//bhaptics::HapticPlayer *bhaptics::HapticPlayer::hapticManager = 0;
+FString UHapticComponent::HapticFileRootFolderStatic = "";
 
 // Sets default values for this component's properties
 UHapticComponent::UHapticComponent()
@@ -16,9 +17,34 @@ UHapticComponent::UHapticComponent()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
-	// ...
-}
+	TArray<FString> HapticFiles;
+	if (bhaptics::HapticPlayer::instance()->anyFilesLoaded())
+	{
+		FString FileDirectory = LoadFeedbackFiles(HapticFiles);
+		for (int i = 0; i < HapticFiles.Num(); i++)
+		{
+			FString FileName = HapticFiles[i];
+			FString FilePath = FileDirectory;
+			int32 index;
+			FileName.FindChar(TCHAR('.'), index);
+			FilePath.Append("/");
+			FilePath.Append(FileName);
+			FString Key = FileName.Left(index);
+			HapticFileNames.AddUnique(*Key);//remove?
+		}
 
+		HapticFileRootFolder = FileDirectory;//remove?
+	}
+	else
+	{
+		//get file names?
+		std::vector<std::string> keys = bhaptics::HapticPlayer::instance()->fileNames();
+		for (int i = 0; i < keys.size(); i++)
+		{
+			HapticFileNames.AddUnique(keys[0].c_str());
+		}
+	}
+}
 
 // Called every frame
 void UHapticComponent::TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction )
@@ -37,52 +63,7 @@ void UHapticComponent::TickComponent( float DeltaTime, ELevelTick TickType, FAct
 
 	IsTicking = true;
 
-	hapticPlayer->doRepeat();
-	UpdateFeedback();
-	TArray<FHapticFeedback> Visualisation = ChangedFeedbacks;
-
-	for (int i = 0; i < Visualisation.Num(); i++)
-	{
-		FHapticFeedback Feedback = Visualisation[i];
-
-		switch (Feedback.Position)
-		{
-		case EPosition::Right:
-			VisualiseFeedback(Feedback, TactosyRight);
-			break;
-		case EPosition::Left:
-			VisualiseFeedback(Feedback, TactosyLeft);
-			break;
-		case EPosition::VestFront:
-			VisualiseFeedback(Feedback, TactotFront);
-			break;
-		case EPosition::VestBack:
-			VisualiseFeedback(Feedback, TactotBack);
-			break;
-		case EPosition::Head:
-			VisualiseFeedback(Feedback, Tactal);
-			break;
-		case EPosition::HandL:
-			VisualiseFeedback(Feedback, TactGloveLeft);
-			break;
-		case EPosition::HandR:
-			VisualiseFeedback(Feedback, TactGloveRight);
-			break;
-		case EPosition::FootL:
-			VisualiseFeedback(Feedback, TactShoeLeft);
-			break;
-		case EPosition::FootR:
-			VisualiseFeedback(Feedback, TactShoeRight);
-			break;
-		case EPosition::Racket:
-			VisualiseFeedback(Feedback, TactRacket);
-		default:
-			printf("Position not found.");
-			break;
-		}
-	}
-
-	ChangedFeedbacks.Empty();
+	bhaptics::HapticPlayer::instance()->doRepeat();
 
 	IsTicking = false;
 }
@@ -90,9 +71,6 @@ void UHapticComponent::TickComponent( float DeltaTime, ELevelTick TickType, FAct
 void UHapticComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
-	ChangedFeedbacks = {};
-	hapticPlayer = new bhaptics::HapticPlayer();
 
 	if (BhapticsUtilities::Initialise())
 	{
@@ -120,43 +98,47 @@ void UHapticComponent::BeginPlay()
 		BhapticsUtilities::Free();
 	}
 
-	hapticPlayer->init();
-
-	InitialiseDots(Tactal);
-	InitialiseDots(TactosyLeft);
-	InitialiseDots(TactosyRight);
-	InitialiseDots(TactotBack);
-	InitialiseDots(TactotFront);
-	InitialiseDots(TactGloveLeft);
-	InitialiseDots(TactGloveRight);
-	InitialiseDots(TactShoeLeft);
-	InitialiseDots(TactShoeRight);
-	InitialiseDots(TactRacket);
+	//bhaptics::HapticPlayer::instance()->init();
 
 	TArray<FString> HapticFiles;
-	FString FileDirectory = LoadFeedbackFiles(HapticFiles);
-	for (int i = 0; i < HapticFiles.Num(); i++)
+	if (bhaptics::HapticPlayer::instance()->anyFilesLoaded())
 	{
-		FString FileName = HapticFiles[i];
-		FString FilePath = FileDirectory;
-		int32 index;
-		FileName.FindChar(TCHAR('.'), index);
-		FilePath.Append("/");
-		FilePath.Append(FileName);
-		FString Key = FileName.Left(index);
-		RegisterFeeback(Key, FilePath);
-		HapticFileNames.AddUnique(*Key);
-	}
+		FString FileDirectory = LoadFeedbackFiles(HapticFiles);
+		for (int i = 0; i < HapticFiles.Num(); i++)
+		{
+			FString FileName = HapticFiles[i];
+			FString FilePath = FileDirectory;
+			int32 index;
+			FileName.FindChar(TCHAR('.'), index);
+			FilePath.Append("/");
+			FilePath.Append(FileName);
+			FString Key = FileName.Left(index);
+			RegisterFeeback(Key, FilePath);
+			HapticFileNames.AddUnique(*Key);//remove?
+		}
 
-	HapticFileRootFolder = FileDirectory;
+		HapticFileRootFolder = FileDirectory;//remove?
+		HapticFileRootFolderStatic = FileDirectory;
+	}
+	else
+	{
+		//get file names?
+		std::vector<std::string> keys = bhaptics::HapticPlayer::instance()->fileNames();
+		for (int i = 0; i < keys.size(); i++)
+		{
+			HapticFileNames.AddUnique(keys[0].c_str());
+		}
+		
+		HapticFileRootFolder = HapticFileRootFolderStatic;
+	}
 	IsInitialised = true;
 }
 
 void UHapticComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	hapticPlayer->turnOff();
-	hapticPlayer->destroy();
-	hapticPlayer = nullptr;
+	//bhaptics::HapticPlayer::instance()->turnOff();
+	//bhaptics::HapticPlayer::instance()->destroy();
+	//bhaptics::HapticPlayer::instance() = nullptr;
 }
 
 
@@ -168,7 +150,7 @@ void UHapticComponent::SubmitKey(const FString &Key)
 	}
 
 	std::string StandardKey(TCHAR_TO_UTF8(*Key));
-	hapticPlayer->submitRegistered(StandardKey);
+	bhaptics::HapticPlayer::instance()->submitRegistered(StandardKey);
 }
 
 void UHapticComponent::SubmitKeyWithIntensityDuration(const FString &Key, const FString &AltKey, FRotationOption RotationOption, FScaleOption ScaleOption)
@@ -187,7 +169,7 @@ void UHapticComponent::SubmitKeyWithIntensityDuration(const FString &Key, const 
 
 	Option.Intensity = ScaleOption.Intensity;
 	Option.Duration = ScaleOption.Duration;
-	hapticPlayer->submitRegistered(StandardKey, StandardAltKey, Option, RotateOption);
+	bhaptics::HapticPlayer::instance()->submitRegistered(StandardKey, StandardAltKey, Option, RotateOption);
 }
 
 void UHapticComponent::SubmitKeyWithTransform(const FString &Key, const FString &AltKey, FRotationOption RotationOption)
@@ -212,7 +194,7 @@ void UHapticComponent::RegisterFeeback(const FString &Key, const FString &FilePa
 		return;
 	}
 
-	hapticPlayer->registerFeedback(stdKey, StandardPath);
+	bhaptics::HapticPlayer::instance()->registerFeedback(stdKey, StandardPath);
 }
 
 FString UHapticComponent::LoadFeedbackFiles(TArray<FString>& FilesOut)
@@ -295,7 +277,7 @@ void UHapticComponent::SubmitBytes(const FString &Key, EPosition PositionEnum, c
 		SubmittedDots[i] = InputBytes[i];
 	}
 
-	hapticPlayer->submit(StandardKey, HapticPosition, SubmittedDots, DurationInMilliSecs);
+	bhaptics::HapticPlayer::instance()->submit(StandardKey, HapticPosition, SubmittedDots, DurationInMilliSecs);
 }
 
 void UHapticComponent::SubmitDots(const FString &Key, EPosition PositionEnum, const TArray<FDotPoint> DotPoints, int32 DurationInMilliSecs)
@@ -349,7 +331,7 @@ void UHapticComponent::SubmitDots(const FString &Key, EPosition PositionEnum, co
 		SubmittedDots.push_back(bhaptics::DotPoint(DotPoints[i].Index, DotPoints[i].Intensity));
 	}
 
-	hapticPlayer->submit(StandardKey, HapticPosition, SubmittedDots, DurationInMilliSecs);
+	bhaptics::HapticPlayer::instance()->submit(StandardKey, HapticPosition, SubmittedDots, DurationInMilliSecs);
 }
 
 void UHapticComponent::SubmitPath(const FString &Key, EPosition PositionEnum, const TArray<FPathPoint>PathPoints, int32 DurationInMilliSecs)
@@ -404,18 +386,18 @@ void UHapticComponent::SubmitPath(const FString &Key, EPosition PositionEnum, co
 		break;
 	}
 
-	hapticPlayer->submit(StandardKey, HapticPosition, PathVector, DurationInMilliSecs);
+	bhaptics::HapticPlayer::instance()->submit(StandardKey, HapticPosition, PathVector, DurationInMilliSecs);
 }
 
 bool UHapticComponent::IsAnythingPlaying()
 {
-	return hapticPlayer->isPlaying();
+	return bhaptics::HapticPlayer::instance()->isPlaying();
 }
 
 bool UHapticComponent::IsRegisteredPlaying(const FString &Key)
 {
 	std::string StandardKey(TCHAR_TO_UTF8(*Key));
-	return hapticPlayer->isPlaying(StandardKey);
+	return bhaptics::HapticPlayer::instance()->isPlaying(StandardKey);
 }
 
 void UHapticComponent::TurnOffAllFeedback()
@@ -424,7 +406,7 @@ void UHapticComponent::TurnOffAllFeedback()
 	{
 		return;
 	}
-	hapticPlayer->turnOff();
+	bhaptics::HapticPlayer::instance()->turnOff();
 }
 
 void UHapticComponent::TurnOffRegisteredFeedback(const FString &Key)
@@ -435,182 +417,15 @@ void UHapticComponent::TurnOffRegisteredFeedback(const FString &Key)
 	}
 
 	std::string StandardKey(TCHAR_TO_UTF8(*Key));
-	hapticPlayer->turnOff(StandardKey);
-}
-
-void UHapticComponent::UpdateFeedback()
-{
-	bhaptics::PlayerResponse Response;
-	std::map<std::string, std::vector<int>> DeviceMotors = hapticPlayer->CurrentResponse.Status;
-
-	for (auto& Device : DeviceMotors)
-	{
-		TArray<uint8_t> ValuesArray;
-		EPosition Position = EPosition::Left;
-
-		if (Device.first == "Left")
-		{
-			Position = EPosition::Left;
-		}
-		else if (Device.first == "Right")
-		{
-			Position = EPosition::Right;
-		}
-		else if (Device.first == "Head")
-		{
-			Position = EPosition::Head;
-		}
-		else if (Device.first == "VestFront")
-		{
-			Position = EPosition::VestFront;
-		}
-		else if (Device.first == "VestBack")
-		{
-			Position = EPosition::VestBack;
-		}
-		else if (Device.first == "Racket")
-		{
-			Position = EPosition::Racket;
-		}
-		else if (Device.first == "HandL")
-		{
-			Position = EPosition::HandL;
-		}
-		else if (Device.first == "HandR")
-		{
-			Position = EPosition::HandR;
-		}
-		else if (Device.first == "FootL")
-		{
-			Position = EPosition::FootL;
-		}
-		else if (Device.first == "FootR")
-		{
-			Position = EPosition::FootR;
-		}
-		else
-		{
-			continue;
-		}
-
-		for (size_t Index = 0; Index < Device.second.size(); Index++)
-		{
-			ValuesArray.Add(Device.second[Index]);
-		}
-
-		FHapticFeedback Feedback(Position, ValuesArray, EFeedbackMode::DOT_MODE);
-		m_Mutex.Lock();
-		ChangedFeedbacks.Add(Feedback);
-		m_Mutex.Unlock();
-	}
-}
-
-void UHapticComponent::InitialiseDots(TArray<USceneComponent*> TactSuitItem)
-{
-	for (int i = 0; i < TactSuitItem.Num(); i++)
-	{
-		UStaticMeshComponent* DotMesh = Cast<UStaticMeshComponent>(TactSuitItem[i]);
-		if (DotMesh == NULL)
-		{
-			continue;
-		}
-
-		UMaterialInstanceDynamic* DotMaterial = DotMesh->CreateAndSetMaterialInstanceDynamicFromMaterial(0, DotMesh->GetMaterial(0));
-		DotMaterial->SetVectorParameterValue("Base Color", FLinearColor(0.8, 0.8, 0.8, 1.0));
-		DotMesh->SetRelativeScale3D(FVector(0.3, 0.3, 0.5));
-	}
-}
-
-void UHapticComponent::VisualiseFeedback(FHapticFeedback Feedback, TArray<USceneComponent*> TactSuitItem)
-{
-	for (int i = 0; i < TactSuitItem.Num(); i++)
-	{
-		FString ComponentName = TactSuitItem[i]->GetName();
-		ComponentName.RemoveAt(0, 2);
-		float DotPosition = FCString::Atof(*ComponentName);
-		float Scale = Feedback.Values[DotPosition] / 100.0;
-		UStaticMeshComponent* DotMesh = Cast<UStaticMeshComponent>(TactSuitItem[i]);
-
-		if (DotMesh == NULL)
-		{
-			continue;
-		}
-
-		UMaterialInstanceDynamic* DotMaterial = Cast<UMaterialInstanceDynamic>(DotMesh->GetMaterial(0));
-		DotMaterial->SetVectorParameterValue("Base Color", FLinearColor(0.8 + Scale*0.2, 0.8 + Scale*0.01, 0.8 - Scale*0.8, 1.0));
-		DotMesh->SetRelativeScale3D(FVector(0.3 + 0.15*(Scale*0.8), 0.3 + 0.15*(Scale*0.8), 0.5 + 0.15*(Scale*0.8)));
-	}
-}
-
-void UHapticComponent::SetTactoSuit(USceneComponent * SleeveLeft, USceneComponent * SleeveRight, USceneComponent * Head, USceneComponent * VestFront,
-	USceneComponent * VestBack, USceneComponent * GloveLeft, USceneComponent * GloveRight, USceneComponent * ShoeLeft, USceneComponent * ShoeRight, USceneComponent * Racket)
-{
-	if (SleeveLeft != NULL)
-	{
-		SleeveLeft->GetChildrenComponents(false, TactosyLeft);
-	}
-
-	if (SleeveRight != NULL)
-	{
-		SleeveRight->GetChildrenComponents(false, TactosyRight);
-	}
-
-	if (Head != NULL)
-	{
-		Head->GetChildrenComponents(false, Tactal);
-	}
-	if (VestFront != NULL)
-	{
-		VestFront->GetChildrenComponents(false, TactotFront);
-	}
-	if (VestBack != NULL)
-	{
-		VestBack->GetChildrenComponents(false, TactotBack);
-	}
-
-	if (GloveLeft != NULL)
-	{
-		GloveLeft->GetChildrenComponents(false, TactGloveLeft);
-	}
-
-	if (GloveRight != NULL)
-	{
-		GloveRight->GetChildrenComponents(false, TactGloveRight);
-	}
-
-	if (ShoeLeft != NULL)
-	{
-		ShoeLeft->GetChildrenComponents(false, TactShoeLeft);
-	}
-
-	if (ShoeRight != NULL)
-	{
-		ShoeRight->GetChildrenComponents(false, TactShoeRight);
-	}
-
-	if (Racket != NULL)
-	{
-		Racket->GetChildrenComponents(false, TactRacket);
-	}
+	bhaptics::HapticPlayer::instance()->turnOff(StandardKey);
 }
 
 void UHapticComponent::Reset()
 {
 	FHapticFeedback BlankFeedback = FHapticFeedback();
 
-	VisualiseFeedback(BlankFeedback, Tactal);
-	VisualiseFeedback(BlankFeedback, TactosyLeft);
-	VisualiseFeedback(BlankFeedback, TactosyRight);
-	VisualiseFeedback(BlankFeedback, TactotFront);
-	VisualiseFeedback(BlankFeedback, TactotBack);
-	VisualiseFeedback(BlankFeedback, TactGloveLeft);
-	VisualiseFeedback(BlankFeedback, TactGloveRight);
-	VisualiseFeedback(BlankFeedback, TactShoeLeft);
-	VisualiseFeedback(BlankFeedback, TactShoeRight);
-	VisualiseFeedback(BlankFeedback, TactRacket);
-
-	hapticPlayer->destroy();
-	hapticPlayer->init();
+	bhaptics::HapticPlayer::instance()->destroy();
+	bhaptics::HapticPlayer::instance()->init();
 }
 
 void UHapticComponent::EnableFeedback()
@@ -619,7 +434,7 @@ void UHapticComponent::EnableFeedback()
 	{
 		return;
 	}
-	hapticPlayer->enableFeedback();
+	bhaptics::HapticPlayer::instance()->enableFeedback();
 }
 
 void UHapticComponent::DisableFeedback()
@@ -628,7 +443,7 @@ void UHapticComponent::DisableFeedback()
 	{
 		return;
 	}
-	hapticPlayer->disableFeedback();
+	bhaptics::HapticPlayer::instance()->disableFeedback();
 }
 
 void UHapticComponent::ToggleFeedback()
@@ -637,7 +452,7 @@ void UHapticComponent::ToggleFeedback()
 	{
 		return;
 	}
-	hapticPlayer->toggleFeedback();
+	bhaptics::HapticPlayer::instance()->toggleFeedback();
 }
 
 bool UHapticComponent::IsDeviceConnected(EPosition device)
@@ -684,6 +499,6 @@ bool UHapticComponent::IsDeviceConnected(EPosition device)
 		break;
 	}
 
-	return hapticPlayer->isDevicePlaying(pos);
+	return bhaptics::HapticPlayer::instance()->isDevicePlaying(pos);
 }
 
