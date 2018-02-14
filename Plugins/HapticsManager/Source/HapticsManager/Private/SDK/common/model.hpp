@@ -299,16 +299,11 @@ namespace bhaptics
 	struct RegisterRequest
 	{
 		string Key;
-//		HapticProject Project;
 		TSharedPtr<FJsonObject> ProjectJson;
 
 		void to_json(FJsonObject& j)
 		{
-			//TSharedPtr<FJsonObject> projectObject = MakeShareable(new FJsonObject);
-
-			//Project.to_json(*projectObject);
 			j.SetStringField("Key", Key.c_str());
-			//j.SetObjectField("Project", projectObject);
 			j.SetObjectField("Project", ProjectJson);
 		}
 	};

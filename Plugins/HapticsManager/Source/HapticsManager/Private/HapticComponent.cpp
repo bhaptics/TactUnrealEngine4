@@ -16,33 +16,6 @@ UHapticComponent::UHapticComponent()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
-	TArray<FString> HapticFiles;
-	if (bhaptics::HapticPlayer::instance()->anyFilesLoaded())
-	{
-		FString FileDirectory = LoadFeedbackFiles(HapticFiles);
-		for (int i = 0; i < HapticFiles.Num(); i++)
-		{
-			FString FileName = HapticFiles[i];
-			FString FilePath = FileDirectory;
-			int32 index;
-			FileName.FindChar(TCHAR('.'), index);
-			FilePath.Append("/");
-			FilePath.Append(FileName);
-			FString Key = FileName.Left(index);
-			HapticFileNames.AddUnique(*Key);//remove?
-		}
-
-		HapticFileRootFolder = FileDirectory;//remove?
-	}
-	else
-	{
-		//get file names?
-		std::vector<std::string> keys = bhaptics::HapticPlayer::instance()->fileNames();
-		for (int i = 0; i < keys.size(); i++)
-		{
-			HapticFileNames.AddUnique(keys[0].c_str());
-		}
-	}
 }
 
 // Called every frame
@@ -50,27 +23,14 @@ void UHapticComponent::TickComponent( float DeltaTime, ELevelTick TickType, FAct
 {
 	Super::TickComponent( DeltaTime, TickType, ThisTickFunction );
 
-	if (IsTicking)
-	{
-		return;
-	}
-
-	if (!IsInitialised)
-	{
-		return;
-	}
-
-	IsTicking = true;
-
-	bhaptics::HapticPlayer::instance()->doRepeat();
-
-	IsTicking = false;
+	//bhaptics::HapticPlayer::instance()->doRepeat();
 }
 
 void UHapticComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
+	//*find a way to do this once
 	if (BhapticsUtilities::Initialise())
 	{
 		FString temp = BhapticsUtilities::GetExecutablePath();
@@ -97,39 +57,6 @@ void UHapticComponent::BeginPlay()
 		BhapticsUtilities::Free();
 	}
 
-	//bhaptics::HapticPlayer::instance()->init();
-
-	TArray<FString> HapticFiles;
-	if (bhaptics::HapticPlayer::instance()->anyFilesLoaded())
-	{
-		FString FileDirectory = LoadFeedbackFiles(HapticFiles);
-		for (int i = 0; i < HapticFiles.Num(); i++)
-		{
-			FString FileName = HapticFiles[i];
-			FString FilePath = FileDirectory;
-			int32 index;
-			FileName.FindChar(TCHAR('.'), index);
-			FilePath.Append("/");
-			FilePath.Append(FileName);
-			FString Key = FileName.Left(index);
-			RegisterFeeback(Key, FilePath);
-			HapticFileNames.AddUnique(*Key);//remove?
-		}
-
-		HapticFileRootFolder = FileDirectory;//remove?
-		HapticFileRootFolderStatic = FileDirectory;
-	}
-	else
-	{
-		//get file names?
-		std::vector<std::string> keys = bhaptics::HapticPlayer::instance()->fileNames();
-		for (int i = 0; i < keys.size(); i++)
-		{
-			HapticFileNames.AddUnique(keys[0].c_str());
-		}
-		
-		HapticFileRootFolder = HapticFileRootFolderStatic;
-	}
 	IsInitialised = true;
 }
 
@@ -181,8 +108,13 @@ void UHapticComponent::SubmitKeyWithIntensityDuration(UFeedbackFile* Feedback, c
 	
 	if (!bhaptics::HapticPlayer::instance()->isFeedbackRegistered(StandardKey))
 	{
-		TSharedPtr<FJsonObject> JsonProject = MakeShareable(new FJsonObject(Feedback->Project));
-		bhaptics::HapticPlayer::instance()->registerFeedback(StandardKey, JsonProject);
+		TSharedPtr<FJsonObject> JsonProject = MakeShareable(new FJsonObject);
+		TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(Feedback->ProjectString);
+
+		if (FJsonSerializer::Deserialize(Reader, JsonProject))
+		{
+			bhaptics::HapticPlayer::instance()->registerFeedback(StandardKey, JsonProject);
+		}
 	}
 
 	bhaptics::HapticPlayer::instance()->submitRegistered(StandardKey, StandardAltKey, Option, RotateOption);
@@ -197,42 +129,20 @@ void UHapticComponent::SubmitKeyWithTransform(UFeedbackFile* Feedback, const FSt
 	SubmitKeyWithIntensityDuration(Feedback, AltKey, RotationOption, FScaleOption(1, 1));
 }
 
-void UHapticComponent::RegisterFeeback(const FString &Key, const FString &FilePath)
+void UHapticComponent::RegisterFeedback(const FString &Key, UFeedbackFile* Feedback )
 {
-	std::string stdKey(TCHAR_TO_UTF8(*Key));
+	std::string StandardKey(TCHAR_TO_UTF8(*Key));
 
-	FString newPath = FilePath;
-	std::string StandardPath(TCHAR_TO_UTF8(*newPath));
-
-	if (!FPaths::FileExists(newPath))
+	if (!bhaptics::HapticPlayer::instance()->isFeedbackRegistered(StandardKey))
 	{
-		UE_LOG(LogTemp, Log, TEXT("File does not exist : %s"), *newPath);
-		return;
+		TSharedPtr<FJsonObject> JsonProject = MakeShareable(new FJsonObject);
+		TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(Feedback->ProjectString);
+
+		if (FJsonSerializer::Deserialize(Reader, JsonProject))
+		{
+			bhaptics::HapticPlayer::instance()->registerFeedback(StandardKey, JsonProject);
+		}
 	}
-
-	//bhaptics::HapticPlayer::instance()->registerFeedback(stdKey, StandardPath);
-}
-
-FString UHapticComponent::LoadFeedbackFiles(TArray<FString>& FilesOut)//not needed
-{
-	FString RootFolderFullPath = FPaths::GameContentDir() + ProjectFeedbackFolder;
-	if (!FPaths::DirectoryExists(RootFolderFullPath) || !UseProjectFeedbackFolder)
-	{
-		RootFolderFullPath = IPluginManager::Get().FindPlugin("HapticsManager")->GetBaseDir() + "/Feedback";
-	}
-	UE_LOG(LogTemp, Log, TEXT("Looking in dir : %s"), *RootFolderFullPath);
-
-	FPaths::NormalizeDirectoryName(RootFolderFullPath);
-	IFileManager& FileManager = IFileManager::Get();
-
-	FString Ext = "*.tactosy";
-	FString Ext2 = "*.tact";
-
-	FString FinalPath = RootFolderFullPath + "/" + Ext;
-	FString FinalPath2 = RootFolderFullPath + "/" + Ext2;
-	FileManager.FindFiles(FilesOut, *FinalPath, true, false);
-	FileManager.FindFiles(FilesOut, *FinalPath2, true, false);
-	return RootFolderFullPath;
 }
 
 void UHapticComponent::SubmitBytes(const FString &Key, EPosition PositionEnum, const TArray<uint8>& InputBytes, int32 DurationInMilliSecs)

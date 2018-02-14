@@ -74,7 +74,7 @@ public:
 		meta = (DisplayName = "Register Feedback",
 			Keywords = "bHaptics"),
 		Category = "bHaptics")
-		void RegisterFeeback(const FString &Key, const FString &FilePath);
+		void RegisterFeedback(const FString &Key, UFeedbackFile* Feedback);
 
 	//Submit a haptic feeback pattern to the given device using a byte array.
 	UFUNCTION(BlueprintCallable,
@@ -158,7 +158,6 @@ private:
 	static FString HapticFileRootFolderStatic;
 	bool IsInitialised = false;
 	bool IsTicking = false;
-	FString LoadFeedbackFiles(TArray<FString>& FilesOut);
 	void Reset();
 	
 };

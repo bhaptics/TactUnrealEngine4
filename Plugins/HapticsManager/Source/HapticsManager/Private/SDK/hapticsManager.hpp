@@ -194,6 +194,7 @@ namespace bhaptics
 		void callbackFunc()
 		{
 			reconnect();
+			doRepeat();
 			_currentTime += _interval;
 		}
 

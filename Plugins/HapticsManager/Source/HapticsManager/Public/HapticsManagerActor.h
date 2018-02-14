@@ -4,6 +4,7 @@
 
 #include "Engine.h"
 #include "HapticStructures.h"
+#include "FeedbackFile.h"
 #include "GameFramework/Actor.h"
 #include "AllowWindowsPlatformTypes.h"
 #include "SDK/hapticsManager.hpp"
@@ -60,21 +61,12 @@ public:
 
 	TArray<USceneComponent*> TactRacket;
 
-	//Boolean to determine whether to load feedback files from the project's contents folder or the plugins directory.
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Haptics")
-		bool UseProjectFeedbackFolder = true;
-
-	//Folder in the Contents directory to search for the haptic feedback files.
-	//The full path is not needed, only its location relative to the Contents directory.
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Haptics")
-		FString ProjectFeedbackFolder = "HapticsManager/Feedback";
-
 	//Submit a registered feedback using the file name as a key
 	UFUNCTION(BlueprintCallable,
 		meta = (DisplayName = "Submit Key",
 			Keywords = "bHaptics"),
 		Category = "bHaptics")
-		void SubmitKey(const FString &Key);
+		void SubmitKey(UFeedbackFile* Feedback);
 
 	//Submit a registered feedback using the file name as a key and a given RotationOption.
 	//This call will only rotate vest feedback files, with other devices being kept the same.
@@ -82,21 +74,21 @@ public:
 		meta = (DisplayName = "Submit Key with Transform",
 			Keywords = "bHaptics"),
 		Category = "bHaptics")
-		void SubmitKeyWithTransform(const FString &Key, const FString &AltKey, FRotationOption Option);
+		void SubmitKeyWithTransform(UFeedbackFile* Feedback, const FString &AltKey, FRotationOption Option);
 
 	//Submit a registered feedback using the file name as a key, and scale the intensity and duration by given ScaleOption.
 	UFUNCTION(BlueprintCallable,
 		meta = (DisplayName = "Submit Key with Scaled Intensity and Duration",
 			Keywords = "bHaptics"),
 		Category = "bHaptics")
-		void SubmitKeyWithIntensityDuration(const FString &Key, const FString &AltKey, FRotationOption RotationOption, FScaleOption ScaleOption);
+		void SubmitKeyWithIntensityDuration(UFeedbackFile* Feedback, const FString &AltKey, FRotationOption RotationOption, FScaleOption ScaleOption);
 
 	//Register a given feedback file from the given file path with the given key.
 	UFUNCTION(BlueprintCallable,
 		meta = (DisplayName = "Register Feedback",
 			Keywords = "bHaptics"),
 		Category = "bHaptics")
-		void RegisterFeeback(const FString &Key, const FString &FilePath);
+		void RegisterFeedback(const FString &Key, UFeedbackFile* Feedback);
 
 	//Submit a haptic feeback pattern to the given device using a byte array.
 	UFUNCTION(BlueprintCallable,
@@ -187,11 +179,9 @@ private:
 	static FCriticalSection m_Mutex;
 	bool IsInitialised = false;
 	bool IsTicking = false;
-	FString LoadFeedbackFiles(TArray<FString>& FilesOut);
 	void Reset();
 	void UpdateFeedback();
 	void VisualiseFeedback(FHapticFeedback Feedback, TArray<USceneComponent*> TactoSuitItem);
 	void InitialiseDots(TArray<USceneComponent*> TactoSuitItem);
-	bhaptics::HapticPlayer* hapticPlayer;
 
 };

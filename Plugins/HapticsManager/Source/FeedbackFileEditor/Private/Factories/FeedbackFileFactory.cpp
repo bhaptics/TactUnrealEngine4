@@ -36,9 +36,7 @@ UObject* UFeedbackFileFactory::FactoryCreateFile(UClass* InClass, UObject* InPar
 			TSharedRef<TJsonWriter<TCHAR, TCondensedJsonPrintPolicy<TCHAR>>> Writer = TJsonWriterFactory<TCHAR, TCondensedJsonPrintPolicy<TCHAR>>::Create(&OutputString);
 			FJsonSerializer::Serialize(JsonObject->GetObjectField("project").ToSharedRef(), Writer);
 
-			FeedbackFile->Project = *JsonObject->GetObjectField("project");
 			FeedbackFile->ProjectString = OutputString;
-			//FeedbackFile->Proj.from_json(*JsonObject->GetObjectField("project"));
 			FeedbackFile->Key = JsonObject->GetStringField("name");
 		}
 	}
