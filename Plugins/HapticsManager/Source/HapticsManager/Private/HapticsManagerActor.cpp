@@ -6,7 +6,6 @@
 #include "BhapticsUtilities.h"
 
 FCriticalSection AHapticsManagerActor::m_Mutex;
-bhaptics::PlayerResponse AHapticsManagerActor::CurrentResponse;
 bhaptics::HapticPlayer *bhaptics::HapticPlayer::hapticManager = 0;
 
 // Sets default values
@@ -230,7 +229,7 @@ void AHapticsManagerActor::RegisterFeeback(const FString &Key, const FString &Fi
 		return;
 	}
 
-	bhaptics::HapticPlayer::instance()->registerFeedback(stdKey, StandardPath);
+	//bhaptics::HapticPlayer::instance()->registerFeedback(stdKey, StandardPath);
 }
 
 FString AHapticsManagerActor::LoadFeedbackFiles(TArray<FString>& FilesOut)

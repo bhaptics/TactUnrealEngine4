@@ -185,7 +185,6 @@ public:
 
 private:
 	static FCriticalSection m_Mutex;
-	static bhaptics::PlayerResponse CurrentResponse;
 	bool IsInitialised = false;
 	bool IsTicking = false;
 	FString LoadFeedbackFiles(TArray<FString>& FilesOut);

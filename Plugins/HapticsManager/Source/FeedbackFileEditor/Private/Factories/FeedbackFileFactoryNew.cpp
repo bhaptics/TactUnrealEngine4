@@ -1,6 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "HapticsManagerPrivatePCH.h"
+#include "FeedbackFileEditor.h"
 #include "FeedbackFileFactoryNew.h"
 #include "FeedbackFile.h"
 

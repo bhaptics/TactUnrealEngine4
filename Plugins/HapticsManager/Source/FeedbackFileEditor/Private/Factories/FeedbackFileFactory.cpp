@@ -1,6 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "HapticsManagerPrivatePCH.h"
+#include "FeedbackFileEditor.h"
 
 #include "FeedbackFileFactory.h"
 #include "Containers/UnrealString.h"
@@ -9,13 +9,14 @@
 
 UFeedbackFileFactory::UFeedbackFileFactory(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-	Formats.Add(FString(TEXT("txt;")) + NSLOCTEXT("UTextAssetFactory", "FormatTxt", "Text File").ToString());
+	Formats.Add(FString(TEXT("tact;")) + NSLOCTEXT("UFeedbackFileFactory", "FormatTact", "Tact File").ToString());
 	SupportedClass = UFeedbackFile::StaticClass();
 	bCreateNew = false;
 	bEditorImport = true;
 }
 
-UObject* UFeedbackFileFactory::FactoryCreateFile(UClass* InClass, UObject* InParent, FName InName, EObjectFlags Flags, const FString& Filename, const TCHAR* Parms, FFeedbackContext* Warn, bool& bOutOperationCanceled)
+UObject* UFeedbackFileFactory::FactoryCreateFile(UClass* InClass, UObject* InParent, FName InName, EObjectFlags Flags,
+	const FString& Filename, const TCHAR* Parms, FFeedbackContext* Warn, bool& bOutOperationCanceled)
 {
 	UFeedbackFile* FeedbackFile = nullptr;
 	FString TextString;
@@ -24,13 +25,21 @@ UObject* UFeedbackFileFactory::FactoryCreateFile(UClass* InClass, UObject* InPar
 	{
 		FeedbackFile = NewObject<UFeedbackFile>(InParent, InClass, InName, Flags);
 		FeedbackFile->Key = Filename;
-		
+		FeedbackFile->Id = FGuid::NewGuid();
+
 		TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject);
 		TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(TextString);
 
 		if (FJsonSerializer::Deserialize(Reader, JsonObject))
 		{
-			FeedbackFile->Project = *JsonObject;
+			FString OutputString;
+			TSharedRef<TJsonWriter<TCHAR, TCondensedJsonPrintPolicy<TCHAR>>> Writer = TJsonWriterFactory<TCHAR, TCondensedJsonPrintPolicy<TCHAR>>::Create(&OutputString);
+			FJsonSerializer::Serialize(JsonObject->GetObjectField("project").ToSharedRef(), Writer);
+
+			FeedbackFile->Project = *JsonObject->GetObjectField("project");
+			FeedbackFile->ProjectString = OutputString;
+			//FeedbackFile->Proj.from_json(*JsonObject->GetObjectField("project"));
+			FeedbackFile->Key = JsonObject->GetStringField("name");
 		}
 	}
 

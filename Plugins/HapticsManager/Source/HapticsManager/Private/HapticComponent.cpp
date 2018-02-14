@@ -7,7 +7,6 @@
 #include "BhapticsUtilities.h"
 
 FCriticalSection UHapticComponent::m_Mutex;
-//bhaptics::HapticPlayer *bhaptics::HapticPlayer::hapticManager = 0;
 FString UHapticComponent::HapticFileRootFolderStatic = "";
 
 // Sets default values for this component's properties
@@ -142,25 +141,35 @@ void UHapticComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 }
 
 
-void UHapticComponent::SubmitKey(const FString &Key)
+void UHapticComponent::SubmitKey(UFeedbackFile* Feedback)
 {
 	if (!IsInitialised)
 	{
 		return;
 	}
 
-	std::string StandardKey(TCHAR_TO_UTF8(*Key));
+	std::string StandardKey(TCHAR_TO_UTF8(*Feedback->Key));
+	if (!bhaptics::HapticPlayer::instance()->isFeedbackRegistered(StandardKey))
+	{
+		TSharedPtr<FJsonObject> JsonProject = MakeShareable(new FJsonObject);
+		TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(Feedback->ProjectString);
+
+		if (FJsonSerializer::Deserialize(Reader, JsonProject))
+		{
+			bhaptics::HapticPlayer::instance()->registerFeedback(StandardKey, JsonProject);
+		}
+	}
 	bhaptics::HapticPlayer::instance()->submitRegistered(StandardKey);
 }
 
-void UHapticComponent::SubmitKeyWithIntensityDuration(const FString &Key, const FString &AltKey, FRotationOption RotationOption, FScaleOption ScaleOption)
+void UHapticComponent::SubmitKeyWithIntensityDuration(UFeedbackFile* Feedback, const FString &AltKey, FRotationOption RotationOption, FScaleOption ScaleOption)
 {
 	if (!IsInitialised)
 	{
 		return;
 	}
-
-	std::string StandardKey(TCHAR_TO_UTF8(*Key));
+	
+	std::string StandardKey(TCHAR_TO_UTF8(*Feedback->Key));
 	std::string StandardAltKey(TCHAR_TO_UTF8(*AltKey));
 	bhaptics::RotationOption RotateOption;
 	bhaptics::ScaleOption Option;
@@ -169,16 +178,23 @@ void UHapticComponent::SubmitKeyWithIntensityDuration(const FString &Key, const 
 
 	Option.Intensity = ScaleOption.Intensity;
 	Option.Duration = ScaleOption.Duration;
+	
+	if (!bhaptics::HapticPlayer::instance()->isFeedbackRegistered(StandardKey))
+	{
+		TSharedPtr<FJsonObject> JsonProject = MakeShareable(new FJsonObject(Feedback->Project));
+		bhaptics::HapticPlayer::instance()->registerFeedback(StandardKey, JsonProject);
+	}
+
 	bhaptics::HapticPlayer::instance()->submitRegistered(StandardKey, StandardAltKey, Option, RotateOption);
 }
 
-void UHapticComponent::SubmitKeyWithTransform(const FString &Key, const FString &AltKey, FRotationOption RotationOption)
+void UHapticComponent::SubmitKeyWithTransform(UFeedbackFile* Feedback, const FString &AltKey, FRotationOption RotationOption)
 {
 	if (!IsInitialised)
 	{
 		return;
 	}
-	SubmitKeyWithIntensityDuration(Key, AltKey, RotationOption, FScaleOption(1, 1));
+	SubmitKeyWithIntensityDuration(Feedback, AltKey, RotationOption, FScaleOption(1, 1));
 }
 
 void UHapticComponent::RegisterFeeback(const FString &Key, const FString &FilePath)
@@ -194,10 +210,10 @@ void UHapticComponent::RegisterFeeback(const FString &Key, const FString &FilePa
 		return;
 	}
 
-	bhaptics::HapticPlayer::instance()->registerFeedback(stdKey, StandardPath);
+	//bhaptics::HapticPlayer::instance()->registerFeedback(stdKey, StandardPath);
 }
 
-FString UHapticComponent::LoadFeedbackFiles(TArray<FString>& FilesOut)
+FString UHapticComponent::LoadFeedbackFiles(TArray<FString>& FilesOut)//not needed
 {
 	FString RootFolderFullPath = FPaths::GameContentDir() + ProjectFeedbackFolder;
 	if (!FPaths::DirectoryExists(RootFolderFullPath) || !UseProjectFeedbackFolder)
@@ -397,7 +413,7 @@ bool UHapticComponent::IsAnythingPlaying()
 bool UHapticComponent::IsRegisteredPlaying(const FString &Key)
 {
 	std::string StandardKey(TCHAR_TO_UTF8(*Key));
-	return bhaptics::HapticPlayer::instance()->isPlaying(StandardKey);
+	return bhaptics::HapticPlayer::instance()->isPlaying(StandardKey); //can use gui?
 }
 
 void UHapticComponent::TurnOffAllFeedback()

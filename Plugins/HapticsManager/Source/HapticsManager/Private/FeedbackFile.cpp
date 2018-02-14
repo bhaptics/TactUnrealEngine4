@@ -3,11 +3,12 @@
 #include "HapticsManagerPrivatePCH.h"
 #include "HapticsManager.h"
 #include "FeedbackFile.h"
-//
-//FeedbackFile::FeedbackFile()
+
+//UFeedbackFile::UFeedbackFile()
 //{
+//	UE_LOG(LogTemp, Log, TEXT("Feedback FIle: %s"), *Key);
 //}
 //
-//FeedbackFile::~FeedbackFile()
+//UFeedbackFile::~UFeedbackFile()
 //{
 //}

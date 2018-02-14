@@ -4,6 +4,7 @@
 
 #include "Components/ActorComponent.h"
 #include "HapticStructures.h"
+#include "FeedbackFile.h"
 #include "AllowWindowsPlatformTypes.h"
 #include "SDK/hapticsManager.hpp"
 #include "HideWindowsPlatformTypes.h"
@@ -51,7 +52,7 @@ public:
 		meta = (DisplayName = "Submit Key",
 			Keywords = "bHaptics"),
 		Category = "bHaptics")
-		void SubmitKey(const FString &Key);
+		void SubmitKey(UFeedbackFile* Feedback);
 
 	//Submit a registered feedback using the file name as a key and a given RotationOption.
 	//This call will only rotate vest feedback files, with other devices being kept the same.
@@ -59,14 +60,14 @@ public:
 		meta = (DisplayName = "Submit Key with Transform",
 			Keywords = "bHaptics"),
 		Category = "bHaptics")
-		void SubmitKeyWithTransform(const FString &Key, const FString &AltKey, FRotationOption Option);
+		void SubmitKeyWithTransform(UFeedbackFile* Feedback, const FString &AltKey, FRotationOption Option);
 
 	//Submit a registered feedback using the file name as a key, and scale the intensity and duration by given ScaleOption.
 	UFUNCTION(BlueprintCallable,
 		meta = (DisplayName = "Submit Key with Scaled Intensity and Duration",
 			Keywords = "bHaptics"),
 		Category = "bHaptics")
-		void SubmitKeyWithIntensityDuration(const FString &Key, const FString &AltKey, FRotationOption RotationOption, FScaleOption ScaleOption);
+		void SubmitKeyWithIntensityDuration(UFeedbackFile* Feedback, const FString &AltKey, FRotationOption RotationOption, FScaleOption ScaleOption);
 
 	//Register a given feedback file from the given file path with the given key.
 	UFUNCTION(BlueprintCallable,

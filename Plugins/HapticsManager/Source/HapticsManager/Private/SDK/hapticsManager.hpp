@@ -28,6 +28,7 @@ namespace bhaptics
 
 		unique_ptr<WebSocket> ws;
 		vector<RegisterRequest> _registered;
+		vector<FJsonObject> _registeredJson;
 
 		vector<string> _activeKeys;
 		vector<Position> _activeDevices;
@@ -128,7 +129,7 @@ namespace bhaptics
 			TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject);
 			request.to_json(*JsonObject);
 			FString OutputString;
-			TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&OutputString);
+			TSharedRef<TJsonWriter<TCHAR, TCondensedJsonPrintPolicy<TCHAR>>> Writer = TJsonWriterFactory<TCHAR, TCondensedJsonPrintPolicy<TCHAR>>::Create(&OutputString);
 			FJsonSerializer::Serialize(JsonObject.ToSharedRef(), Writer);
 			std::string jStr(TCHAR_TO_UTF8(*OutputString));
 
@@ -220,13 +221,12 @@ namespace bhaptics
 
 		HapticPlayer() {}
 
-		int registerFeedback(const string &key, const string &filePath)
+		int registerFeedback(const string &key, TSharedPtr<FJsonObject> ProjectJson)
 		{
-			HapticFile file = Util::parse(filePath);
 
 			RegisterRequest req;
 			req.Key = key;
-			req.Project = file.project;
+			req.ProjectJson = ProjectJson;
 
 			registerMtx.lock();
 			_registered.push_back(req);
@@ -441,6 +441,13 @@ namespace bhaptics
 			vector<bhaptics::Position> temp = _activeDevices;
 			mtx.unlock();
 			bool ret = std::find(temp.begin(), temp.end(), device) != temp.end();
+			return ret;
+		}
+
+		bool isFeedbackRegistered(string key)
+		{
+			vector<string> tempReg = CurrentResponse.RegisteredKeys;
+			bool ret = std::find(tempReg.begin(), tempReg.end(), key) != tempReg.end();
 			return ret;
 		}
 
