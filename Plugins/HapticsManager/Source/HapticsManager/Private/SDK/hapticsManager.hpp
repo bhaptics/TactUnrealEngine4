@@ -309,13 +309,14 @@ namespace bhaptics
 			{
 				return;
 			}
+
 			SubmitRequest req;
 			PlayerRequest playerReq;
 			req.Key = key;
 			req.Type = "key";
 			req.Parameters["scaleOption"] = option.to_string();
 			req.Parameters["rotationOption"] = rotOption.to_string();
-			if (!altKey.empty())
+			if (!altKey.empty() && isPlaying(key))
 			{
 				req.Parameters["altKey"] = altKey;
 			}

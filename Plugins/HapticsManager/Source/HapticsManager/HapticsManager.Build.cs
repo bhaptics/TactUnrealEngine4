@@ -46,7 +46,6 @@ public class HapticsManager : ModuleRules
                 "JsonUtilities",
                 "Projects",
                 "InputCore",
-                "UnrealEd"
                 //"Sockets",
 				// ... add private dependencies that you statically link with here ...	
 			}
