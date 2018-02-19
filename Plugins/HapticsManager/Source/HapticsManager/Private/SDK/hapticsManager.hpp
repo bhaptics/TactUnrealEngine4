@@ -6,7 +6,6 @@
 #include "thirdparty/easywsclient.hpp"
 #include "common/timer.hpp"
 #include "common/model.hpp"
-#include "common/util.hpp"
 #include "Engine.h"
 
 #ifdef _WIN32
@@ -33,9 +32,13 @@ namespace bhaptics
 		vector<string> _activeKeys;
 		vector<Position> _activeDevices;
 
+		std::map<std::string, std::vector<int>> _activeFeedback;
+
 		mutex mtx;// mutex for _activeKeys and _activeDevices variable
 		mutex registerMtx; //mutex for _registered variable
 		mutex pollingMtx; //mutex for _registered variable
+		//mutex connectionMtx;
+		mutex responseMtx;
 
 		int _currentTime = 0;
 		int _interval = 20;
@@ -54,6 +57,8 @@ namespace bhaptics
 		std::chrono::steady_clock::time_point prevReconnect;
 
 		bool isRegisterSent = true;
+
+		int connectionCount = 0;
 
 		void reconnect()
 		{
@@ -243,6 +248,7 @@ namespace bhaptics
 
 		void init()
 		{
+
 			if (_enable|| ws)
 				return;
 			function<void()> callback = std::bind(&HapticPlayer::callbackFunc, this);
@@ -362,6 +368,7 @@ namespace bhaptics
 
 		void parseReceivedMessage(const char * message)
 		{
+
 			TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject);
 			FString JsonString(message);
 			TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(JsonString);
@@ -434,6 +441,10 @@ namespace bhaptics
 			_activeKeys = response.ActiveKeys;
 			_activeDevices = response.ConnectedPositions;
 			mtx.unlock();
+
+			responseMtx.lock();
+			_activeFeedback = response.Status;
+			responseMtx.unlock();
 		}
 
 		bool isDevicePlaying(Position device)
@@ -471,6 +482,37 @@ namespace bhaptics
 			return keys;
 		}
 
+		void registerConnection()
+		{
+			//connectionMtx.lock();
+			connectionCount++;
+			if (!ws)
+			{
+				init();
+			}
+			
+			//connectionMtx.unlock();
+		}
+
+		void unregisterConnection()
+		{
+			//connectionMtx.lock();
+			connectionCount--;
+			if (connectionCount <= 0)
+			{
+				destroy();
+			}
+			//connectionMtx.unlock();
+		}
+
+		std::map<std::string, std::vector<int>> getResponseStatus()
+		{
+			responseMtx.lock();
+			std::map<std::string, std::vector<int>> ret = _activeFeedback;
+			responseMtx.unlock();
+			return ret;
+		}
+
 		HapticPlayer(HapticPlayer const&) = delete;
 		void operator= (HapticPlayer const&) = delete;
 
@@ -479,7 +521,7 @@ namespace bhaptics
 			if (!hapticManager)
 			{
 				hapticManager = new HapticPlayer();
-				hapticManager->init();
+				//hapticManager->init();
 			}
 
 			return hapticManager;

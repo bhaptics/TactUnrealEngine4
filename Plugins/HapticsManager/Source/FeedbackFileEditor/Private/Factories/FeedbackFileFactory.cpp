@@ -33,11 +33,13 @@ UObject* UFeedbackFileFactory::FactoryCreateFile(UClass* InClass, UObject* InPar
 		if (FJsonSerializer::Deserialize(Reader, JsonObject))
 		{
 			FString OutputString;
+			TSharedPtr<FJsonObject> JsonProject = JsonObject->GetObjectField("project");
 			TSharedRef<TJsonWriter<TCHAR, TCondensedJsonPrintPolicy<TCHAR>>> Writer = TJsonWriterFactory<TCHAR, TCondensedJsonPrintPolicy<TCHAR>>::Create(&OutputString);
-			FJsonSerializer::Serialize(JsonObject->GetObjectField("project").ToSharedRef(), Writer);
+			FJsonSerializer::Serialize(JsonProject.ToSharedRef(), Writer);
 
 			FeedbackFile->ProjectString = OutputString;
 			FeedbackFile->Key = JsonObject->GetStringField("name");
+			FeedbackFile->Device = JsonProject->GetObjectField("layout")->GetStringField("name");
 		}
 	}
 

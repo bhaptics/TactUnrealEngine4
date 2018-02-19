@@ -24,5 +24,8 @@ public :
 
 	UPROPERTY()
 	FGuid Id;
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "FeedbackFile")
+		FString Device;
 };
 

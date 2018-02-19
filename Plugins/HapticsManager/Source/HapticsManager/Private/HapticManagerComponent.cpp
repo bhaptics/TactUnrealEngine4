@@ -2,15 +2,15 @@
 
 #include "HapticsManagerPrivatePCH.h"
 #include "HapticsManager.h"
-#include "HapticComponent.h"
+#include "HapticManagerComponent.h"
 #include "HapticStructures.h"
 #include "BhapticsUtilities.h"
 
-FCriticalSection UHapticComponent::m_Mutex;
-FString UHapticComponent::HapticFileRootFolderStatic = "";
+FCriticalSection UHapticManagerComponent::m_Mutex;
+FString UHapticManagerComponent::HapticFileRootFolderStatic = "";
 
 // Sets default values for this component's properties
-UHapticComponent::UHapticComponent()
+UHapticManagerComponent::UHapticManagerComponent()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
@@ -19,18 +19,18 @@ UHapticComponent::UHapticComponent()
 }
 
 // Called every frame
-void UHapticComponent::TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction )
+void UHapticManagerComponent::TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction )
 {
 	Super::TickComponent( DeltaTime, TickType, ThisTickFunction );
 
 	//bhaptics::HapticPlayer::instance()->doRepeat();
 }
 
-void UHapticComponent::BeginPlay()
+void UHapticManagerComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	//*find a way to do this once
+	/*find a way to do this once
 	if (BhapticsUtilities::Initialise())
 	{
 		FString temp = BhapticsUtilities::GetExecutablePath();
@@ -55,22 +55,25 @@ void UHapticComponent::BeginPlay()
 		}
 
 		BhapticsUtilities::Free();
-	}
+	}//*/
+
+	bhaptics::HapticPlayer::instance()->registerConnection();
 
 	IsInitialised = true;
 }
 
-void UHapticComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
+void UHapticManagerComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	//bhaptics::HapticPlayer::instance()->turnOff();
-	//bhaptics::HapticPlayer::instance()->destroy();
-	//bhaptics::HapticPlayer::instance() = nullptr;
+	if (EndPlayReason == EEndPlayReason::Destroyed)
+	{
+		bhaptics::HapticPlayer::instance()->unregisterConnection();
+	}
 }
 
 
-void UHapticComponent::SubmitKey(UFeedbackFile* Feedback)
+void UHapticManagerComponent::SubmitKey(UFeedbackFile* Feedback)
 {
-	if (!IsInitialised)
+	if (!IsInitialised || Feedback == NULL)
 	{
 		return;
 	}
@@ -89,9 +92,9 @@ void UHapticComponent::SubmitKey(UFeedbackFile* Feedback)
 	bhaptics::HapticPlayer::instance()->submitRegistered(StandardKey);
 }
 
-void UHapticComponent::SubmitKeyWithIntensityDuration(UFeedbackFile* Feedback, const FString &AltKey, FRotationOption RotationOption, FScaleOption ScaleOption)
+void UHapticManagerComponent::SubmitKeyWithIntensityDuration(UFeedbackFile* Feedback, const FString &AltKey, FRotationOption RotationOption, FScaleOption ScaleOption)
 {
-	if (!IsInitialised)
+	if (!IsInitialised || Feedback == NULL)
 	{
 		return;
 	}
@@ -120,16 +123,16 @@ void UHapticComponent::SubmitKeyWithIntensityDuration(UFeedbackFile* Feedback, c
 	bhaptics::HapticPlayer::instance()->submitRegistered(StandardKey, StandardAltKey, Option, RotateOption);
 }
 
-void UHapticComponent::SubmitKeyWithTransform(UFeedbackFile* Feedback, const FString &AltKey, FRotationOption RotationOption)
+void UHapticManagerComponent::SubmitKeyWithTransform(UFeedbackFile* Feedback, const FString &AltKey, FRotationOption RotationOption)
 {
-	if (!IsInitialised)
+	if (!IsInitialised || Feedback == NULL)
 	{
 		return;
 	}
 	SubmitKeyWithIntensityDuration(Feedback, AltKey, RotationOption, FScaleOption(1, 1));
 }
 
-void UHapticComponent::RegisterFeedback(const FString &Key, UFeedbackFile* Feedback )
+void UHapticManagerComponent::RegisterFeedback(const FString &Key, UFeedbackFile* Feedback )
 {
 	std::string StandardKey(TCHAR_TO_UTF8(*Key));
 
@@ -145,7 +148,7 @@ void UHapticComponent::RegisterFeedback(const FString &Key, UFeedbackFile* Feedb
 	}
 }
 
-void UHapticComponent::SubmitBytes(const FString &Key, EPosition PositionEnum, const TArray<uint8>& InputBytes, int32 DurationInMilliSecs)
+void UHapticManagerComponent::SubmitBytes(const FString &Key, EPosition PositionEnum, const TArray<uint8>& InputBytes, int32 DurationInMilliSecs)
 {
 	if (!IsInitialised)
 	{
@@ -206,7 +209,7 @@ void UHapticComponent::SubmitBytes(const FString &Key, EPosition PositionEnum, c
 	bhaptics::HapticPlayer::instance()->submit(StandardKey, HapticPosition, SubmittedDots, DurationInMilliSecs);
 }
 
-void UHapticComponent::SubmitDots(const FString &Key, EPosition PositionEnum, const TArray<FDotPoint> DotPoints, int32 DurationInMilliSecs)
+void UHapticManagerComponent::SubmitDots(const FString &Key, EPosition PositionEnum, const TArray<FDotPoint> DotPoints, int32 DurationInMilliSecs)
 {
 	if (!IsInitialised)
 	{
@@ -260,7 +263,7 @@ void UHapticComponent::SubmitDots(const FString &Key, EPosition PositionEnum, co
 	bhaptics::HapticPlayer::instance()->submit(StandardKey, HapticPosition, SubmittedDots, DurationInMilliSecs);
 }
 
-void UHapticComponent::SubmitPath(const FString &Key, EPosition PositionEnum, const TArray<FPathPoint>PathPoints, int32 DurationInMilliSecs)
+void UHapticManagerComponent::SubmitPath(const FString &Key, EPosition PositionEnum, const TArray<FPathPoint>PathPoints, int32 DurationInMilliSecs)
 {
 	if (!IsInitialised)
 	{
@@ -315,18 +318,18 @@ void UHapticComponent::SubmitPath(const FString &Key, EPosition PositionEnum, co
 	bhaptics::HapticPlayer::instance()->submit(StandardKey, HapticPosition, PathVector, DurationInMilliSecs);
 }
 
-bool UHapticComponent::IsAnythingPlaying()
+bool UHapticManagerComponent::IsAnythingPlaying()
 {
 	return bhaptics::HapticPlayer::instance()->isPlaying();
 }
 
-bool UHapticComponent::IsRegisteredPlaying(const FString &Key)
+bool UHapticManagerComponent::IsRegisteredPlaying(const FString &Key)
 {
 	std::string StandardKey(TCHAR_TO_UTF8(*Key));
 	return bhaptics::HapticPlayer::instance()->isPlaying(StandardKey); //can use gui?
 }
 
-void UHapticComponent::TurnOffAllFeedback()
+void UHapticManagerComponent::TurnOffAllFeedback()
 {
 	if (!IsInitialised)
 	{
@@ -335,7 +338,7 @@ void UHapticComponent::TurnOffAllFeedback()
 	bhaptics::HapticPlayer::instance()->turnOff();
 }
 
-void UHapticComponent::TurnOffRegisteredFeedback(const FString &Key)
+void UHapticManagerComponent::TurnOffRegisteredFeedback(const FString &Key)
 {
 	if (!IsInitialised)
 	{
@@ -346,7 +349,7 @@ void UHapticComponent::TurnOffRegisteredFeedback(const FString &Key)
 	bhaptics::HapticPlayer::instance()->turnOff(StandardKey);
 }
 
-void UHapticComponent::Reset()
+void UHapticManagerComponent::Reset()
 {
 	FHapticFeedback BlankFeedback = FHapticFeedback();
 
@@ -354,7 +357,7 @@ void UHapticComponent::Reset()
 	bhaptics::HapticPlayer::instance()->init();
 }
 
-void UHapticComponent::EnableFeedback()
+void UHapticManagerComponent::EnableFeedback()
 {
 	if (!IsInitialised)
 	{
@@ -363,7 +366,7 @@ void UHapticComponent::EnableFeedback()
 	bhaptics::HapticPlayer::instance()->enableFeedback();
 }
 
-void UHapticComponent::DisableFeedback()
+void UHapticManagerComponent::DisableFeedback()
 {
 	if (!IsInitialised)
 	{
@@ -372,7 +375,7 @@ void UHapticComponent::DisableFeedback()
 	bhaptics::HapticPlayer::instance()->disableFeedback();
 }
 
-void UHapticComponent::ToggleFeedback()
+void UHapticManagerComponent::ToggleFeedback()
 {
 	if (!IsInitialised)
 	{
@@ -381,7 +384,7 @@ void UHapticComponent::ToggleFeedback()
 	bhaptics::HapticPlayer::instance()->toggleFeedback();
 }
 
-bool UHapticComponent::IsDeviceConnected(EPosition device)
+bool UHapticManagerComponent::IsDeviceConnected(EPosition device)
 {
 	bhaptics::Position pos = bhaptics::Position::All;
 

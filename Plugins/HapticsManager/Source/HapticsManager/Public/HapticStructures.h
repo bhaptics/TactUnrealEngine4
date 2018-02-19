@@ -95,46 +95,6 @@ struct FPathPoint
 };
 
 USTRUCT(BlueprintType)
-struct FHapticFeedbackFrame
-{
-	GENERATED_BODY()
-
-		FHapticFeedbackFrame()
-	{
-		Position = EPosition::All;
-		PathPoints.Add(FPathPoint());
-		DotPoints.Add(FDotPoint());
-		Texture = 0;
-	}
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Vars)
-		TArray<FPathPoint> PathPoints;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Vars)
-		TArray<FDotPoint> DotPoints;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Vars)
-		int32 Texture;
-
-	UPROPERTY(BlueprintReadWrite, Category = Vars)
-		EPosition Position;
-
-	FHapticFeedbackFrame(EPosition _pos, const TArray<FPathPoint> &_pathPoints)
-	{
-		Position = _pos;
-		PathPoints = _pathPoints;
-		Texture = 0;
-	}
-
-	FHapticFeedbackFrame(EPosition _pos, const TArray<FDotPoint> &_dotPoints)
-	{
-		Position = _pos;
-		DotPoints = _dotPoints;
-		Texture = 0;
-	}
-};
-
-USTRUCT(BlueprintType)
 struct FHapticFeedback
 {
 	GENERATED_BODY()
@@ -150,7 +110,6 @@ struct FHapticFeedback
 	{
 		Position = _pos;
 		Mode = _mod;
-		//values.assign(20, 0);
 		Values.AddZeroed(20);
 		for (int i = 0; i < 20; i++)
 		{
@@ -176,7 +135,6 @@ USTRUCT(BlueprintType)
 struct FRotationOption
 {
 	GENERATED_BODY()
-
 
 	FRotationOption()
 	{

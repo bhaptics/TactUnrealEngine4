@@ -8,17 +8,17 @@
 #include "AllowWindowsPlatformTypes.h"
 #include "SDK/hapticsManager.hpp"
 #include "HideWindowsPlatformTypes.h"
-#include "HapticComponent.generated.h"
+#include "HapticManagerComponent.generated.h"
 
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class HAPTICSMANAGER_API UHapticComponent : public UActorComponent
+UCLASS( ClassGroup=(bHaptics), meta=(BlueprintSpawnableComponent) )
+class HAPTICSMANAGER_API UHapticManagerComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:	
 	// Sets default values for this component's properties
-	UHapticComponent();
+	UHapticManagerComponent();
 
 	// Called when the game starts
 	virtual void BeginPlay() override;

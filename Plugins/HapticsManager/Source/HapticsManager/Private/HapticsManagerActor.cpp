@@ -18,7 +18,6 @@ AHapticsManagerActor::AHapticsManagerActor()
 void AHapticsManagerActor::OnConstruction(const FTransform & Transform)
 {
 	Super::OnConstruction(Transform);
-
 }
 
 // Called when the game starts or when spawned
@@ -53,8 +52,6 @@ void AHapticsManagerActor::BeginPlay()
 		BhapticsUtilities::Free();
 	}
 
-	//bhaptics::HapticPlayer::instance()->init();
-
 	InitialiseDots(Tactal);
 	InitialiseDots(TactosyLeft);
 	InitialiseDots(TactosyRight);
@@ -66,14 +63,14 @@ void AHapticsManagerActor::BeginPlay()
 	InitialiseDots(TactShoeRight);
 	InitialiseDots(TactRacket);
 
+	bhaptics::HapticPlayer::instance()->registerConnection();
+
 	IsInitialised = true;
 }
 
 void AHapticsManagerActor::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	//bhaptics::HapticPlayer::instance()->turnOff();
-	//bhaptics::HapticPlayer::instance()->destroy();
-	//bhaptics::HapticPlayer::instance() = nullptr;
+	bhaptics::HapticPlayer::instance()->unregisterConnection();
 }
 
 // Called every frame
@@ -93,7 +90,6 @@ void AHapticsManagerActor::Tick(float DeltaTime)
 
 	IsTicking = true;
 
-	//bhaptics::HapticPlayer::instance()->doRepeat();
 	UpdateFeedback();
 	TArray<FHapticFeedback> Visualisation = ChangedFeedbacks;
 
@@ -423,8 +419,8 @@ void AHapticsManagerActor::TurnOffRegisteredFeedback(const FString &Key)
 
 void AHapticsManagerActor::UpdateFeedback()
 {
-	bhaptics::PlayerResponse Response;
-	std::map<std::string, std::vector<int>> DeviceMotors = bhaptics::HapticPlayer::instance()->CurrentResponse.Status;
+	//bhaptics::PlayerResponse Response = bhaptics::HapticPlayer::instance()->CurrentResponse;
+	std::map<std::string, std::vector<int>> DeviceMotors = bhaptics::HapticPlayer::instance()->getResponseStatus();
 
 	for (auto& Device : DeviceMotors)
 	{
