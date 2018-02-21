@@ -40,6 +40,7 @@ UObject* UFeedbackFileFactory::FactoryCreateFile(UClass* InClass, UObject* InPar
 			FeedbackFile->ProjectString = OutputString;
 			FeedbackFile->Key = JsonObject->GetStringField("name");
 			FeedbackFile->Device = JsonProject->GetObjectField("layout")->GetStringField("name");
+			FeedbackFile->Duration = JsonObject->GetNumberField("durationMillis")/1000;
 		}
 	}
 

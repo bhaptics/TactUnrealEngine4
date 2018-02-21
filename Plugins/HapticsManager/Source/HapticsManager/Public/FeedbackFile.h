@@ -12,9 +12,6 @@ class HAPTICSMANAGER_API UFeedbackFile : public UObject
 {
 	GENERATED_BODY()
 
-private:
-	
-
 public :
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "FeedbackFile")
 	FString Key;
@@ -27,5 +24,8 @@ public :
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "FeedbackFile")
 		FString Device;
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "FeedbackFile")
+		float Duration;
 };
 

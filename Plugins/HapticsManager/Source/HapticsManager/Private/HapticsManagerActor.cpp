@@ -141,7 +141,7 @@ void AHapticsManagerActor::Tick(float DeltaTime)
 
 void AHapticsManagerActor::SubmitKey(UFeedbackFile* Feedback)
 {
-	if (!IsInitialised)
+	if (!IsInitialised || Feedback == NULL)
 	{
 		return;
 	}
@@ -162,7 +162,7 @@ void AHapticsManagerActor::SubmitKey(UFeedbackFile* Feedback)
 
 void AHapticsManagerActor::SubmitKeyWithIntensityDuration(UFeedbackFile* Feedback, const FString &AltKey, FRotationOption RotationOption, FScaleOption ScaleOption)
 {
-	if (!IsInitialised)
+	if (!IsInitialised || Feedback == NULL)
 	{
 		return;
 	}
