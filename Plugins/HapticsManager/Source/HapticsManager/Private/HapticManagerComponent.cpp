@@ -15,7 +15,8 @@ UHapticManagerComponent::UHapticManagerComponent()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-
+	FGuid Gui = FGuid::NewGuid();
+	Id = Gui.ToString();
 }
 
 // Called every frame
@@ -30,48 +31,22 @@ void UHapticManagerComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	/*find a way to do this once
-	if (BhapticsUtilities::Initialise())
-	{
-		FString temp = BhapticsUtilities::GetExecutablePath();
-
-		if (!BhapticsUtilities::IsPlayerRunning())
-		{
-			UE_LOG(LogTemp, Log, TEXT("Player is not running"));
-
-			if (BhapticsUtilities::IsPlayerInstalled())
-			{
-				UE_LOG(LogTemp, Log, TEXT("Player is installed - launching"));
-				BhapticsUtilities::LaunchPlayer();
-			}
-			else
-			{
-				UE_LOG(LogTemp, Log, TEXT("Player is not Installed"));
-			}
-		}
-		else
-		{
-			UE_LOG(LogTemp, Log, TEXT("Player is running"));
-		}
-
-		BhapticsUtilities::Free();
-	}//*/
-
-	bhaptics::HapticPlayer::instance()->registerConnection();
+	std::string StandardId(TCHAR_TO_UTF8(*Id));
+	UE_LOG(LogTemp, Log, TEXT("Initialise %s."), StandardId.c_str());
+	bhaptics::HapticPlayer::instance()->registerConnection(StandardId);
 
 	IsInitialised = true;
 }
 
 void UHapticManagerComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	if (EndPlayReason == EEndPlayReason::Destroyed)
-	{
-		bhaptics::HapticPlayer::instance()->unregisterConnection();
-	}
+	std::string StandardId(TCHAR_TO_UTF8(*Id));
+	bhaptics::HapticPlayer::instance()->unregisterConnection(StandardId);
+	
 }
 
 
-void UHapticManagerComponent::SubmitKey(UFeedbackFile* Feedback)
+void UHapticManagerComponent::SubmitFeedback(UFeedbackFile* Feedback)
 {
 	if (!IsInitialised || Feedback == NULL)
 	{
@@ -92,7 +67,7 @@ void UHapticManagerComponent::SubmitKey(UFeedbackFile* Feedback)
 	bhaptics::HapticPlayer::instance()->submitRegistered(StandardKey);
 }
 
-void UHapticManagerComponent::SubmitKeyWithIntensityDuration(UFeedbackFile* Feedback, const FString &AltKey, FRotationOption RotationOption, FScaleOption ScaleOption)
+void UHapticManagerComponent::SubmitFeedbackWithIntensityDuration(UFeedbackFile* Feedback, const FString &AltKey, FRotationOption RotationOption, FScaleOption ScaleOption)
 {
 	if (!IsInitialised || Feedback == NULL)
 	{
@@ -123,16 +98,16 @@ void UHapticManagerComponent::SubmitKeyWithIntensityDuration(UFeedbackFile* Feed
 	bhaptics::HapticPlayer::instance()->submitRegistered(StandardKey, StandardAltKey, Option, RotateOption);
 }
 
-void UHapticManagerComponent::SubmitKeyWithTransform(UFeedbackFile* Feedback, const FString &AltKey, FRotationOption RotationOption)
+void UHapticManagerComponent::SubmitFeedbackWithTransform(UFeedbackFile* Feedback, const FString &AltKey, FRotationOption RotationOption)
 {
 	if (!IsInitialised || Feedback == NULL)
 	{
 		return;
 	}
-	SubmitKeyWithIntensityDuration(Feedback, AltKey, RotationOption, FScaleOption(1, 1));
+	SubmitFeedbackWithIntensityDuration(Feedback, AltKey, RotationOption, FScaleOption(1, 1));
 }
 
-void UHapticManagerComponent::RegisterFeedback(const FString &Key, UFeedbackFile* Feedback )
+void UHapticManagerComponent::RegisterFeedbackFile(const FString &Key, UFeedbackFile* Feedback )
 {
 	std::string StandardKey(TCHAR_TO_UTF8(*Key));
 

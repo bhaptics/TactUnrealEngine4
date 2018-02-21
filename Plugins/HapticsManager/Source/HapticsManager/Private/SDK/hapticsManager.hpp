@@ -6,6 +6,7 @@
 #include "thirdparty/easywsclient.hpp"
 #include "common/timer.hpp"
 #include "common/model.hpp"
+#include "common/util.hpp"
 #include "Engine.h"
 
 #ifdef _WIN32
@@ -31,6 +32,8 @@ namespace bhaptics
 
 		vector<string> _activeKeys;
 		vector<Position> _activeDevices;
+
+		vector<string> componentIds;
 
 		std::map<std::string, std::vector<int>> _activeFeedback;
 
@@ -233,6 +236,26 @@ namespace bhaptics
 			RegisterRequest req;
 			req.Key = key;
 			req.ProjectJson = ProjectJson;
+
+			registerMtx.lock();
+			_registered.push_back(req);
+
+			PlayerRequest playerReq;
+
+			playerReq.Register.push_back(req);
+
+			send(playerReq);
+			registerMtx.unlock();
+			return 0;
+		}
+
+		int registerFeedback(const string &key, const string &filePath)
+		{
+			HapticFile file = Util::parse(filePath);
+
+			RegisterRequest req;
+			req.Key = key;
+			req.ProjectJson = file.ProjectJson;
 
 			registerMtx.lock();
 			_registered.push_back(req);
@@ -483,25 +506,35 @@ namespace bhaptics
 			return keys;
 		}
 
-		void registerConnection()
+		void registerConnection(string Id)
 		{
 			//connectionMtx.lock();
-			connectionCount++;
+			componentIds.push_back(Id);
+			connectionCount = componentIds.size();
 			if (!ws)
 			{
 				init();
 			}
-			
 			//connectionMtx.unlock();
 		}
 
-		void unregisterConnection()
+		void unregisterConnection(string Id)
 		{
 			//connectionMtx.lock();
-			connectionCount--;
-			if (connectionCount <= 0)
+			std::_Vector_iterator<std::_Vector_val<std::_Simple_types<string>>> component = std::find(componentIds.begin(), componentIds.end(), Id);
+			if (component != componentIds.end())
+			{
+				componentIds.erase(component);
+			}
+			else
+			{
+				return;
+			}
+			connectionCount = componentIds.size();
+			if (componentIds.size() <= 0)
 			{
 				destroy();
+				connectionCount = 0;
 			}
 			//connectionMtx.unlock();
 		}

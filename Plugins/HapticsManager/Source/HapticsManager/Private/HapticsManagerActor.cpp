@@ -5,7 +5,9 @@
 #include "HapticStructures.h"
 #include "BhapticsUtilities.h"
 
+
 FCriticalSection AHapticsManagerActor::m_Mutex;
+bhaptics::PlayerResponse AHapticsManagerActor::CurrentResponse;
 bhaptics::HapticPlayer *bhaptics::HapticPlayer::hapticManager = 0;
 
 // Sets default values
@@ -13,11 +15,33 @@ AHapticsManagerActor::AHapticsManagerActor()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	FGuid Gui = FGuid::NewGuid();
+	Id = Gui.ToString();
 }
 
 void AHapticsManagerActor::OnConstruction(const FTransform & Transform)
 {
 	Super::OnConstruction(Transform);
+
+	if (!HasAnyFlags(RF_Transient))
+	{
+		TArray<FString> HapticFiles;
+		FString FileDirectory = LoadFeedbackFiles(HapticFiles);
+		for (int i = 0; i < HapticFiles.Num(); i++)
+		{
+			FString FileName = HapticFiles[i];
+			FString FilePath = FileDirectory;
+			int32 index;
+			FileName.FindChar(TCHAR('.'), index);
+			FilePath.Append("/");
+			FilePath.Append(FileName);
+			FString Key = FileName.Left(index);
+			HapticFileNames.AddUnique(*Key);
+		}
+
+		HapticFileRootFolder = FileDirectory;
+	}
+
 }
 
 // Called when the game starts or when spawned
@@ -25,6 +49,7 @@ void AHapticsManagerActor::BeginPlay()
 {
 	Super::BeginPlay();
 	ChangedFeedbacks = {};
+	//bhaptics::HapticPlayer::instance() = new bhaptics::HapticPlayer();
 
 	if (BhapticsUtilities::Initialise())
 	{
@@ -52,6 +77,12 @@ void AHapticsManagerActor::BeginPlay()
 		BhapticsUtilities::Free();
 	}
 
+	//bhaptics::HapticPlayer::instance()->init();
+	std::string StandardId(TCHAR_TO_UTF8(*Id));
+	UE_LOG(LogTemp, Log, TEXT("Initialise %s."), StandardId.c_str());
+	bhaptics::HapticPlayer::instance()->registerConnection(StandardId);
+	IsInitialised = true;
+
 	InitialiseDots(Tactal);
 	InitialiseDots(TactosyLeft);
 	InitialiseDots(TactosyRight);
@@ -63,14 +94,28 @@ void AHapticsManagerActor::BeginPlay()
 	InitialiseDots(TactShoeRight);
 	InitialiseDots(TactRacket);
 
-	bhaptics::HapticPlayer::instance()->registerConnection();
+	TArray<FString> HapticFiles;
+	FString FileDirectory = LoadFeedbackFiles(HapticFiles);
+	for (int i = 0; i < HapticFiles.Num(); i++)
+	{
+		FString FileName = HapticFiles[i];
+		FString FilePath = FileDirectory;
+		int32 index;
+		FileName.FindChar(TCHAR('.'), index);
+		FilePath.Append("/");
+		FilePath.Append(FileName);
+		FString Key = FileName.Left(index);
+		RegisterFeeback(Key, FilePath);
+		HapticFileNames.AddUnique(*Key);
+	}
 
-	IsInitialised = true;
+	HapticFileRootFolder = FileDirectory;
 }
 
 void AHapticsManagerActor::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	bhaptics::HapticPlayer::instance()->unregisterConnection();
+	std::string StandardId(TCHAR_TO_UTF8(*Id));
+	bhaptics::HapticPlayer::instance()->unregisterConnection(StandardId);
 }
 
 // Called every frame
@@ -83,13 +128,9 @@ void AHapticsManagerActor::Tick(float DeltaTime)
 		return;
 	}
 
-	if (!IsInitialised)
-	{
-		return;
-	}
-
 	IsTicking = true;
 
+	//bhaptics::HapticPlayer::instance()->doRepeat();
 	UpdateFeedback();
 	TArray<FHapticFeedback> Visualisation = ChangedFeedbacks;
 
@@ -139,35 +180,15 @@ void AHapticsManagerActor::Tick(float DeltaTime)
 	IsTicking = false;
 }
 
-void AHapticsManagerActor::SubmitKey(UFeedbackFile* Feedback)
+void AHapticsManagerActor::SubmitKey(const FString &Key)
 {
-	if (!IsInitialised || Feedback == NULL)
-	{
-		return;
-	}
-
-	std::string StandardKey(TCHAR_TO_UTF8(*Feedback->Key));
-	if (!bhaptics::HapticPlayer::instance()->isFeedbackRegistered(StandardKey))
-	{
-		TSharedPtr<FJsonObject> JsonProject = MakeShareable(new FJsonObject);
-		TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(Feedback->ProjectString);
-
-		if (FJsonSerializer::Deserialize(Reader, JsonProject))
-		{
-			bhaptics::HapticPlayer::instance()->registerFeedback(StandardKey, JsonProject);
-		}
-	}
+	std::string StandardKey(TCHAR_TO_UTF8(*Key));
 	bhaptics::HapticPlayer::instance()->submitRegistered(StandardKey);
 }
 
-void AHapticsManagerActor::SubmitKeyWithIntensityDuration(UFeedbackFile* Feedback, const FString &AltKey, FRotationOption RotationOption, FScaleOption ScaleOption)
+void AHapticsManagerActor::SubmitKeyWithIntensityDuration(const FString &Key, const FString &AltKey, FRotationOption RotationOption, FScaleOption ScaleOption)
 {
-	if (!IsInitialised || Feedback == NULL)
-	{
-		return;
-	}
-
-	std::string StandardKey(TCHAR_TO_UTF8(*Feedback->Key));
+	std::string StandardKey(TCHAR_TO_UTF8(*Key));
 	std::string StandardAltKey(TCHAR_TO_UTF8(*AltKey));
 	bhaptics::RotationOption RotateOption;
 	bhaptics::ScaleOption Option;
@@ -176,52 +197,54 @@ void AHapticsManagerActor::SubmitKeyWithIntensityDuration(UFeedbackFile* Feedbac
 
 	Option.Intensity = ScaleOption.Intensity;
 	Option.Duration = ScaleOption.Duration;
-
-	if (!bhaptics::HapticPlayer::instance()->isFeedbackRegistered(StandardKey))
-	{
-		TSharedPtr<FJsonObject> JsonProject = MakeShareable(new FJsonObject);
-		TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(Feedback->ProjectString);
-
-		if (FJsonSerializer::Deserialize(Reader, JsonProject))
-		{
-			bhaptics::HapticPlayer::instance()->registerFeedback(StandardKey, JsonProject);
-		}
-	}
-
 	bhaptics::HapticPlayer::instance()->submitRegistered(StandardKey, StandardAltKey, Option, RotateOption);
 }
 
-void AHapticsManagerActor::SubmitKeyWithTransform(UFeedbackFile* Feedback, const FString &AltKey, FRotationOption RotationOption)
+void AHapticsManagerActor::SubmitKeyWithTransform(const FString &Key, const FString &AltKey, FRotationOption RotationOption)
 {
-	if (!IsInitialised)
-	{
-		return;
-	}
-	SubmitKeyWithIntensityDuration(Feedback, AltKey, RotationOption, FScaleOption(1, 1));
+	SubmitKeyWithIntensityDuration(Key, AltKey, RotationOption, FScaleOption(1, 1));
 }
 
-void AHapticsManagerActor::RegisterFeedback(const FString &Key, UFeedbackFile* Feedback)
+void AHapticsManagerActor::RegisterFeeback(const FString &Key, const FString &FilePath)
 {
-	std::string StandardKey(TCHAR_TO_UTF8(*Key));
+	std::string stdKey(TCHAR_TO_UTF8(*Key));
 
-	if (!bhaptics::HapticPlayer::instance()->isFeedbackRegistered(StandardKey))
+	FString newPath = FilePath;
+	std::string StandardPath(TCHAR_TO_UTF8(*newPath));
+
+	if (!FPaths::FileExists(newPath))
 	{
-		TSharedPtr<FJsonObject> JsonProject = MakeShareable(new FJsonObject);
-		TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(Feedback->ProjectString);
-
-		if (FJsonSerializer::Deserialize(Reader, JsonProject))
-		{
-			bhaptics::HapticPlayer::instance()->registerFeedback(StandardKey, JsonProject);
-		}
+		UE_LOG(LogTemp, Log, TEXT("File does not exist : %s"), *newPath);
+		return;
 	}
+
+	bhaptics::HapticPlayer::instance()->registerFeedback(stdKey, StandardPath);
+}
+
+FString AHapticsManagerActor::LoadFeedbackFiles(TArray<FString>& FilesOut)
+{
+	FString RootFolderFullPath = FPaths::GameContentDir() + ProjectFeedbackFolder;
+	if (!FPaths::DirectoryExists(RootFolderFullPath) || !UseProjectFeedbackFolder)
+	{
+		RootFolderFullPath = IPluginManager::Get().FindPlugin("HapticsManager")->GetBaseDir() + "/Feedback";
+	}
+	UE_LOG(LogTemp, Log, TEXT("Looking in dir : %s"), *RootFolderFullPath);
+
+	FPaths::NormalizeDirectoryName(RootFolderFullPath);
+	IFileManager& FileManager = IFileManager::Get();
+
+	FString Ext = "*.tactosy";
+	FString Ext2 = "*.tact";
+
+	FString FinalPath = RootFolderFullPath + "/" + Ext;
+	FString FinalPath2 = RootFolderFullPath + "/" + Ext2;
+	FileManager.FindFiles(FilesOut, *FinalPath, true, false);
+	FileManager.FindFiles(FilesOut, *FinalPath2, true, false);
+	return RootFolderFullPath;
 }
 
 void AHapticsManagerActor::SubmitBytes(const FString &Key, EPosition PositionEnum, const TArray<uint8>& InputBytes, int32 DurationInMilliSecs)
 {
-	if (!IsInitialised)
-	{
-		return;
-	}
 	bhaptics::Position HapticPosition = bhaptics::Position::All;
 	std::string StandardKey(TCHAR_TO_UTF8(*Key));
 
@@ -279,10 +302,6 @@ void AHapticsManagerActor::SubmitBytes(const FString &Key, EPosition PositionEnu
 
 void AHapticsManagerActor::SubmitDots(const FString &Key, EPosition PositionEnum, const TArray<FDotPoint> DotPoints, int32 DurationInMilliSecs)
 {
-	if (!IsInitialised)
-	{
-		return;
-	}
 	bhaptics::Position HapticPosition = bhaptics::Position::All;
 	std::string StandardKey(TCHAR_TO_UTF8(*Key));
 	switch (PositionEnum)
@@ -333,10 +352,6 @@ void AHapticsManagerActor::SubmitDots(const FString &Key, EPosition PositionEnum
 
 void AHapticsManagerActor::SubmitPath(const FString &Key, EPosition PositionEnum, const TArray<FPathPoint>PathPoints, int32 DurationInMilliSecs)
 {
-	if (!IsInitialised)
-	{
-		return;
-	}
 	bhaptics::Position HapticPosition = bhaptics::Position::All;
 	std::vector<bhaptics::PathPoint> PathVector;
 	std::string StandardKey(TCHAR_TO_UTF8(*Key));
@@ -399,28 +414,19 @@ bool AHapticsManagerActor::IsRegisteredPlaying(const FString &Key)
 
 void AHapticsManagerActor::TurnOffAllFeedback()
 {
-	if (!IsInitialised)
-	{
-		return;
-	}
 	bhaptics::HapticPlayer::instance()->turnOff();
 }
 
 void AHapticsManagerActor::TurnOffRegisteredFeedback(const FString &Key)
 {
-	if (!IsInitialised)
-	{
-		return;
-	}
-
 	std::string StandardKey(TCHAR_TO_UTF8(*Key));
 	bhaptics::HapticPlayer::instance()->turnOff(StandardKey);
 }
 
 void AHapticsManagerActor::UpdateFeedback()
 {
-	//bhaptics::PlayerResponse Response = bhaptics::HapticPlayer::instance()->CurrentResponse;
-	std::map<std::string, std::vector<int>> DeviceMotors = bhaptics::HapticPlayer::instance()->getResponseStatus();
+	bhaptics::PlayerResponse Response;
+	std::map<std::string, std::vector<int>> DeviceMotors = bhaptics::HapticPlayer::instance()->getResponseStatus();//fix
 
 	for (auto& Device : DeviceMotors)
 	{
@@ -594,28 +600,16 @@ void AHapticsManagerActor::Reset()
 
 void AHapticsManagerActor::EnableFeedback()
 {
-	if (!IsInitialised)
-	{
-		return;
-	}
 	bhaptics::HapticPlayer::instance()->enableFeedback();
 }
 
 void AHapticsManagerActor::DisableFeedback()
 {
-	if (!IsInitialised)
-	{
-		return;
-	}
 	bhaptics::HapticPlayer::instance()->disableFeedback();
 }
 
 void AHapticsManagerActor::ToggleFeedback()
 {
-	if (!IsInitialised)
-	{
-		return;
-	}
 	bhaptics::HapticPlayer::instance()->toggleFeedback();
 }
 
@@ -664,4 +658,81 @@ bool AHapticsManagerActor::IsDeviceConnected(EPosition device)
 	}
 
 	return bhaptics::HapticPlayer::instance()->isDevicePlaying(pos);
+}
+
+void AHapticsManagerActor::SubmitFeedback(UFeedbackFile* Feedback)
+{
+	if (!IsInitialised || Feedback == NULL)
+	{
+		return;
+	}
+
+	std::string StandardKey(TCHAR_TO_UTF8(*Feedback->Key));
+	if (!bhaptics::HapticPlayer::instance()->isFeedbackRegistered(StandardKey))
+	{
+		TSharedPtr<FJsonObject> JsonProject = MakeShareable(new FJsonObject);
+		TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(Feedback->ProjectString);
+
+		if (FJsonSerializer::Deserialize(Reader, JsonProject))
+		{
+			bhaptics::HapticPlayer::instance()->registerFeedback(StandardKey, JsonProject);
+		}
+	}
+	bhaptics::HapticPlayer::instance()->submitRegistered(StandardKey);
+}
+
+void AHapticsManagerActor::SubmitFeedbackWithIntensityDuration(UFeedbackFile* Feedback, const FString &AltKey, FRotationOption RotationOption, FScaleOption ScaleOption)
+{
+	if (!IsInitialised || Feedback == NULL)
+	{
+		return;
+	}
+
+	std::string StandardKey(TCHAR_TO_UTF8(*Feedback->Key));
+	std::string StandardAltKey(TCHAR_TO_UTF8(*AltKey));
+	bhaptics::RotationOption RotateOption;
+	bhaptics::ScaleOption Option;
+	RotateOption.OffsetAngleX = RotationOption.OffsetAngleX;
+	RotateOption.OffsetY = RotationOption.OffsetY;
+
+	Option.Intensity = ScaleOption.Intensity;
+	Option.Duration = ScaleOption.Duration;
+
+	if (!bhaptics::HapticPlayer::instance()->isFeedbackRegistered(StandardKey))
+	{
+		TSharedPtr<FJsonObject> JsonProject = MakeShareable(new FJsonObject);
+		TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(Feedback->ProjectString);
+
+		if (FJsonSerializer::Deserialize(Reader, JsonProject))
+		{
+			bhaptics::HapticPlayer::instance()->registerFeedback(StandardKey, JsonProject);
+		}
+	}
+
+	bhaptics::HapticPlayer::instance()->submitRegistered(StandardKey, StandardAltKey, Option, RotateOption);
+}
+
+void AHapticsManagerActor::SubmitFeedbackWithTransform(UFeedbackFile* Feedback, const FString &AltKey, FRotationOption RotationOption)
+{
+	if (IsInitialised ||Feedback == NULL)
+	{
+		return;
+	}
+	SubmitFeedbackWithIntensityDuration(Feedback, AltKey, RotationOption, FScaleOption(1, 1));
+}
+
+void AHapticsManagerActor::RegisterFeedbackFile(const FString &Key, UFeedbackFile* Feedback)
+{
+	std::string StandardKey(TCHAR_TO_UTF8(*Key));
+
+	if (!bhaptics::HapticPlayer::instance()->isFeedbackRegistered(StandardKey))
+	{
+		TSharedPtr<FJsonObject> JsonProject = MakeShareable(new FJsonObject);
+		TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(Feedback->ProjectString);
+
+		if (FJsonSerializer::Deserialize(Reader, JsonProject))
+		{
+			bhaptics::HapticPlayer::instance()->registerFeedback(StandardKey, JsonProject);
+		}
+	}
 }
