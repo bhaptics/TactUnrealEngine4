@@ -1,6 +1,5 @@
 //Copyright bHaptics Inc. 2017
 
-#include "HapticsManagerPrivatePCH.h"
 #include "HapticsManagerActor.h"
 #include "HapticStructures.h"
 #include "BhapticsUtilities.h"

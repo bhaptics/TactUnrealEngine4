@@ -2,6 +2,7 @@
 	"FileVersion": 3,
 	"Version": 5,
 	"VersionName": "1.2.0",
+	"EngineVersion": "4.18.0",
 	"FriendlyName": "HapticsManager",
 	"Description": "bHaptics Haptic Library",
 	"Category": "Haptic",

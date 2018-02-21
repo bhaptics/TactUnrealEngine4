@@ -5,21 +5,10 @@ using System.Collections.Generic;
 
 public class bHapticsManagerEditorTarget : TargetRules
 {
-	public bHapticsManagerEditorTarget(TargetInfo Target)
-	{
-		Type = TargetType.Editor;
-	}
+    public bHapticsManagerEditorTarget(TargetInfo Target) : base(Target)
+    {
+        Type = TargetType.Editor;
 
-	//
-	// TargetRules interface.
-	//
-
-	public override void SetupBinaries(
-		TargetInfo Target,
-		ref List<UEBuildBinaryConfiguration> OutBuildBinaryConfigurations,
-		ref List<string> OutExtraModuleNames
-		)
-	{
-		OutExtraModuleNames.AddRange( new string[] { "bHapticsManager" } );
-	}
+        ExtraModuleNames.AddRange(new string[] { "bHapticsManager" });
+    }
 }
