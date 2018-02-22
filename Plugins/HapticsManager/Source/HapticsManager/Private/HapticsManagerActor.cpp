@@ -77,9 +77,7 @@ void AHapticsManagerActor::BeginPlay()
 		BhapticsUtilities::Free();
 	}
 
-	//bhaptics::HapticPlayer::instance()->init();
 	std::string StandardId(TCHAR_TO_UTF8(*Id));
-	UE_LOG(LogTemp, Log, TEXT("Initialise %s."), StandardId.c_str());
 	bhaptics::HapticPlayer::instance()->registerConnection(StandardId);
 	IsInitialised = true;
 
@@ -94,22 +92,25 @@ void AHapticsManagerActor::BeginPlay()
 	InitialiseDots(TactShoeRight);
 	InitialiseDots(TactRacket);
 
-	TArray<FString> HapticFiles;
-	FString FileDirectory = LoadFeedbackFiles(HapticFiles);
-	for (int i = 0; i < HapticFiles.Num(); i++)
+	if (!DisableFileLoad)
 	{
-		FString FileName = HapticFiles[i];
-		FString FilePath = FileDirectory;
-		int32 index;
-		FileName.FindChar(TCHAR('.'), index);
-		FilePath.Append("/");
-		FilePath.Append(FileName);
-		FString Key = FileName.Left(index);
-		RegisterFeeback(Key, FilePath);
-		HapticFileNames.AddUnique(*Key);
-	}
+		TArray<FString> HapticFiles;
+		FString FileDirectory = LoadFeedbackFiles(HapticFiles);
+		for (int i = 0; i < HapticFiles.Num(); i++)
+		{
+			FString FileName = HapticFiles[i];
+			FString FilePath = FileDirectory;
+			int32 index;
+			FileName.FindChar(TCHAR('.'), index);
+			FilePath.Append("/");
+			FilePath.Append(FileName);
+			FString Key = FileName.Left(index);
+			RegisterFeeback(Key, FilePath);
+			HapticFileNames.AddUnique(*Key);
+		}
 
-	HapticFileRootFolder = FileDirectory;
+		HapticFileRootFolder = FileDirectory;
+	}
 }
 
 void AHapticsManagerActor::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -130,7 +131,6 @@ void AHapticsManagerActor::Tick(float DeltaTime)
 
 	IsTicking = true;
 
-	//bhaptics::HapticPlayer::instance()->doRepeat();
 	UpdateFeedback();
 	TArray<FHapticFeedback> Visualisation = ChangedFeedbacks;
 

@@ -75,7 +75,7 @@ public:
 		meta = (DisplayName = "Submit Key",
 			Keywords = "bHaptics",
 			DeprecatedFunction,
-			DeprecationMessage = "Function Deprecated. Please usse SubmitFeedback in the HapticManagerComponent. Will be removed in 1.3.1."),
+			DeprecationMessage = "Function Deprecated. Please use SubmitFeedback in the HapticManagerComponent."),
 		Category = "bHaptics")
 		void SubmitKey(const FString &Key);
 
@@ -85,7 +85,7 @@ public:
 		meta = (DisplayName = "Submit Key with Transform",
 			Keywords = "bHaptics",
 			DeprecatedFunction,
-			DeprecationMessage = "Function Deprecated. Please usse SubmitFeedbackWithTransform in the HapticManagerComponent. Will be removed in 1.3.1."),
+			DeprecationMessage = "Function Deprecated. Please use SubmitFeedbackWithTransform in the HapticManagerComponent."),
 		Category = "bHaptics")
 		void SubmitKeyWithTransform(const FString &Key, const FString &AltKey, FRotationOption Option);
 
@@ -94,7 +94,7 @@ public:
 		meta = (DisplayName = "Submit Key with Scaled Intensity and Duration",
 			Keywords = "bHaptics",
 			DeprecatedFunction,
-			DeprecationMessage = "Function Deprecated. Please usse SubmitFeedbackWithIntensityDuration in the HapticManagerComponent. Will be removed in 1.3.1."),
+			DeprecationMessage = "Function Deprecated. Please use SubmitFeedbackWithIntensityDuration in the HapticManagerComponent."),
 		Category = "bHaptics")
 		void SubmitKeyWithIntensityDuration(const FString &Key, const FString &AltKey, FRotationOption RotationOption, FScaleOption ScaleOption);
 
@@ -213,6 +213,9 @@ public:
 		Category = "bHaptics")
 	void SubmitFeedback(UFeedbackFile* Feedback);
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Haptics")
+	bool DisableFileLoad = false;
+
 private:
 	static FCriticalSection m_Mutex;
 	static bhaptics::PlayerResponse CurrentResponse;
@@ -225,5 +228,6 @@ private:
 	void RegisterFeeback(const FString &Key, const FString &FilePath);
 	FString Id;
 	bool IsInitialised = false;
+	
 
 };

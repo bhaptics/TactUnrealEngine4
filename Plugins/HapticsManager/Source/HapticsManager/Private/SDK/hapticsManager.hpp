@@ -508,19 +508,16 @@ namespace bhaptics
 
 		void registerConnection(string Id)
 		{
-			//connectionMtx.lock();
 			componentIds.push_back(Id);
 			connectionCount = componentIds.size();
 			if (!ws)
 			{
 				init();
 			}
-			//connectionMtx.unlock();
 		}
 
 		void unregisterConnection(string Id)
 		{
-			//connectionMtx.lock();
 			std::_Vector_iterator<std::_Vector_val<std::_Simple_types<string>>> component = std::find(componentIds.begin(), componentIds.end(), Id);
 			if (component != componentIds.end())
 			{
@@ -536,7 +533,6 @@ namespace bhaptics
 				destroy();
 				connectionCount = 0;
 			}
-			//connectionMtx.unlock();
 		}
 
 		std::map<std::string, std::vector<int>> getResponseStatus()
@@ -555,7 +551,6 @@ namespace bhaptics
 			if (!hapticManager)
 			{
 				hapticManager = new HapticPlayer();
-				//hapticManager->init();
 			}
 
 			return hapticManager;

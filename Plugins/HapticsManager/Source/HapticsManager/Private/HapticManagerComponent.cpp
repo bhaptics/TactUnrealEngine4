@@ -23,8 +23,6 @@ UHapticManagerComponent::UHapticManagerComponent()
 void UHapticManagerComponent::TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction )
 {
 	Super::TickComponent( DeltaTime, TickType, ThisTickFunction );
-
-	//bhaptics::HapticPlayer::instance()->doRepeat();
 }
 
 void UHapticManagerComponent::BeginPlay()
@@ -326,8 +324,6 @@ void UHapticManagerComponent::TurnOffRegisteredFeedback(const FString &Key)
 
 void UHapticManagerComponent::Reset()
 {
-	FHapticFeedback BlankFeedback = FHapticFeedback();
-
 	bhaptics::HapticPlayer::instance()->destroy();
 	bhaptics::HapticPlayer::instance()->init();
 }
