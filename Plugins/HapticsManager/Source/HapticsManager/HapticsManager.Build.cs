@@ -6,6 +6,7 @@ using UnrealBuildTool;
 
 public class HapticsManager : ModuleRules
 {
+
     public HapticsManager(TargetInfo Target)
 	{
         //PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
@@ -60,4 +61,5 @@ public class HapticsManager : ModuleRules
 			);
 
 	}
+
 }
