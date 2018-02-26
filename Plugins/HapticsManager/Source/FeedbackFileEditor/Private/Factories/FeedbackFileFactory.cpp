@@ -6,6 +6,9 @@
 #include "Containers/UnrealString.h"
 #include "FeedbackFile.h"
 #include "Misc/FileHelper.h"
+#include "TactotFeedbackFile.h"
+#include "TactosyFeedbackFile.h"
+#include "TactalFeedbackFile.h"
 
 UFeedbackFileFactory::UFeedbackFileFactory(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -20,13 +23,14 @@ UObject* UFeedbackFileFactory::FactoryCreateFile(UClass* InClass, UObject* InPar
 {
 	UFeedbackFile* FeedbackFile = nullptr;
 	FString TextString;
+	FGuid Id = FGuid::NewGuid();
+	FString ProjectString = "";
+	FString Key = "";
+	FString Device = "Tactot";
+	float Duration = 0;
 
 	if (FFileHelper::LoadFileToString(TextString, *Filename))
 	{
-		FeedbackFile = NewObject<UFeedbackFile>(InParent, InClass, InName, Flags);
-		FeedbackFile->Key = Filename;
-		FeedbackFile->Id = FGuid::NewGuid();
-
 		TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject);
 		TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(TextString);
 
@@ -37,14 +41,55 @@ UObject* UFeedbackFileFactory::FactoryCreateFile(UClass* InClass, UObject* InPar
 			TSharedRef<TJsonWriter<TCHAR, TCondensedJsonPrintPolicy<TCHAR>>> Writer = TJsonWriterFactory<TCHAR, TCondensedJsonPrintPolicy<TCHAR>>::Create(&OutputString);
 			FJsonSerializer::Serialize(JsonProject.ToSharedRef(), Writer);
 
-			FeedbackFile->ProjectString = OutputString;
-			FeedbackFile->Key = JsonObject->GetStringField("name");
-			FeedbackFile->Device = JsonProject->GetObjectField("layout")->GetStringField("name");
-			FeedbackFile->Duration = JsonObject->GetNumberField("durationMillis")/1000;
+			ProjectString = OutputString;
+			Key = JsonObject->GetStringField("name");
+			Device = JsonProject->GetObjectField("layout")->GetStringField("name");
+			Duration = JsonProject->GetNumberField("mediaFileDuration");
 		}
 	}
 
 	bOutOperationCanceled = false;
 
+	if (Device == "Tactot")
+	{
+		UTactotFeedbackFile* TactotFile = nullptr;
+		TactotFile = NewObject<UTactotFeedbackFile>(InParent, UTactotFeedbackFile::StaticClass(), InName, Flags);
+		TactotFile->Id = Id;
+		TactotFile->ProjectString = ProjectString;
+		TactotFile->Key = Key;
+		TactotFile->Device = Device;
+		TactotFile->Duration = Duration;
+		return TactotFile;
+	}
+	else if (Device == "Tactosy")
+	{
+		UTactosyFeedbackFile* TactosyFile = nullptr;
+		TactosyFile = NewObject<UTactosyFeedbackFile>(InParent, UTactosyFeedbackFile::StaticClass(), InName, Flags);
+		TactosyFile->Id = Id;
+		TactosyFile->ProjectString = ProjectString;
+		TactosyFile->Key = Key;
+		TactosyFile->Device = Device;
+		TactosyFile->Duration = Duration;
+		return TactosyFile;
+	}
+	else if (Device == "Tactal")
+	{
+		UTactalFeedbackFile* TactalFile = nullptr;
+		TactalFile = NewObject<UTactalFeedbackFile>(InParent, UTactalFeedbackFile::StaticClass(), InName, Flags);
+		TactalFile->Id = Id;
+		TactalFile->ProjectString = ProjectString;
+		TactalFile->Key = Key;
+		TactalFile->Device = Device;
+		TactalFile->Duration = Duration;
+		return TactalFile;
+	}
+
+	FeedbackFile = NewObject<UFeedbackFile>(InParent, InClass, InName, Flags);
+	FeedbackFile->Id = Id;
+	FeedbackFile->ProjectString = ProjectString;
+	FeedbackFile->Key = Key;
+	FeedbackFile->Device = Device;
+	FeedbackFile->Duration = Duration;
+	
 	return FeedbackFile;
 }

@@ -22,5 +22,5 @@ UObject* UFeedbackFileFactoryNew::FactoryCreateNew(UClass* InClass, UObject* InP
 
 bool UFeedbackFileFactoryNew::ShouldShowInNewMenu() const
 {
-	return true;
+	return false;
 }
