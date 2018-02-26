@@ -51,32 +51,6 @@ void AHapticsManagerActor::BeginPlay()
 	ChangedFeedbacks = {};
 	//bhaptics::HapticPlayer::instance() = new bhaptics::HapticPlayer();
 
-	if (BhapticsUtilities::Initialise())
-	{
-		FString temp = BhapticsUtilities::GetExecutablePath();
-
-		if (!BhapticsUtilities::IsPlayerRunning())
-		{
-			UE_LOG(LogTemp, Log, TEXT("Player is not running"));
-
-			if (BhapticsUtilities::IsPlayerInstalled())
-			{
-				UE_LOG(LogTemp, Log, TEXT("Player is installed - launching"));
-				BhapticsUtilities::LaunchPlayer();
-			}
-			else
-			{
-				UE_LOG(LogTemp, Log, TEXT("Player is not Installed"));
-			}
-		}
-		else
-		{
-			UE_LOG(LogTemp, Log, TEXT("Player is running"));
-		}
-
-		BhapticsUtilities::Free();
-	}
-
 	std::string StandardId(TCHAR_TO_UTF8(*Id));
 	bhaptics::HapticPlayer::instance()->registerConnection(StandardId);
 	IsInitialised = true;

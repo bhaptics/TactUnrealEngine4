@@ -2,12 +2,38 @@
 
 #include "HapticsManagerPrivatePCH.h"
 #include "HapticsManager.h"
+#include "BhapticsUtilities.h"
 
 #define LOCTEXT_NAMESPACE "FHapticsManagerModule"
 
 void FHapticsManagerModule::StartupModule()
 {
 	// This code will execute after your module is loaded into memory; the exact timing is specified in the .uplugin file per-module
+	if (BhapticsUtilities::Initialise())
+	{
+		FString temp = BhapticsUtilities::GetExecutablePath();
+
+		if (!BhapticsUtilities::IsPlayerRunning())
+		{
+			UE_LOG(LogTemp, Log, TEXT("Player is not running"));
+
+			if (BhapticsUtilities::IsPlayerInstalled())
+			{
+				UE_LOG(LogTemp, Log, TEXT("Player is installed - launching"));
+				BhapticsUtilities::LaunchPlayer();
+			}
+			else
+			{
+				UE_LOG(LogTemp, Log, TEXT("Player is not Installed"));
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Log, TEXT("Player is running"));
+		}
+
+		BhapticsUtilities::Free();
+	}
 }
 
 void FHapticsManagerModule::ShutdownModule()
