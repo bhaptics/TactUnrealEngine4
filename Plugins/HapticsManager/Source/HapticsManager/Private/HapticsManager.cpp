@@ -2,10 +2,11 @@
 
 #include "HapticsManagerPrivatePCH.h"
 #include "HapticsManager.h"
+#include "SDK/hapticsManager.hpp"
 #include "BhapticsUtilities.h"
 
 #define LOCTEXT_NAMESPACE "FHapticsManagerModule"
-
+bhaptics::HapticPlayer *bhaptics::HapticPlayer::hapticManager = 0;
 void FHapticsManagerModule::StartupModule()
 {
 	// This code will execute after your module is loaded into memory; the exact timing is specified in the .uplugin file per-module

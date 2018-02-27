@@ -8,7 +8,6 @@
 
 FCriticalSection AHapticsManagerActor::m_Mutex;
 bhaptics::PlayerResponse AHapticsManagerActor::CurrentResponse;
-bhaptics::HapticPlayer *bhaptics::HapticPlayer::hapticManager = 0;
 
 // Sets default values
 AHapticsManagerActor::AHapticsManagerActor()

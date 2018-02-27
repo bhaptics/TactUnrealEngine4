@@ -5,6 +5,8 @@
 #include "IPluginManager.h"
 #include "SlateCore.h"
 #include "SlateStyleRegistry.h"
+#include "AssetTools/FeedbackFileActions.h"
+
 
 #define LOCTEXT_NAMESPACE "FFeedbackFileEditorModule"
 
@@ -49,6 +51,11 @@ void FFeedbackFileEditorModule::StartupModule()
 	}
 
 	FSlateStyleRegistry::RegisterSlateStyle(*StyleSet);
+
+	IAssetTools& AssetTools = FModuleManager::LoadModuleChecked<FAssetToolsModule>("AssetTools").Get();
+	auto Action = MakeShareable(new FFeedbackFileActions(StyleSet.ToSharedRef()));
+	AssetTools.RegisterAssetTypeActions(Action);
+	RegisteredAssetTypeActions.Add(Action);
 }
 
 void FFeedbackFileEditorModule::ShutdownModule()
