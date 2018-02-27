@@ -3,17 +3,18 @@
 #pragma once
 #include "Developer/AssetTools/Public/AssetTypeActions_Base.h"
 #include "Templates/SharedPointer.h"
+#include "FeedbackFileActions.h"
 
 class FSlateStyleSet;
 /**
  * 
  */
-class FFeedbackFileActions
+class FTactosyFileActions
 	: public FAssetTypeActions_Base
 {
 public:
-	FFeedbackFileActions(const TSharedRef<FSlateStyleSet>& InStyle);
-
+	FTactosyFileActions(const TSharedRef<FSlateStyleSet>& InStyle) ;
+	
 public:
 
 	virtual bool CanFilter() override;
@@ -23,8 +24,6 @@ public:
 	virtual UClass* GetSupportedClass() const override;
 	virtual FColor GetTypeColor() const override;
 	virtual bool HasActions(const TArray<UObject*>& InObjects) const override;
-
-private:
 
 	/** Pointer to the style set to use for toolkits. */
 	TSharedRef<FSlateStyleSet> Style;

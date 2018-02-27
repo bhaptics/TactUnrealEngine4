@@ -1,4 +1,4 @@
-//Copyright bHaptics Inc. 2017
+//Copyright bHaptics Inc. 2018
 #pragma once
 #ifndef BHAPTICS_HPP
 #define BHAPTICS_HPP
@@ -558,4 +558,5 @@ namespace bhaptics
 	};
 }
 
+//bhaptics::HapticPlayer *bhaptics::HapticPlayer::hapticManager = 0;
 #endif

@@ -3,19 +3,19 @@
 #pragma once
 #include "Developer/AssetTools/Public/AssetTypeActions_Base.h"
 #include "Templates/SharedPointer.h"
+#include "FeedbackFileActions.h"
 
 class FSlateStyleSet;
 /**
  * 
  */
-class FFeedbackFileActions
+class FTactalFileActions
 	: public FAssetTypeActions_Base
 {
 public:
-	FFeedbackFileActions(const TSharedRef<FSlateStyleSet>& InStyle);
-
+	FTactalFileActions(const TSharedRef<FSlateStyleSet>& InStyle);
+	
 public:
-
 	virtual bool CanFilter() override;
 	virtual void GetActions(const TArray<UObject*>& InObjects, FMenuBuilder& MenuBuilder) override;
 	virtual uint32 GetCategories() override;

@@ -1,4 +1,4 @@
-//Copyright bHaptics Inc. 2017
+//Copyright bHaptics Inc. 2018
 
 #include "HapticsManagerPrivatePCH.h"
 #include "BhapticsUtilities.h"

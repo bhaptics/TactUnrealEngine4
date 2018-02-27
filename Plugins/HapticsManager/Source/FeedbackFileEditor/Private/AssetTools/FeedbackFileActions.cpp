@@ -1,18 +1,17 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+//Copyright bHaptics Inc. 2018
 
 #include "FeedbackFileEditor.h"
 #include "FeedbackFileActions.h"
 
 #include "Framework/MultiBox/MultiBoxBuilder.h"
 #include "FeedbackFile.h"
-//#include "AllowWindowsPlatformTypes.h"
-//#include "HapticsManager/Private/SDK/hapticsManager.hpp"
-//#include "HideWindowsPlatformTypes.h"
+#include "AllowWindowsPlatformTypes.h"
+#include "HapticsManager/Private/SDK/hapticsManager.hpp"
+#include "HideWindowsPlatformTypes.h"
 #include "Styling/SlateStyle.h"
 
 
 #define LOCTEXT_NAMESPACE "AssetTypeActions"
-
 FFeedbackFileActions::FFeedbackFileActions(const TSharedRef<FSlateStyleSet>& InStyle)
 	: Style(InStyle)
 {
@@ -25,20 +24,22 @@ bool FFeedbackFileActions::CanFilter()
 
 void FFeedbackFileActions::GetActions(const TArray<UObject*>& InObjects, FMenuBuilder & MenuBuilder)
 {
-	/*FAssetTypeActions_Base::GetActions(InObjects, MenuBuilder);
+	FAssetTypeActions_Base::GetActions(InObjects, MenuBuilder);
 
 	auto FeedbackFiles = GetTypedWeakObjectPtrs<UFeedbackFile>(InObjects);
 
 	MenuBuilder.AddMenuEntry(
 		LOCTEXT("FeedbackFile_PlayFeedback", "Play Feedback"),
-		LOCTEXT("FeedbackFile_PlayFeedbackToolTip", "Play the selected feedback. Game must be running or simulated."),
+		LOCTEXT("FeedbackFile_PlayFeedbackToolTip", "Play the selected feedback. To display on UI, use the HapticsManager_BP."),
 		FSlateIcon(),
 		FUIAction(
 			FExecuteAction::CreateLambda([=] {
+				
 				for (auto& FeedbackFile : FeedbackFiles)
 				{
 					if (FeedbackFile.IsValid())
 					{
+
 						std::string StandardKey(TCHAR_TO_UTF8(*FeedbackFile->Key));
 						if (!bhaptics::HapticPlayer::instance()->isFeedbackRegistered(StandardKey))
 						{
@@ -52,8 +53,10 @@ void FFeedbackFileActions::GetActions(const TArray<UObject*>& InObjects, FMenuBu
 						bhaptics::HapticPlayer::instance()->submitRegistered(StandardKey);
 					}
 				}
+				//bhaptics::HapticPlayer::instance()->destroy();
+
 			}),
-					FCanExecuteAction::CreateLambda([=] {
+			FCanExecuteAction::CreateLambda([=] {
 				for (auto& FeedbackFile : FeedbackFiles)
 				{
 					if (FeedbackFile.IsValid())
@@ -64,7 +67,7 @@ void FFeedbackFileActions::GetActions(const TArray<UObject*>& InObjects, FMenuBu
 				return false;
 			})
 		)
-	);*/
+	);
 }
 
 uint32 FFeedbackFileActions::GetCategories()
@@ -84,12 +87,12 @@ UClass * FFeedbackFileActions::GetSupportedClass() const
 
 FColor FFeedbackFileActions::GetTypeColor() const
 {
-	return FColor::Silver;
+	return FColor::Magenta;
 }
 
 bool FFeedbackFileActions::HasActions(const TArray<UObject*>& InObjects) const
 {
-	return false;
+	return true;
 }
 
 #undef LOCTEXT_NAMESPACE
