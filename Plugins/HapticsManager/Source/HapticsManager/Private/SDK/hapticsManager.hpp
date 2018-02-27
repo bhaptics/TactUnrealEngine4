@@ -40,7 +40,6 @@ namespace bhaptics
 		mutex mtx;// mutex for _activeKeys and _activeDevices variable
 		mutex registerMtx; //mutex for _registered variable
 		mutex pollingMtx; //mutex for _registered variable
-		//mutex connectionMtx;
 		mutex responseMtx;
 
 		int _currentTime = 0;

@@ -50,12 +50,12 @@ void FFeedbackFileEditorModule::StartupModule()
 		StyleSet->Set("ClassThumbnail.TactalFeedbackFile", ThumbnailBrushHead);
 	}
 
-	FSlateStyleRegistry::RegisterSlateStyle(*StyleSet);
-
 	IAssetTools& AssetTools = FModuleManager::LoadModuleChecked<FAssetToolsModule>("AssetTools").Get();
 	auto Action = MakeShareable(new FFeedbackFileActions(StyleSet.ToSharedRef()));
 	AssetTools.RegisterAssetTypeActions(Action);
 	RegisteredAssetTypeActions.Add(Action);
+
+	FSlateStyleRegistry::RegisterSlateStyle(*StyleSet);
 }
 
 void FFeedbackFileEditorModule::ShutdownModule()

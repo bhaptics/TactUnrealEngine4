@@ -5,13 +5,11 @@
 
 #include "Framework/MultiBox/MultiBoxBuilder.h"
 #include "FeedbackFile.h"
-#include "AllowWindowsPlatformTypes.h"
-#include "HapticsManager/Private/SDK/hapticsManager.hpp"
-#include "HideWindowsPlatformTypes.h"
+//#include "AllowWindowsPlatformTypes.h"
+//#include "HapticsManager/Private/SDK/hapticsManager.hpp"
+//#include "HideWindowsPlatformTypes.h"
 #include "Styling/SlateStyle.h"
 
-
-//#include "TextAssetEditorToolkit.h"
 
 #define LOCTEXT_NAMESPACE "AssetTypeActions"
 
@@ -37,35 +35,34 @@ void FFeedbackFileActions::GetActions(const TArray<UObject*>& InObjects, FMenuBu
 		FSlateIcon(),
 		FUIAction(
 			FExecuteAction::CreateLambda([=] {
-		for (auto& FeedbackFile : FeedbackFiles)
-		{
-			if (FeedbackFile.IsValid())
-			{
-				std::string StandardKey(TCHAR_TO_UTF8(*FeedbackFile->Key));
-				if (!bhaptics::HapticPlayer::instance()->isFeedbackRegistered(StandardKey))
+				for (auto& FeedbackFile : FeedbackFiles)
 				{
-					TSharedPtr<FJsonObject> JsonProject = MakeShareable(new FJsonObject);
-					TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(FeedbackFile->ProjectString);
-
-					if (FJsonSerializer::Deserialize(Reader, JsonProject))
+					if (FeedbackFile.IsValid())
 					{
-						bhaptics::HapticPlayer::instance()->registerFeedback(StandardKey, JsonProject);
+						std::string StandardKey(TCHAR_TO_UTF8(*FeedbackFile->Key));
+						if (!bhaptics::HapticPlayer::instance()->isFeedbackRegistered(StandardKey))
+						{
+							TSharedPtr<FJsonObject> JsonProject = MakeShareable(new FJsonObject);
+							TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(FeedbackFile->ProjectString);
+							if (FJsonSerializer::Deserialize(Reader, JsonProject))
+							{
+								bhaptics::HapticPlayer::instance()->registerFeedback(StandardKey, JsonProject);
+							}
+						}
+						bhaptics::HapticPlayer::instance()->submitRegistered(StandardKey);
 					}
 				}
-				bhaptics::HapticPlayer::instance()->submitRegistered(StandardKey);
-			}
-		}
-	}),
-			FCanExecuteAction::CreateLambda([=] {
-		for (auto& FeedbackFile : FeedbackFiles)
-		{
-			if (FeedbackFile.IsValid())
-			{
-				return true;
-			}
-		}
-		return false;
-	})
+			}),
+					FCanExecuteAction::CreateLambda([=] {
+				for (auto& FeedbackFile : FeedbackFiles)
+				{
+					if (FeedbackFile.IsValid())
+					{
+						return true;
+					}
+				}
+				return false;
+			})
 		)
 	);*/
 }
