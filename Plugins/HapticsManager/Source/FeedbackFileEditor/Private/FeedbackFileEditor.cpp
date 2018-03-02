@@ -10,14 +10,14 @@
 #include "AssetTools/TactotFileActions.h"
 #include "AssetTools/TactalFileActions.h"
 
-#include "AllowWindowsPlatformTypes.h"
-#include "HapticsManager/Private/SDK/hapticsManager.hpp"
-#include "HideWindowsPlatformTypes.h"
+//#include "AllowWindowsPlatformTypes.h"
+//#include "HapticsManager/Private/SDK/hapticsManager.hpp"
+//#include "HideWindowsPlatformTypes.h"
 
 
 #define LOCTEXT_NAMESPACE "FFeedbackFileEditorModule"
 
-bhaptics::HapticPlayer *bhaptics::HapticPlayer::hapticManager = 0;
+//bhaptics::HapticPlayer *bhaptics::HapticPlayer::hapticManager = 0;HapticsManager
 
 void FFeedbackFileEditorModule::StartupModule()
 {
@@ -77,7 +77,7 @@ void FFeedbackFileEditorModule::StartupModule()
 	RegisteredAssetTypeActions.Add(ActionHead);
 
 	FSlateStyleRegistry::RegisterSlateStyle(*StyleSet);
-	bhaptics::HapticPlayer::instance()->init();
+	//bhaptics::HapticPlayer::instance()->init();
 
 }
 
@@ -87,7 +87,7 @@ void FFeedbackFileEditorModule::ShutdownModule()
 	// we call this function before unloading the module.
 	FSlateStyleRegistry::UnRegisterSlateStyle(StyleSet->GetStyleSetName());
 	FAssetToolsModule* AssetToolsModule = FModuleManager::GetModulePtr<FAssetToolsModule>("AssetTools");
-	bhaptics::HapticPlayer::instance()->destroy();
+	//bhaptics::HapticPlayer::instance()->destroy();
 
 	if (AssetToolsModule != nullptr)
 	{
