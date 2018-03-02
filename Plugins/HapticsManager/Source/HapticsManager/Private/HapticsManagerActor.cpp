@@ -687,10 +687,6 @@ void AHapticsManagerActor::SubmitFeedbackWithIntensityDuration(UFeedbackFile* Fe
 
 void AHapticsManagerActor::SubmitFeedbackWithTransform(UFeedbackFile* Feedback, const FString &AltKey, FRotationOption RotationOption)
 {
-	if (IsInitialised ||Feedback == NULL)
-	{
-		return;
-	}
 	SubmitFeedbackWithIntensityDuration(Feedback, AltKey, RotationOption, FScaleOption(1, 1));
 }
 

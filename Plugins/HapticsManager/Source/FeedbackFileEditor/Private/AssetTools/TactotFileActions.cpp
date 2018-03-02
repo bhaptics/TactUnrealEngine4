@@ -42,55 +42,55 @@ bool FTactotFileActions::CanFilter()
 
 void FTactotFileActions::GetActions(const TArray<UObject*>& InObjects, FMenuBuilder & MenuBuilder)
 {
-	FAssetTypeActions_Base::GetActions(InObjects, MenuBuilder);
+	//FAssetTypeActions_Base::GetActions(InObjects, MenuBuilder);
 
-	auto FeedbackFiles = GetTypedWeakObjectPtrs<UFeedbackFile>(InObjects);
+	//auto FeedbackFiles = GetTypedWeakObjectPtrs<UFeedbackFile>(InObjects);
 
-	MenuBuilder.AddMenuEntry(
-		LOCTEXT("FeedbackFile_PlayFeedback", "Play Feedback"),
-		LOCTEXT("FeedbackFile_PlayFeedbackToolTip", "Play the selected feedback. To display on UI, use the HapticsManager_BP."),
-		FSlateIcon(),
-		FUIAction(
-			FExecuteAction::CreateLambda([=] {
+	//MenuBuilder.AddMenuEntry(
+	//	LOCTEXT("FeedbackFile_PlayFeedback", "Play Feedback"),
+	//	LOCTEXT("FeedbackFile_PlayFeedbackToolTip", "Play the selected feedback. To display on UI, use the HapticsManager_BP."),
+	//	FSlateIcon(),
+	//	FUIAction(
+	//		FExecuteAction::CreateLambda([=] {
 
-		for (auto& FeedbackFile : FeedbackFiles)
-		{
-			if (FeedbackFile.IsValid())
-			{
+	//	for (auto& FeedbackFile : FeedbackFiles)
+	//	{
+	//		if (FeedbackFile.IsValid())
+	//		{
 
-				std::string StandardKey(TCHAR_TO_UTF8(*FeedbackFile->Key));
-				if (!bhaptics::HapticPlayer::instance()->isFeedbackRegistered(StandardKey))
-				{
-					TSharedPtr<FJsonObject> JsonProject = MakeShareable(new FJsonObject);
-					TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(FeedbackFile->ProjectString);
-					if (FJsonSerializer::Deserialize(Reader, JsonProject))
-					{
-						bhaptics::HapticPlayer::instance()->registerFeedback(StandardKey, JsonProject);
-					}
-				}
-				bhaptics::HapticPlayer::instance()->submitRegistered(StandardKey);
-			}
-		}
-		//bhaptics::HapticPlayer::instance()->destroy();
+	//			std::string StandardKey(TCHAR_TO_UTF8(*FeedbackFile->Key));
+	//			if (!bhaptics::HapticPlayer::instance()->isFeedbackRegistered(StandardKey))
+	//			{
+	//				TSharedPtr<FJsonObject> JsonProject = MakeShareable(new FJsonObject);
+	//				TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(FeedbackFile->ProjectString);
+	//				if (FJsonSerializer::Deserialize(Reader, JsonProject))
+	//				{
+	//					bhaptics::HapticPlayer::instance()->registerFeedback(StandardKey, JsonProject);
+	//				}
+	//			}
+	//			bhaptics::HapticPlayer::instance()->submitRegistered(StandardKey);
+	//		}
+	//	}
+	//	//bhaptics::HapticPlayer::instance()->destroy();
 
-	}),
-			FCanExecuteAction::CreateLambda([=] {
-		for (auto& FeedbackFile : FeedbackFiles)
-		{
-			if (FeedbackFile.IsValid())
-			{
-				return true;
-			}
-		}
-		return false;
-	})
-		)
-	);
+	//}),
+	//		FCanExecuteAction::CreateLambda([=] {
+	//	for (auto& FeedbackFile : FeedbackFiles)
+	//	{
+	//		if (FeedbackFile.IsValid())
+	//		{
+	//			return true;
+	//		}
+	//	}
+	//	return false;
+	//})
+	//	)
+	//);
 }
 
 bool FTactotFileActions::HasActions(const TArray<UObject*>& InObjects) const
 {
-	return true;
+	return false;
 }
 
 #undef LOCTEXT_NAMESPACE
