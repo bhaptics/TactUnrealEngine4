@@ -145,6 +145,15 @@ public:
 		Category = "bHaptics")
 		static FRotationOption ProjectToVest(FVector Location, UPrimitiveComponent* HitComponent, float HalfHeight= 50);
 
+	//Helper function to compute rotation for a given collision.
+	//Performs the same function as Project To Vest, but allows the Forward and Up vectors to be changed.
+	UFUNCTION(BlueprintPure,
+		meta = (DisplayName = "Custom Project To Vest",
+			Keywords = "bHaptics",
+			AdvancedDisplay = "3"),
+		Category = "bHaptics")
+		static FRotationOption CustomProjectToVest(FVector Location, UPrimitiveComponent* HitComponent, float HalfHeight = 50, FVector UpVector = FVector::ZeroVector, FVector ForwardVector = FVector::ZeroVector);
+
 private:
 	static FCriticalSection m_Mutex;
 	static FString HapticFileRootFolderStatic;
