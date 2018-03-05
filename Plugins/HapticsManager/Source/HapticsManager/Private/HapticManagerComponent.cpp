@@ -355,6 +355,38 @@ void UHapticManagerComponent::ToggleFeedback()
 	bhaptics::HapticPlayer::instance()->toggleFeedback();
 }
 
+FRotationOption UHapticManagerComponent::ProjectToVest(FVector Location, UPrimitiveComponent * HitComponent, float HalfHeight)
+{
+	FRotator InverseRotation = HitComponent->GetComponentRotation().GetInverse();
+	FVector HitPoint = InverseRotation.RotateVector(Location - HitComponent->GetComponentLocation());
+	FVector UpVector = InverseRotation.RotateVector(HitComponent->GetUpVector());
+	FVector ForwardVector = InverseRotation.RotateVector(HitComponent->GetForwardVector());
+	FVector Scale = HitComponent->GetComponentScale();
+	float DotProduct, Angle, Y_Offset, A, B;
+	FVector Result;
+
+	UpVector.Normalize();
+	ForwardVector.Normalize();
+
+	HitPoint.X = HitPoint.X / Scale.X;
+	HitPoint.Y = HitPoint.Y / Scale.Y;
+	HitPoint.Z = HitPoint.Z / Scale.Z;
+
+	DotProduct = FVector::DotProduct(HitPoint,UpVector);
+	
+	Result = HitPoint - (DotProduct * UpVector);
+	Result.Normalize();
+
+	A = ForwardVector.X * Result.Y - Result.X * ForwardVector.Y;
+	B = ForwardVector.X * Result.X + Result.Y * ForwardVector.Y;
+
+	Angle = FMath::RadiansToDegrees(FMath::Atan2(A, B));
+
+	Y_Offset = FMath::Clamp(DotProduct / (HalfHeight * 2), -0.5f, 0.5f);
+
+	return FRotationOption(Angle,Y_Offset);
+}
+
 bool UHapticManagerComponent::IsDeviceConnected(EPosition device)
 {
 	bhaptics::Position pos = bhaptics::Position::All;

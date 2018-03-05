@@ -136,6 +136,15 @@ public:
 		Category = "bHaptics")
 		void ToggleFeedback();
 
+	//Helper function to compute rotation for a given collision.
+	//Compute's the horizontal angle and vertical offset and returns a RotationOption for use with a feedback file.
+	//Assumes the origin of the component is in the center, and that the ForwardVector is the front of the vest.
+	UFUNCTION(BlueprintPure,
+		meta = (DisplayName = "Project To Vest",
+			Keywords = "bHaptics"),
+		Category = "bHaptics")
+		static FRotationOption ProjectToVest(FVector Location, UPrimitiveComponent* HitComponent, float HalfHeight= 50);
+
 private:
 	static FCriticalSection m_Mutex;
 	static FString HapticFileRootFolderStatic;
