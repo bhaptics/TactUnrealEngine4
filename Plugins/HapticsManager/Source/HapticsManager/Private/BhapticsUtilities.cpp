@@ -1,4 +1,4 @@
-//Copyright bHaptics Inc. 2017
+//Copyright bHaptics Inc. 2018
 
 #include "HapticsManagerPrivatePCH.h"
 #include "BhapticsUtilities.h"
@@ -32,7 +32,7 @@ bool BhapticsUtilities::Initialise()
 {
 	if (!IsInitialised)
 	{
-		FString FilePath = IPluginManager::Get().FindPlugin("HapticsManager")->GetBaseDir();//*FPaths::EnginePluginsDir();
+		FString FilePath = IPluginManager::Get().FindPlugin("HapticsManager")->GetBaseDir();
 		FString FilePathProject = *FPaths::GameContentDir();
 
 #ifdef USEDLL64

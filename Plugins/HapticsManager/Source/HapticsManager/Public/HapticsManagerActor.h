@@ -7,6 +7,7 @@
 #include "GameFramework/Actor.h"
 #include "AllowWindowsPlatformTypes.h"
 #include "SDK/hapticsManager.hpp"
+#include "FeedbackFile.h"
 #include "HideWindowsPlatformTypes.h"
 #include "HapticsManagerActor.generated.h"
 
@@ -72,7 +73,9 @@ public:
 	//Submit a registered feedback using the file name as a key
 	UFUNCTION(BlueprintCallable,
 		meta = (DisplayName = "Submit Key",
-			Keywords = "bHaptics"),
+			Keywords = "bHaptics",
+			DeprecatedFunction,
+			DeprecationMessage = "Function Deprecated. Please use SubmitFeedback in the HapticManagerComponent."),
 		Category = "bHaptics")
 		void SubmitKey(const FString &Key);
 
@@ -80,23 +83,27 @@ public:
 	//This call will only rotate vest feedback files, with other devices being kept the same.
 	UFUNCTION(BlueprintCallable,
 		meta = (DisplayName = "Submit Key with Transform",
-			Keywords = "bHaptics"),
+			Keywords = "bHaptics",
+			DeprecatedFunction,
+			DeprecationMessage = "Function Deprecated. Please use SubmitFeedbackWithTransform in the HapticManagerComponent."),
 		Category = "bHaptics")
 		void SubmitKeyWithTransform(const FString &Key, const FString &AltKey, FRotationOption Option);
 
 	//Submit a registered feedback using the file name as a key, and scale the intensity and duration by given ScaleOption.
 	UFUNCTION(BlueprintCallable,
 		meta = (DisplayName = "Submit Key with Scaled Intensity and Duration",
-			Keywords = "bHaptics"),
+			Keywords = "bHaptics",
+			DeprecatedFunction,
+			DeprecationMessage = "Function Deprecated. Please use SubmitFeedbackWithIntensityDuration in the HapticManagerComponent."),
 		Category = "bHaptics")
 		void SubmitKeyWithIntensityDuration(const FString &Key, const FString &AltKey, FRotationOption RotationOption, FScaleOption ScaleOption);
 
-	//Register a given feedback file from the given file path with the given key.
+	//Register a given feedback file.
 	UFUNCTION(BlueprintCallable,
 		meta = (DisplayName = "Register Feedback",
 			Keywords = "bHaptics"),
 		Category = "bHaptics")
-		void RegisterFeeback(const FString &Key, const FString &FilePath);
+		void RegisterFeedbackFile(const FString &Key, UFeedbackFile* Feedback);
 
 	//Submit a haptic feeback pattern to the given device using a byte array.
 	UFUNCTION(BlueprintCallable,
@@ -183,6 +190,32 @@ public:
 		Category = "bHaptics")
 		void ToggleFeedback();
 
+
+	//Submit a feedback file, and transform by a given RotationOption.
+	//This call will only rotate vest feedback files, with other devices being kept the same.
+	UFUNCTION(BlueprintCallable,
+		meta = (DisplayName = "Submit Feedback with Transform",
+			Keywords = "bHaptics"),
+		Category = "bHaptics")
+	void SubmitFeedbackWithTransform(UFeedbackFile* Feedback, const FString &AltKey, FRotationOption RotationOption);
+	
+	//Submit a feedback file, and scale the intensity and duration by the given ScaleOption.
+	UFUNCTION(BlueprintCallable,
+		meta = (DisplayName = "Submit Feedback with Scaled Intensity and Duration",
+			Keywords = "bHaptics"),
+		Category = "bHaptics")
+	void SubmitFeedbackWithIntensityDuration(UFeedbackFile* Feedback, const FString &AltKey, FRotationOption RotationOption, FScaleOption ScaleOption);
+
+	//Submit a feedback file
+	UFUNCTION(BlueprintCallable,
+		meta = (DisplayName = "Submit Feedback",
+			Keywords = "bHaptics"),
+		Category = "bHaptics")
+	void SubmitFeedback(UFeedbackFile* Feedback);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Haptics")
+	bool DisableFileLoad = false;
+
 private:
 	static FCriticalSection m_Mutex;
 	static bhaptics::PlayerResponse CurrentResponse;
@@ -192,6 +225,9 @@ private:
 	void UpdateFeedback();
 	void VisualiseFeedback(FHapticFeedback Feedback, TArray<USceneComponent*> TactoSuitItem);
 	void InitialiseDots(TArray<USceneComponent*> TactoSuitItem);
-	bhaptics::HapticPlayer* hapticPlayer;
+	void RegisterFeeback(const FString &Key, const FString &FilePath);
+	FString Id;
+	bool IsInitialised = false;
+	
 
 };

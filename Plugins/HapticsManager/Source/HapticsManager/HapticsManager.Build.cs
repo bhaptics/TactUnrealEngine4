@@ -6,6 +6,7 @@ using UnrealBuildTool;
 
 public class HapticsManager : ModuleRules
 {
+
     public HapticsManager(TargetInfo Target)
 	{
         //PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
@@ -44,7 +45,8 @@ public class HapticsManager : ModuleRules
                 "HapticsManager",
                 "Json",
                 "JsonUtilities",
-                "Projects"
+                "Projects",
+                "InputCore",
                 //"Sockets",
 				// ... add private dependencies that you statically link with here ...	
 			}
@@ -59,4 +61,5 @@ public class HapticsManager : ModuleRules
 			);
 
 	}
+
 }

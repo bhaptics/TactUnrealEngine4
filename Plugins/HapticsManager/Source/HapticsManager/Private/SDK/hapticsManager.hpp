@@ -1,4 +1,4 @@
-//Copyright bHaptics Inc. 2017
+//Copyright bHaptics Inc. 2018
 #pragma once
 #ifndef BHAPTICS_HPP
 #define BHAPTICS_HPP
@@ -24,15 +24,23 @@ namespace bhaptics
 	class HapticPlayer
 	{
 	private:
+		static HapticPlayer *hapticManager;
+
 		unique_ptr<WebSocket> ws;
 		vector<RegisterRequest> _registered;
+		vector<FJsonObject> _registeredJson;
 
 		vector<string> _activeKeys;
 		vector<Position> _activeDevices;
 
+		vector<string> componentIds;
+
+		std::map<std::string, std::vector<int>> _activeFeedback;
+
 		mutex mtx;// mutex for _activeKeys and _activeDevices variable
 		mutex registerMtx; //mutex for _registered variable
 		mutex pollingMtx; //mutex for _registered variable
+		mutex responseMtx;
 
 		int _currentTime = 0;
 		int _interval = 20;
@@ -51,6 +59,8 @@ namespace bhaptics
 		std::chrono::steady_clock::time_point prevReconnect;
 
 		bool isRegisterSent = true;
+
+		int connectionCount = 0;
 
 		void reconnect()
 		{
@@ -126,7 +136,7 @@ namespace bhaptics
 			TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject);
 			request.to_json(*JsonObject);
 			FString OutputString;
-			TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&OutputString);
+			TSharedRef<TJsonWriter<TCHAR, TCondensedJsonPrintPolicy<TCHAR>>> Writer = TJsonWriterFactory<TCHAR, TCondensedJsonPrintPolicy<TCHAR>>::Create(&OutputString);
 			FJsonSerializer::Serialize(JsonObject.ToSharedRef(), Writer);
 			std::string jStr(TCHAR_TO_UTF8(*OutputString));
 
@@ -191,6 +201,7 @@ namespace bhaptics
 		void callbackFunc()
 		{
 			reconnect();
+			doRepeat();
 			_currentTime += _interval;
 		}
 
@@ -218,13 +229,32 @@ namespace bhaptics
 
 		HapticPlayer() {}
 
+		int registerFeedback(const string &key, TSharedPtr<FJsonObject> ProjectJson)
+		{
+
+			RegisterRequest req;
+			req.Key = key;
+			req.ProjectJson = ProjectJson;
+
+			registerMtx.lock();
+			_registered.push_back(req);
+
+			PlayerRequest playerReq;
+
+			playerReq.Register.push_back(req);
+
+			send(playerReq);
+			registerMtx.unlock();
+			return 0;
+		}
+
 		int registerFeedback(const string &key, const string &filePath)
 		{
 			HapticFile file = Util::parse(filePath);
 
 			RegisterRequest req;
 			req.Key = key;
-			req.Project = file.project;
+			req.ProjectJson = file.ProjectJson;
 
 			registerMtx.lock();
 			_registered.push_back(req);
@@ -240,7 +270,8 @@ namespace bhaptics
 
 		void init()
 		{
-			if (_enable)
+
+			if (_enable|| ws)
 				return;
 			function<void()> callback = std::bind(&HapticPlayer::callbackFunc, this);
 			timer.addTimerHandler(callback);
@@ -300,13 +331,14 @@ namespace bhaptics
 			{
 				return;
 			}
+
 			SubmitRequest req;
 			PlayerRequest playerReq;
 			req.Key = key;
 			req.Type = "key";
 			req.Parameters["scaleOption"] = option.to_string();
 			req.Parameters["rotationOption"] = rotOption.to_string();
-			if (!altKey.empty())
+			if (!altKey.empty() && isPlaying(key))
 			{
 				req.Parameters["altKey"] = altKey;
 			}
@@ -359,6 +391,7 @@ namespace bhaptics
 
 		void parseReceivedMessage(const char * message)
 		{
+
 			TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject);
 			FString JsonString(message);
 			TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(JsonString);
@@ -431,6 +464,10 @@ namespace bhaptics
 			_activeKeys = response.ActiveKeys;
 			_activeDevices = response.ConnectedPositions;
 			mtx.unlock();
+
+			responseMtx.lock();
+			_activeFeedback = response.Status;
+			responseMtx.unlock();
 		}
 
 		bool isDevicePlaying(Position device)
@@ -441,7 +478,85 @@ namespace bhaptics
 			bool ret = std::find(temp.begin(), temp.end(), device) != temp.end();
 			return ret;
 		}
+
+		bool isFeedbackRegistered(string key)
+		{
+			vector<string> tempReg = CurrentResponse.RegisteredKeys;
+			bool ret = std::find(tempReg.begin(), tempReg.end(), key) != tempReg.end();
+			return ret;
+		}
+
+		bool anyFilesLoaded()
+		{
+			return  _registered.size() > 0;
+		}
+
+		vector<string> fileNames()
+		{
+			vector<string> keys;
+			registerMtx.lock();
+			vector<RegisterRequest> tempRegister = _registered;
+			registerMtx.unlock();
+
+			for (size_t i = 0; i < tempRegister.size(); i++)
+			{
+				keys.push_back(tempRegister[i].Key);
+			}
+			return keys;
+		}
+
+		void registerConnection(string Id)
+		{
+			componentIds.push_back(Id);
+			connectionCount = componentIds.size();
+			if (!ws)
+			{
+				init();
+			}
+		}
+
+		void unregisterConnection(string Id)
+		{
+			std::_Vector_iterator<std::_Vector_val<std::_Simple_types<string>>> component = std::find(componentIds.begin(), componentIds.end(), Id);
+			if (component != componentIds.end())
+			{
+				componentIds.erase(component);
+			}
+			else
+			{
+				return;
+			}
+			connectionCount = componentIds.size();
+			if (componentIds.size() <= 0)
+			{
+				destroy();
+				connectionCount = 0;
+			}
+		}
+
+		std::map<std::string, std::vector<int>> getResponseStatus()
+		{
+			responseMtx.lock();
+			std::map<std::string, std::vector<int>> ret = _activeFeedback;
+			responseMtx.unlock();
+			return ret;
+		}
+
+		HapticPlayer(HapticPlayer const&) = delete;
+		void operator= (HapticPlayer const&) = delete;
+
+		static HapticPlayer *instance()
+		{
+			if (!hapticManager)
+			{
+				hapticManager = new HapticPlayer();
+			}
+
+			return hapticManager;
+		}
+
 	};
 }
 
+//bhaptics::HapticPlayer *bhaptics::HapticPlayer::hapticManager = 0;
 #endif
