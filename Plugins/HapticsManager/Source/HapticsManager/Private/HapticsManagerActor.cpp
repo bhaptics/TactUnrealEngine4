@@ -4,10 +4,12 @@
 #include "HapticsManagerActor.h"
 #include "HapticStructures.h"
 #include "BhapticsUtilities.h"
+#include "AllowWindowsPlatformTypes.h"
+#include "SDK/hapticsManager.hpp"
+#include "HideWindowsPlatformTypes.h"
 
 
 FCriticalSection AHapticsManagerActor::m_Mutex;
-bhaptics::PlayerResponse AHapticsManagerActor::CurrentResponse;
 
 // Sets default values
 AHapticsManagerActor::AHapticsManagerActor()
