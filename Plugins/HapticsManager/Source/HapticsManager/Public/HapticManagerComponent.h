@@ -5,9 +5,6 @@
 #include "Components/ActorComponent.h"
 #include "HapticStructures.h"
 #include "FeedbackFile.h"
-#include "AllowWindowsPlatformTypes.h"
-#include "SDK/hapticsManager.hpp"
-#include "HideWindowsPlatformTypes.h"
 #include "HapticManagerComponent.generated.h"
 
 

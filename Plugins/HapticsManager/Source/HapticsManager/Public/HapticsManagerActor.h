@@ -5,10 +5,7 @@
 #include "Engine.h"
 #include "HapticStructures.h"
 #include "GameFramework/Actor.h"
-#include "AllowWindowsPlatformTypes.h"
-#include "SDK/hapticsManager.hpp"
 #include "FeedbackFile.h"
-#include "HideWindowsPlatformTypes.h"
 #include "HapticsManagerActor.generated.h"
 
 
@@ -218,7 +215,7 @@ public:
 
 private:
 	static FCriticalSection m_Mutex;
-	static bhaptics::PlayerResponse CurrentResponse;
+	//static bhaptics::PlayerResponse CurrentResponse;
 	bool IsTicking = false;
 	FString LoadFeedbackFiles(TArray<FString>& FilesOut);
 	void Reset();

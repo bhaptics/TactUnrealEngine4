@@ -5,6 +5,9 @@
 #include "HapticManagerComponent.h"
 #include "HapticStructures.h"
 #include "BhapticsUtilities.h"
+#include "AllowWindowsPlatformTypes.h"
+#include "SDK/hapticsManager.hpp"
+#include "HideWindowsPlatformTypes.h"
 
 FCriticalSection UHapticManagerComponent::m_Mutex;
 FString UHapticManagerComponent::HapticFileRootFolderStatic = "";
@@ -30,7 +33,6 @@ void UHapticManagerComponent::BeginPlay()
 	Super::BeginPlay();
 
 	std::string StandardId(TCHAR_TO_UTF8(*Id));
-	UE_LOG(LogTemp, Log, TEXT("Initialise %s."), StandardId.c_str());
 	bhaptics::HapticPlayer::instance()->registerConnection(StandardId);
 
 	IsInitialised = true;
@@ -384,7 +386,7 @@ FRotationOption UHapticManagerComponent::ProjectToVest(FVector Location, UPrimit
 	Result = HitPoint - (DotProduct * UpVector);
 	Result.Normalize();
 
-	A = ForwardVector.X * Result.Y - Result.X * ForwardVector.Y + ForwardVector.Y * Result.Z - Result.Y * ForwardVector.Z + ForwardVector.Z * Result.X - Result.Z * ForwardVector.X;
+	A = Result.X * ForwardVector.Y - ForwardVector.X * Result.Y + Result.Y * ForwardVector.Z - ForwardVector.Y * Result.Z + Result.Z * ForwardVector.X - ForwardVector.Z * Result.X;
 	B = ForwardVector.X * Result.X + Result.Y * ForwardVector.Y + Result.Z * ForwardVector.Z;
 
 	Angle = FMath::RadiansToDegrees(FMath::Atan2(A, B));
@@ -438,7 +440,7 @@ FRotationOption UHapticManagerComponent::CustomProjectToVest(FVector Location, U
 	Result = HitPoint - (DotProduct * UpVector);
 	Result.Normalize();
 
-	A = ForwardVector.X * Result.Y - Result.X * ForwardVector.Y + ForwardVector.Y * Result.Z - Result.Y * ForwardVector.Z + ForwardVector.Z * Result.X - Result.Z * ForwardVector.X;
+	A = Result.X * ForwardVector.Y - ForwardVector.X * Result.Y + Result.Y * ForwardVector.Z - ForwardVector.Y * Result.Z + Result.Z * ForwardVector.X - ForwardVector.Z * Result.X;
 	B = ForwardVector.X * Result.X + Result.Y * ForwardVector.Y + Result.Z * ForwardVector.Z;
 
 	Angle = FMath::RadiansToDegrees(FMath::Atan2(A, B));

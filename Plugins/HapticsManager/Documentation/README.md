@@ -1,6 +1,6 @@
 # bHaptics haptic devices Unreal Engine C++ plugin
 This project helps to utilize haptic devices in Unreal Engine 4
-Current version is 1.3.0
+Current version is 1.3.2
 
 ## Prerequisite
 * bHaptics Player has to be installed (Windows)
@@ -14,6 +14,15 @@ Current version is 1.3.0
 * For blueprint-only projects, in the case of any compiling errors, you may need to create a C++ class to generate the solution files for your project and rebuild the plugin.
 
 ## How to use the plugin
+* For C++ projects, include the HapticsManager Module in the projects Build file.
+```
+PublicDependencyModuleNames.AddRange(
+	new string[]
+	{
+	...,
+	"HapticsManager"
+	});
+```
 * On the actor from which you wish to call the feedback, add the Haptic Manager Component to the actor.
 * You can now call any of the SDK's functions by referencing the component.
 * The Haptic Manager has 3 different ways of submitting feedback: using preset haptic files, specifying which motors or 'dots' to play, or specifying a point on the device to play the feedback.
@@ -21,7 +30,7 @@ Current version is 1.3.0
 ### Presets
 * Presets can be constructed through using the bHaptics designer at https://designer.bhaptics.com
 * After signing in, you can create a new project and design a feedback effect for use in the game.
-* In order to use the feedback effect in Unreal, export the feedback file from the Designer, and simply drag and drop the file into your Unreal project.
+* In order to use the feedback effect in Unreal, export the feedback file from the Designer, and simply drag and drop the file into your Unreal project, or you can import the files using the import function in the Content Browser.
 * The files will be automatically converted into a UAsset, and you can view the feedback effect's identifying Key, the device it will be played on, and the duration of the effect
 * Example feedback files are given in the Feedback folder in the Plugin's contents directory, to help get you started.
 
@@ -51,6 +60,7 @@ Current version is 1.3.0
 * Other functions are provided to help give more freedom in developing different kinds of feedback effects.
 * For example, checks for whether a specified feedback effect is playing are provided as well as functions to cease the feedback effect.
 * These can be used to add effects such as interrupting feedback effects, or even to loop a certain feedback effect.
+* The ProjectToVest function is provided to simplify collision, taking a location and component and converting it to Cylindrical coordinates and returning as a RotationOption. You can use this and the customisable CustomProjectToVest to quickly give feedback to the vest.
 * All the functions for the plugin can be found in the bHaptics category in blueprints, or in the HapticsManagerComponent.h file in the plugin.
 
 ## Testing
@@ -76,13 +86,13 @@ Current version is 1.3.0
 * For the Submit Key With Transform, you can consider the torso as a cylinder and project the haptic feedback file onto that. You can then change the horizontal offset by finding the angle offset from the forward vector, and the OffsetY from the height on the cylinder to play. This will help the feedback feel more continuous as it moves from the front to the back or vice versa. You can see the KeyDummy blueprint for an example of how to do this.
 * Some simple examples are provided in the Plugin's Content/Blueprints folder, with Dummies for collision detection examples, as well some simple macro effects in the Macro Effect Library .
 * The ForLoops in blueprints can cause unexpected results with feedback, as it does not natively support delays. A ForLoopWithDelay macro is provided; however, if you are using loops and delays heavily, it is recommended to work in C++ for these functions, or use the designer for the feedback.
-* For further references, you can find our tutorial series at our youtube channel [here](https://www.youtube.com/channel/UCGyV7l7iZz9tUtEg4wvsOpA/playlists?shelf_id=0&sort=dd&view=1).
+* For further references, you can find our tutorial series at our youtube channel [here](https://www.youtube.com/watch?v=Dy2D4Jnx-Io&t=2s&list=PLfaa78_N6dlvd0Ha0s0Y_LT62-Oqp8N2A&index=3).
 
 ## Contact
 * Official Website: http://www.bhaptics.com/
 * E-mail: contact@bhaptics.com
 
-Last update of README.md: March. 2nd, 2018.
+Last update of README.md: April. 24th, 2018.
 
 
 ###### Copyright (c) 2018 bHaptics Inc. All rights reserved.
