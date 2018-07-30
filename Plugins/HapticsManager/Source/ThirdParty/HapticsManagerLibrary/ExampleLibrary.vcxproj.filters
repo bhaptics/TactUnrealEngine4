@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="SDK\easywsclient.cpp" />
+    <ClCompile Include="SDK\hapticsManager.cpp" />
+    <ClCompile Include="SDK\timer.cpp" />
+    <ClCompile Include="SDK\util.cpp" />
+    <ClCompile Include="HapticLibrary.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="SDK\easywsclient.h" />
+    <ClInclude Include="SDK\hapticsManager.h" />
+    <ClInclude Include="SDK\json.hpp" />
+    <ClInclude Include="SDK\model.h" />
+    <ClInclude Include="SDK\timer.h" />
+    <ClInclude Include="SDK\util.h" />
+    <ClInclude Include="HapticLibrary.h" />
+  </ItemGroup>
+</Project>
