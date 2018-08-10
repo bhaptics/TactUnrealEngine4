@@ -10,14 +10,9 @@
 #include "AssetTools/TactotFileActions.h"
 #include "AssetTools/TactalFileActions.h"
 
-//#include "AllowWindowsPlatformTypes.h"
-//#include "HapticsManager/Private/SDK/hapticsManager.hpp"
-//#include "HideWindowsPlatformTypes.h"
 
 
 #define LOCTEXT_NAMESPACE "FFeedbackFileEditorModule"
-
-//bhaptics::HapticPlayer *bhaptics::HapticPlayer::hapticManager = 0;HapticsManager
 
 void FFeedbackFileEditorModule::StartupModule()
 {

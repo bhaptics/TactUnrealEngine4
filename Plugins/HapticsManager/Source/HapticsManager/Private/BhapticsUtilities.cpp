@@ -1,9 +1,8 @@
 //Copyright bHaptics Inc. 2018
 
-#include "HapticsManagerPrivatePCH.h"
+#include "HapticsManager.h"
 #include "BhapticsUtilities.h"
 #include "IPluginManager.h"
-#include "HapticsManager.h"
 
 #if _WIN64
 #define USEDLL64
@@ -13,11 +12,13 @@ typedef char*(*_GetExePath)();
 typedef bool(*_IsPlayerInstalled)();
 typedef bool(*_IsPlayerRunning)();
 typedef void(*_LaunchPlayer)();
+typedef bool(*_IsExternalPlayerRunning)(char* file);
 
 _IsPlayerInstalled m_IsPlayerInstalled;
 _IsPlayerRunning m_IsPlayerRunning;
 _LaunchPlayer m_LaunchPlayer;
 _GetExePath m_GetExePath;
+_IsExternalPlayerRunning m_IsExternalPlayerRunning;
 
 bool BhapticsUtilities::IsInitialised = false;
 
@@ -162,4 +163,24 @@ void BhapticsUtilities::LaunchPlayer()
 	}
 	UE_LOG(LogTemp, Log, TEXT("Launching Function Failed"));
 
+}
+
+bool BhapticsUtilities::IsExternalPlayerRunning(FString file)
+{
+	if (v_dllHandle != NULL)
+	{
+		m_IsExternalPlayerRunning = NULL;
+
+		FString ProcName = "isExternalPlayerRunning";
+		m_IsExternalPlayerRunning = (_IsExternalPlayerRunning)FPlatformProcess::GetDllExport(v_dllHandle, *ProcName);
+		if (m_IsExternalPlayerRunning != NULL)
+		{
+			char* fileChar = TCHAR_TO_ANSI(*file);
+			bool ret = m_IsExternalPlayerRunning(fileChar);
+			UE_LOG(LogTemp, Log, TEXT("Set EXE location to %s"), *file);
+			return ret;
+		}
+		UE_LOG(LogTemp, Log, TEXT("Function Failed"));
+	}
+	return false;
 }

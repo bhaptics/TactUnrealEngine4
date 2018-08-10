@@ -21,6 +21,8 @@ public:
 
 	static void Free();
 
+	static bool IsExternalPlayerRunning(FString Path);
+
 private:
 	static bool IsInitialised;
 	static FString ExecutableFilePath;

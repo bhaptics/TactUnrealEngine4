@@ -1,5 +1,7 @@
 ﻿// Copyright 1998-2016 Epic Games, Inc. All Rights Reserved.
 
+#define VERSION_BELOW_16
+
 using System;
 using System.IO;
 using UnrealBuildTool;
@@ -10,6 +12,7 @@ public class HapticsManager : ModuleRules
     public HapticsManager(TargetInfo Target)
 	{
         //PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
+
         PublicIncludePaths.AddRange(
 			new string[] {
                 "HapticsManager/Public"
@@ -47,6 +50,7 @@ public class HapticsManager : ModuleRules
                 "JsonUtilities",
                 "Projects",
                 "InputCore",
+                "HapticsManagerLibrary",
                 //"Sockets",
 				// ... add private dependencies that you statically link with here ...	
 			}

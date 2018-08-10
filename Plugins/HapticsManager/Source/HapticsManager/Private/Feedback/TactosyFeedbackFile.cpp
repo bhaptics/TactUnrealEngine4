@@ -1,6 +1,6 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+//Copyright bHaptics Inc. 2018
 
-#include "HapticsManagerPrivatePCH.h"
+#include "HapticsManager.h"
 #include "TactosyFeedbackFile.h"
 
 

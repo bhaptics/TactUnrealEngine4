@@ -6,9 +6,8 @@
     #include <stdio.h>
 #endif
 
-#include "SDK/hapticsManager.h"
-#include "SDK/model.h"
-//#include "ExampleLibrary.h"
+#include "hapticsManager.h"
+#include "model.h"
 #ifndef DLLEXPORT
     #define DLLEXPORT
 #endif
@@ -109,11 +108,14 @@ DLLEXPORT bool IsDevicePlaying(bhaptics::Position Pos)
 
 DLLEXPORT void GetResponseForPosition(std::vector<int>& retValues, std::string& pos)
 {
-	std::vector<int> response = bhaptics::HapticPlayer::instance()->getResponseStatus().at(pos);
-	/*retValues = response.at(pos);*/
-	for (int i = 0; i < retValues.size(); i++)
+	if (!bhaptics::HapticPlayer::instance()->getResponseStatus().empty())
 	{
-		retValues[i] = response.at(i);
+		std::vector<int> response = bhaptics::HapticPlayer::instance()->getResponseStatus().at(pos);
+		/*retValues = response.at(pos);*/
+		for (int i = 0; i < retValues.size(); i++)
+		{
+			retValues[i] = response.at(i);
+		}
 	}
 }
 

@@ -1,6 +1,6 @@
 # bHaptics haptic devices Unreal Engine C++ plugin
 This project helps to utilize haptic devices in Unreal Engine 4
-Current version is 1.3.2
+Current version is 1.4.0
 
 ## Prerequisite
 * bHaptics Player has to be installed (Windows)
@@ -71,9 +71,6 @@ PublicDependencyModuleNames.AddRange(
 * You can also test out simple DotPoint and PathPoint patterns, by creating the points using the variables in the details panel, and setting the duration and device to play the feedback on, and then calling their respective functions to play the feedback.
 * Using these functions you can get a good idea of how the haptic feedback will feel, as well as to test new ideas, especially testing any changes to existing feedback files.
 
-## Packaging
-* The plugin also uses a dll (bHapticUtility64.dll) to run the bHaptics Player if it is installed; however, this dll is not copied when packaging and must be done manually into the Plugins/HapticsManager/DLL directory. This functionality is optional and will not affect the haptic feedback.
-
 ## Samples 
 * You can reference the blueprints in this project for how to implement different haptic feedback effects, as well as how to use the Feedback Files.
 * While no C++ examples are provided, the logic is the same as with the blueprints by calling the functions provided by the Haptics Manager Component.
@@ -92,7 +89,7 @@ PublicDependencyModuleNames.AddRange(
 * Official Website: http://www.bhaptics.com/
 * E-mail: contact@bhaptics.com
 
-Last update of README.md: April. 24th, 2018.
+Last update of README.md: August. 10th, 2018.
 
 
 ###### Copyright (c) 2018 bHaptics Inc. All rights reserved.

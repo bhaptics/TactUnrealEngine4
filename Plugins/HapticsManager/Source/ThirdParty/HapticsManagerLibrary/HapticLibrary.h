@@ -4,8 +4,7 @@
 #define DLLIMPORT
 #endif
 
-#include "SDK/model.h"
-//#include "Json/Public/Dom/JsonObject.h"
+#include "model.h"
 #include <vector>
 
 DLLIMPORT void ExampleLibraryFunction();

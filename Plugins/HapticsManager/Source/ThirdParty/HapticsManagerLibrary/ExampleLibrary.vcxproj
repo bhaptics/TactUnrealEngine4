@@ -149,20 +149,20 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="easywsclient.cpp" />
     <ClCompile Include="HapticLibrary.cpp" />
-    <ClCompile Include="SDK\easywsclient.cpp" />
-    <ClCompile Include="SDK\hapticsManager.cpp" />
-    <ClCompile Include="SDK\timer.cpp" />
-    <ClCompile Include="SDK\util.cpp" />
+    <ClCompile Include="hapticsManager.cpp" />
+    <ClCompile Include="timer.cpp" />
+    <ClCompile Include="util.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="easywsclient.h" />
     <ClInclude Include="HapticLibrary.h" />
-    <ClInclude Include="SDK\easywsclient.h" />
-    <ClInclude Include="SDK\hapticsManager.h" />
-    <ClInclude Include="SDK\json.hpp" />
-    <ClInclude Include="SDK\model.h" />
-    <ClInclude Include="SDK\timer.h" />
-    <ClInclude Include="SDK\util.h" />
+    <ClInclude Include="hapticsManager.h" />
+    <ClInclude Include="json.hpp" />
+    <ClInclude Include="model.h" />
+    <ClInclude Include="timer.h" />
+    <ClInclude Include="util.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

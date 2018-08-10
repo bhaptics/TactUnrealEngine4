@@ -5,9 +5,6 @@
 
 #include "Framework/MultiBox/MultiBoxBuilder.h"
 #include "FeedbackFile.h"
-#include "AllowWindowsPlatformTypes.h"
-#include "HapticsManager/Private/SDK/hapticsManager.hpp"
-#include "HideWindowsPlatformTypes.h"
 #include "Styling/SlateStyle.h"
 
 

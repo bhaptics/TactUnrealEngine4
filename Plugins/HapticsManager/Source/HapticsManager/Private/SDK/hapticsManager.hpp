@@ -1,4 +1,5 @@
 //Copyright bHaptics Inc. 2018
+
 #pragma once
 #ifndef BHAPTICS_HPP
 #define BHAPTICS_HPP
