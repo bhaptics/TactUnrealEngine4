@@ -1,6 +1,9 @@
 //Copyright bHaptics Inc. 2018
 
-#include "FeedbackFileEditor.h"
+#if (ENGINE_MINOR_VERSION < 16)
+//#include "FeedbackFileEditor.h"
+#endif
+
 #include "TactosyFileActions.h"
 
 #include "Framework/MultiBox/MultiBoxBuilder.h"

@@ -1,10 +1,12 @@
 //Copyright bHaptics Inc. 2018
 
-#include "HapticsManager.h"
+#if (ENGINE_MINOR_VERSION < 16)
+//#include "HapticsManager.h"
+#endif
 #include "BhapticsLibrary.h"
 #include "Interfaces/IPluginManager.h"
 
-#if (ENGINE_MAJOR_VERSION >= 4) && (ENGINE_MINOR_VERSION >= 16)
+#if (ENGINE_MINOR_VERSION >= 16)
 #include "Core/Public/Misc/Paths.h"
 #endif
 

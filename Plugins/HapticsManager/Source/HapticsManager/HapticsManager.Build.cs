@@ -1,18 +1,21 @@
 ﻿// Copyright 1998-2016 Epic Games, Inc. All Rights Reserved.
 
-#define VERSION_BELOW_16
-
+//#define VERSION_BELOW_16
+#define VERSION_BELOW_18
 using System;
 using System.IO;
 using UnrealBuildTool;
 
 public class HapticsManager : ModuleRules
 {
-
+#if VERSION_BELOW_16
     public HapticsManager(TargetInfo Target)
+    {
+#else
+    public HapticsManager(ReadOnlyTargetRules Target) : base (Target)
 	{
-        //PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
-
+        PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
+#endif
         PublicIncludePaths.AddRange(
 			new string[] {
                 "HapticsManager/Public"
@@ -64,6 +67,17 @@ public class HapticsManager : ModuleRules
 			}
 			);
 
-	}
+        if (Target.Platform == UnrealTargetPlatform.Win64)
+        {
+#if VERSION_BELOW_16 || VERSION_BELOW_18
+            RuntimeDependencies.Add(new RuntimeDependency(Path.Combine(ModuleDirectory, "../../DLLs/HapticLibrary.dll")));
+            RuntimeDependencies.Add(new RuntimeDependency(Path.Combine(ModuleDirectory, "../../DLLs/bHapticUtility64.dll")));
+#else
+            RuntimeDependencies.Add(Path.Combine(ModuleDirectory, "../../DLLs/HapticLibrary.dll"));
+            RuntimeDependencies.Add(Path.Combine(ModuleDirectory, "../../DLLs/bHapticUtility64.dll"));
+#endif
+        }
+
+    }
 
 }

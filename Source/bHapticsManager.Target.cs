@@ -14,12 +14,14 @@ public class bHapticsManagerTarget : TargetRules
     //
     // TargetRules interface.
     //
-	public override void SetupBinaries(TargetInfo Target,
+#if VERSION_BELOW_16
+    public override void SetupBinaries(TargetInfo Target,
 		ref List<UEBuildBinaryConfiguration> OutBuildBinaryConfigurations,
 		ref List<string> OutExtraModuleNames
 		)
 	{
 		OutExtraModuleNames.AddRange( new string[] { "bHapticsManager" } );
 	}
+#endif
 
 }

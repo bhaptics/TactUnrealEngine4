@@ -1,6 +1,9 @@
 //Copyright bHaptics Inc. 2017
 
-#include "HapticsManager.h"
+#if (ENGINE_MINOR_VERSION < 16)
+//#include "HapticsManager.h"
+#endif
+
 #include "HapticStructures.h"
 
 HapticStructures::HapticStructures()

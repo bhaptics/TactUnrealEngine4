@@ -8,11 +8,13 @@ public class bHapticsManagerEditorTarget : TargetRules
 	public bHapticsManagerEditorTarget(TargetInfo Target)
 	{
 		Type = TargetType.Editor;
-	}
+        ExtraModuleNames.AddRange(new string[] { "bHapticsManager" });
+    }
 
     //
     // TargetRules interface.
     //
+#if VERSION_BELOW_16
     public override void SetupBinaries(TargetInfo Target,
     ref List<UEBuildBinaryConfiguration> OutBuildBinaryConfigurations,
     ref List<string> OutExtraModuleNames
@@ -20,4 +22,5 @@ public class bHapticsManagerEditorTarget : TargetRules
     {
         OutExtraModuleNames.AddRange(new string[] { "bHapticsManager" });
     }
+#endif
 }

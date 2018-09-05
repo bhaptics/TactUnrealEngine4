@@ -2,7 +2,7 @@
 
 #pragma once
 
-#if (ENGINE_MAJOR_VERSION >= 4) && (ENGINE_MINOR_VERSION >= 16)
+#if(ENGINE_MINOR_VERSION >= 16)
 #include "CoreMinimal.h"
 #endif
 

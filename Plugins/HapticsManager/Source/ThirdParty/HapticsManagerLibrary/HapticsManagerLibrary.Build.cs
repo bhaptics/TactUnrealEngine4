@@ -1,14 +1,19 @@
 //Copyright bHaptics Inc. 2018
 
-#define VERSION_BELOW_16
+//#define VERSION_BELOW_16
 
 using System.IO;
 using UnrealBuildTool;
 
 public class HapticsManagerLibrary : ModuleRules
 {
+#if VERSION_BELOW_16
     public HapticsManagerLibrary(TargetInfo Target)
     {
+#else
+    public HapticsManagerLibrary(ReadOnlyTargetRules Target) : base(Target)
+    {
+#endif
         Type = ModuleType.External;
 
         if (Target.Platform == UnrealTargetPlatform.Win64)

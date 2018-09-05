@@ -10,7 +10,7 @@ void FHapticsManagerModule::StartupModule()
 	// This code will execute after your module is loaded into memory; the exact timing is specified in the .uplugin file per-module
 	if (BhapticsUtilities::Initialise())
 	{
-#if (ENGINE_MAJOR_VERSION >= 4) && (ENGINE_MINOR_VERSION >= 18)
+#if (ENGINE_MINOR_VERSION >= 18)
 		FString ConfigPath = *FPaths::ProjectContentDir();
 #else
 		FString ConfigPath = *FPaths::GameContentDir();

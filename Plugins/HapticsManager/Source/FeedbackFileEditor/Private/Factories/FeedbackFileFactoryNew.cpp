@@ -1,6 +1,9 @@
 //Copyright bHaptics Inc. 2017
 
-#include "FeedbackFileEditor.h"
+#if(ENGINE_MINOR_VERSION < 16)
+//#include "FeedbackFileEditor.h"
+#endif
+
 #include "FeedbackFileFactoryNew.h"
 #include "FeedbackFile.h"
 
