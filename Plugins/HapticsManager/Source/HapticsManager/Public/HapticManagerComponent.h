@@ -32,6 +32,7 @@ public:
 
 	//Submit a haptic feedback file and transform it by a given RotationOption.
 	//This call will only rotate vest feedback files, with other devices being kept the same.
+	//Provide an AltKey to uniquely identify this feedback.
 	UFUNCTION(BlueprintCallable,
 		meta = (DisplayName = "Submit Feedback with Transform",
 			Keywords = "bHaptics"),
@@ -39,6 +40,7 @@ public:
 		void SubmitFeedbackWithTransform(UFeedbackFile* Feedback, const FString &AltKey, FRotationOption Option);
 
 	//Submit a haptic feedback file, and scale the intensity and duration by a given ScaleOption.
+	//Provide an AltKey to uniquely identify this feedback.
 	UFUNCTION(BlueprintCallable,
 		meta = (DisplayName = "Submit Feedback with Scaled Intensity and Duration",
 			Keywords = "bHaptics"),

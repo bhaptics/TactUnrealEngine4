@@ -272,4 +272,3 @@ bool UHapticManagerComponent::IsDeviceConnected(EPosition device)
 	Value = BhapticsLibrary::Lib_IsDevicePlaying(device);
 	return Value;
 }
-

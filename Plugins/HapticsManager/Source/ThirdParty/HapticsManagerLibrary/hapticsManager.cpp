@@ -328,7 +328,7 @@ namespace bhaptics
 		req.Type = "key";
 		req.Parameters["scaleOption"] = option.to_string();
 		req.Parameters["rotationOption"] = rotOption.to_string();
-		if (!altKey.empty() && isPlaying(key))
+		if (!altKey.empty())
 		{
 			req.Parameters["altKey"] = altKey;
 		}

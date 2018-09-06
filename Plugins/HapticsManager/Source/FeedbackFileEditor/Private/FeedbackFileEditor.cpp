@@ -72,8 +72,6 @@ void FFeedbackFileEditorModule::StartupModule()
 	RegisteredAssetTypeActions.Add(ActionHead);
 
 	FSlateStyleRegistry::RegisterSlateStyle(*StyleSet);
-	//bhaptics::HapticPlayer::instance()->init();
-
 }
 
 void FFeedbackFileEditorModule::ShutdownModule()
@@ -82,7 +80,6 @@ void FFeedbackFileEditorModule::ShutdownModule()
 	// we call this function before unloading the module.
 	FSlateStyleRegistry::UnRegisterSlateStyle(StyleSet->GetStyleSetName());
 	FAssetToolsModule* AssetToolsModule = FModuleManager::GetModulePtr<FAssetToolsModule>("AssetTools");
-	//bhaptics::HapticPlayer::instance()->destroy();
 
 	if (AssetToolsModule != nullptr)
 	{
