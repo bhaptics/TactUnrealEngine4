@@ -1,6 +1,7 @@
 //Copyright bHaptics Inc. 2018
 
 //#define VERSION_BELOW_16
+//#define VERSION_BELOW_19
 
 using System.IO;
 using UnrealBuildTool;
