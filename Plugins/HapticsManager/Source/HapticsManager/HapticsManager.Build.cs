@@ -1,7 +1,7 @@
 ﻿// Copyright 1998-2016 Epic Games, Inc. All Rights Reserved.
 
 //#define VERSION_BELOW_16
-#define VERSION_BELOW_18
+#define VERSION_BELOW_19
 using System;
 using System.IO;
 using UnrealBuildTool;
@@ -69,7 +69,7 @@ public class HapticsManager : ModuleRules
 
         if (Target.Platform == UnrealTargetPlatform.Win64)
         {
-#if VERSION_BELOW_16 || VERSION_BELOW_18
+#if VERSION_BELOW_16 || VERSION_BELOW_19
             RuntimeDependencies.Add(new RuntimeDependency(Path.Combine(ModuleDirectory, "../../DLLs/HapticLibrary.dll")));
             RuntimeDependencies.Add(new RuntimeDependency(Path.Combine(ModuleDirectory, "../../DLLs/bHapticUtility64.dll")));
 #else

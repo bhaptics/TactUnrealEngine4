@@ -36,7 +36,12 @@ bool BhapticsUtilities::Initialise()
 	if (!IsInitialised)
 	{
 		FString FilePath = IPluginManager::Get().FindPlugin("HapticsManager")->GetBaseDir();
+
+#if (ENGINE_MINOR_VERSION <= 18)
 		FString FilePathProject = *FPaths::GameContentDir();
+#else
+		FString FilePathProject = *FPaths::ProjectContentDir();
+#endif
 
 #ifdef USEDLL64
 		FilePath.Append("/DLLs/bHapticUtility64.dll");

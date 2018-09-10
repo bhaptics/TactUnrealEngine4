@@ -10,10 +10,10 @@ void FHapticsManagerModule::StartupModule()
 	// This code will execute after your module is loaded into memory; the exact timing is specified in the .uplugin file per-module
 	if (BhapticsUtilities::Initialise())
 	{
-#if (ENGINE_MINOR_VERSION >= 18)
-		FString ConfigPath = *FPaths::ProjectContentDir();
-#else
+#if (ENGINE_MINOR_VERSION <= 18)
 		FString ConfigPath = *FPaths::GameContentDir();
+#else
+		FString ConfigPath = *FPaths::ProjectContentDir();
 #endif
 
 		ConfigPath.Append("/ConfigFiles/HapticPlayer.txt");

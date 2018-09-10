@@ -89,7 +89,7 @@ PublicDependencyModuleNames.AddRange(
 * Official Website: http://www.bhaptics.com/
 * E-mail: contact@bhaptics.com
 
-Last update of README.md: August. 10th, 2018.
+Last update of README.md: Sept. 6th, 2018.
 
 
 ###### Copyright (c) 2018 bHaptics Inc. All rights reserved.
