@@ -12,28 +12,24 @@
     #define DLLEXPORT
 #endif
 
-DLLEXPORT void ExampleLibraryFunction()
+DLLEXPORT void Initialise()
 {
-#if defined _WIN32 || defined _WIN64
-	MessageBox(NULL, TEXT("Hello world!"), NULL, MB_OK);
-#else
-    printf("Hello World");
-#endif
+	bhaptics::HapticPlayer::instance()->registerConnection("Plugin");
 }
 
-DLLEXPORT void RegisterConnection(std::string &Id)
+DLLEXPORT void Destroy()
 {
-	bhaptics::HapticPlayer::instance()->registerConnection(Id);
-}
-
-DLLEXPORT void UnregisterConnection(std::string &Id)
-{
-	bhaptics::HapticPlayer::instance()->unregisterConnection(Id);
+	bhaptics::HapticPlayer::instance()->unregisterConnection("Plugin");
 }
 
 DLLEXPORT void RegisterFeedback(std::string& Key, std::string& ProjectJson)
 {
 	bhaptics::HapticPlayer::instance()->registerFeedbackFromString(Key, ProjectJson);
+}
+
+DLLEXPORT void LoadAndRegisterFeedback(std::string& Key, std::string& FilePath)
+{
+	bhaptics::HapticPlayer::instance()->registerFeedbackFromFile(Key,FilePath);
 }
 
 DLLEXPORT void SubmitRegistered(std::string& Key)

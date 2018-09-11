@@ -19,10 +19,6 @@ public:
 
 	static void Free();
 	
-	static void Lib_RegisterConnection(FString Id);
-
-	static void Lib_UnregisterConnection(FString Id);
-
 	static void Lib_RegisterFeedback(FString Key, FString ProjectJson);
 
 	static void Lib_SubmitRegistered(FString Key);

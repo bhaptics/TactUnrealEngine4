@@ -30,26 +30,13 @@ BhapticsLibrary::~BhapticsLibrary()
 
 bool BhapticsLibrary::Initialise()
 {
-	Lib_RegisterConnection("Manager");
+	Initialise();
 	return true;
-
 }
 
 void BhapticsLibrary::Free()
 {
-	Lib_UnregisterConnection("Manager");
-}
-
-void BhapticsLibrary::Lib_RegisterConnection(FString Id)
-{
-	std::string StandardId(TCHAR_TO_UTF8(*Id));
-	RegisterConnection(StandardId);
-}
-
-void BhapticsLibrary::Lib_UnregisterConnection(FString Id)
-{
-	std::string StandardId(TCHAR_TO_UTF8(*Id));
-	UnregisterConnection(StandardId);
+	Destroy();
 }
 
 void BhapticsLibrary::Lib_RegisterFeedback(FString Key, FString ProjectJson)
