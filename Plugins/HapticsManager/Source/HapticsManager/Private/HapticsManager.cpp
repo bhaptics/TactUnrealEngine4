@@ -56,8 +56,6 @@ void FHapticsManagerModule::StartupModule()
 		BhapticsUtilities::Free();
 	}
 
-	//BhapticsLibrary::Initialise();
-
 	// Get the base directory of this plugin
 	FString BaseDir = IPluginManager::Get().FindPlugin("HapticsManager")->GetBaseDir();
 
@@ -71,7 +69,7 @@ void FHapticsManagerModule::StartupModule()
 
 	HapticLibraryHandle = !LibraryPath.IsEmpty() ? FPlatformProcess::GetDllHandle(*LibraryPath) : nullptr;
 
-	BhapticsLibrary::Initialise();
+	BhapticsLibrary::InitialiseConnection();
 }
 
 void FHapticsManagerModule::ShutdownModule()

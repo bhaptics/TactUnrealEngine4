@@ -15,7 +15,7 @@ public:
 	BhapticsLibrary();
 	~BhapticsLibrary();
 
-	static bool Initialise();
+	static bool InitialiseConnection();
 
 	static void Free();
 	

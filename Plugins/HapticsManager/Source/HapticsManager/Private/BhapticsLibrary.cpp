@@ -28,7 +28,7 @@ BhapticsLibrary::~BhapticsLibrary()
 
 }
 
-bool BhapticsLibrary::Initialise()
+bool BhapticsLibrary::InitialiseConnection()
 {
 	Initialise();
 	return true;
