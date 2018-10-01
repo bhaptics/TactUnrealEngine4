@@ -55,7 +55,7 @@ Current version is 1.4.0
 }
 ```
 
-*Register File Example
+* Register File Example
 ```
 {
   "Register" :
@@ -69,7 +69,7 @@ Current version is 1.4.0
 }
 ```
 
-*Submit File Example
+* Submit File Example
 ```
 {
   "Register" :
