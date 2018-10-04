@@ -24,6 +24,42 @@ Current version is 1.4.0
 * You can either use your own JSON Parser and pass the Project attribute to the SDK, or pass the file path and let the SDK load and parse the file itself.
 * See the util files for the implementation of this parser.
 
+### Altering Feedback Files
+* Feedback files can be altered at runtime using additional parameters to the submitRegistered function.
+* ScaleOption adds scaling values for intensity and duration, allowing you to change these values when playing the feedback. Submitting a value of 0.5, for example, will halve the value (decreasing intensity, or shortening the duration) while a value of 2 will double it (increasing the intensity or lengthening the duration).
+* RotationOption contains an angular X-value and a positional Y-value ranging from [-1.0,1.0] to rotate the feedback around the body counter-clockwise (right-to-left), as well as move it vertically. So values of (30.0, 0.5) would move the feedback to the left and up. This feature is only available for feedback to the Vest.
+* To uniquely identify this feedback, an 'altKey' is also required. Since multiple instances of the same feedback file could be playing at the same time, this alt key allows the Player to properly manage the feedback files without over-writing a currently playing effect.
+
+### Tips for Feedback Files
+* When designing impact effects for the vest, keep the center of the effect at the center of the vest. This will ensure that when rotating the vest it is in the correct position.
+* For converting to the rotation, you can refer to the [HapticManagerComponent](https://github.com/bhaptics/TactUnrealEngine4/blob/master/Plugins/HapticsManager/Source/HapticsManager/Private/HapticManagerComponent.cpp) and the ProjectToVest and CustomProjectToVest methods. For reference, both methods use the following algorithm:
+```
+ProjectToVest ( Vector ImpactLocation, Vector PlayerChestLocation, PlayerObject Player ) =>
+{
+  InverseRotation => inverse rotation of Player;
+  Vector ImpactDirection => InverseRotation( ImpactLocation - PlayerChestLocation) // Get the Local direction of the impact point.
+  
+  Vector UpVector => get Local Up Vector of the Player's avatar;
+  Vector ForwardVector => get Local Forward Vector of Player's avatar;
+  
+  float DotProduct => Dot(HitPoint, UpVector);
+  
+  Vector Projection => ImpactDirection - (DotProduct * UpVector); // Project the Impact Direction onto the same plane as the Forward Vector.
+  
+  float Alpha => Projection.X * ForwardVector.Y - ForwardVector.X * Projection.Y + Projection.Y * ForwardVector.Z - ForwardVector.Y * Projection.Z + Projection.Z * ForwardVector.X - ForwardVector.Z * Projection.X;
+  
+  float Beta => ForwardVector.X * Projection.X + Projection.Y * ForwardVector.Y + Projection.Z * ForwardVector.Z;
+  
+  float Angle => Atan2(A,B); // Make sure this value is given in degrees
+  
+  float Y_Offset => Clamp( DotProduct / (ChestHeight), -0.5, 0.5);
+  
+  return (Angle, Y_Offset);
+}    
+```
+* The above algorithm, in short, converts the collision to local coordinates and then finds the direction of the impact on the chest, projects it onto the plane defined by the Up Vector, and finally calculates the angle between the impact direction and the Forward Vector.
+* Note, the direction of the angle is important, so the angle calculation above gives positive degrees rotating the feedback counter-clockwise from the wearer's frame of reference (right to left), while negative values rotate the feedback clockwise (left to right).
+
 ## Example Integration
 * This project is a part of our UE4 Plugin.
 * You can refer to the HapticsManager/Private/HapticManagerComponent.cpp file and its associated header file for how to integrate the library into an engine.
