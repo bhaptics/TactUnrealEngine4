@@ -49,6 +49,13 @@ void UHapticManagerComponent::SubmitFeedback(UFeedbackFile* Feedback)
 	BhapticsLibrary::Lib_SubmitRegistered(Feedback->Key);
 }
 
+void UHapticManagerComponent::SubmitAlteredFeedbackFile(UFeedbackFile * Feedback, FRotationOption RotationOption, FScaleOption ScaleOption)
+{
+	FString altKey = Feedback->Key + FString::FromInt(FMath::Rand());
+	
+	SubmitFeedbackWithIntensityDuration(Feedback, altKey, RotationOption, ScaleOption);
+}
+
 void UHapticManagerComponent::SubmitFeedbackWithIntensityDuration(UFeedbackFile* Feedback, const FString &AltKey, FRotationOption RotationOption, FScaleOption ScaleOption)
 {
 	if (!IsInitialised || Feedback == NULL)

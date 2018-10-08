@@ -30,6 +30,16 @@ public:
 		Category = "bHaptics")
 		void SubmitFeedback(UFeedbackFile* Feedback);
 
+	//Submit a haptic feedback file, allowing for the same feedback to be played multiple times at once.
+	//Has the same options as SubmitFeedback with Scaled Intensity and Duration.
+	//Use Turn Off All Feedback to stop playing this feedback.
+	UFUNCTION(BlueprintCallable,
+		meta = (DisplayName = "Submit Feedback with Duplicates",
+			Keywords = "bHaptics",
+			AdvancedDisplay = "1"),
+		Category = "bHaptics")
+		void SubmitAlteredFeedbackFile(UFeedbackFile* Feedback, FRotationOption RotationOption, FScaleOption ScaleOption);
+
 	//Submit a haptic feedback file and transform it by a given RotationOption.
 	//This call will only rotate vest feedback files, with other devices being kept the same.
 	//Provide an AltKey to uniquely identify this feedback.
