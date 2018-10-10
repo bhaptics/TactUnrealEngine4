@@ -118,7 +118,8 @@ ProjectToVest ( Vector ImpactLocation, Vector PlayerChestLocation, PlayerObject 
         "Parameters": 
           {
             "altKey": "GunShot1",
-            "rotationOption": "{ \"offsetAngleX\" : -11.664018, \"offsetY\" : 0.237115}","scaleOption": "{ \"intensity\" : 1.000000, \"duration\" : 1.000000}"
+            "rotationOption": { "offsetAngleX" : -61.428627, "offsetY" : -0.137965},
+            "scaleOption": { "intensity" : 1.000000, "duration" : 1.000000}
           },
         "Frame" : { "DurationMillis":0, "Position": 53995, "Texture": 0, "DotPoints": [], "PathPoints": []}
       }
