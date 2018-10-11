@@ -330,7 +330,7 @@ namespace bhaptics
 		req.Parameters["rotationOption"] = rotOption.to_string();
 		if (!altKey.empty())
 		{
-			req.Parameters["altKey"] = altKey;
+			req.Parameters["altKey"] = "\""+altKey+"\"";
 		}
 		playerReq.Submit.push_back(req);
 

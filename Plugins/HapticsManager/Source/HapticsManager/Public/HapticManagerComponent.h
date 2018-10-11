@@ -30,32 +30,24 @@ public:
 		Category = "bHaptics")
 		void SubmitFeedback(UFeedbackFile* Feedback);
 
-	//Submit a haptic feedback file, allowing for the same feedback to be played multiple times at once.
-	//Has the same options as SubmitFeedback with Scaled Intensity and Duration.
-	//Use Turn Off All Feedback to stop playing this feedback.
-	UFUNCTION(BlueprintCallable,
-		meta = (DisplayName = "Submit Feedback with Duplicates",
-			Keywords = "bHaptics",
-			AdvancedDisplay = "1"),
-		Category = "bHaptics")
-		void SubmitAlteredFeedbackFile(UFeedbackFile* Feedback, FRotationOption RotationOption, FScaleOption ScaleOption);
-
 	//Submit a haptic feedback file and transform it by a given RotationOption.
 	//This call will only rotate vest feedback files, with other devices being kept the same.
 	//Provide an AltKey to uniquely identify this feedback.
 	UFUNCTION(BlueprintCallable,
 		meta = (DisplayName = "Submit Feedback with Transform",
-			Keywords = "bHaptics"),
+			Keywords = "bHaptics",
+			AdvancedDisplay = "AltKey"),
 		Category = "bHaptics")
-		void SubmitFeedbackWithTransform(UFeedbackFile* Feedback, const FString &AltKey, FRotationOption Option);
+		void SubmitFeedbackWithTransform(UFeedbackFile* Feedback, const FString &AltKey, FRotationOption Option, bool UseAltKey = false);
 
 	//Submit a haptic feedback file, and scale the intensity and duration by a given ScaleOption.
 	//Provide an AltKey to uniquely identify this feedback.
 	UFUNCTION(BlueprintCallable,
 		meta = (DisplayName = "Submit Feedback with Scaled Intensity and Duration",
-			Keywords = "bHaptics"),
+			Keywords = "bHaptics",
+			AdvancedDisplay ="AltKey"),
 		Category = "bHaptics")
-		void SubmitFeedbackWithIntensityDuration(UFeedbackFile* Feedback, const FString &AltKey, FRotationOption RotationOption, FScaleOption ScaleOption);
+		void SubmitFeedbackWithIntensityDuration(UFeedbackFile* Feedback, const FString &AltKey, FRotationOption RotationOption, FScaleOption ScaleOption, bool UseAltKey = false);
 
 	//Register a given haptic feedback file under the specified key.
 	UFUNCTION(BlueprintCallable,
@@ -92,12 +84,19 @@ public:
 		Category = "bHaptics")
 		bool IsAnythingPlaying();
 
-	//Is the specified haptic feedback pattern currently playing
+	//Is the specified haptic feedback pattern currently playing using the AltKey value.
 	UFUNCTION(BlueprintPure,
 		meta = (DisplayName = "Is Feedback Currently Playing",
 			Keywords = "bHaptics"),
 		Category = "bHaptics")
 		bool IsRegisteredPlaying(const FString &Key);
+
+	//Is the specified haptic feedback pattern currently playing.
+	UFUNCTION(BlueprintPure,
+		meta = (DisplayName = "Is Feedback File Currently Playing",
+			Keywords = "bHaptics"),
+		Category = "bHaptics")
+	bool IsRegisteredFilePlaying(UFeedbackFile* Feedback);
 
 	//Is the given haptic device connected
 	UFUNCTION(BlueprintPure,
@@ -116,9 +115,18 @@ public:
 	//Turn off the specified haptic feedback pattern if it is playing;
 	UFUNCTION(BlueprintCallable,
 		meta = (DisplayName = "Turn Off Feedback",
-			Keywords = "bHaptics"),
+			Keywords = "bHaptics",
+			DeprecatedFunction,
+			DeprecationMessage="Now managed through the FeedbackFile."),
 		Category = "bHaptics")
 		void TurnOffRegisteredFeedback(const FString &Key);
+
+	//Turn off the specified haptic feedback pattern if it is playing;
+	UFUNCTION(BlueprintCallable,
+		meta = (DisplayName = "Turn Off Feedback File",
+			Keywords = "bHaptics"),
+		Category = "bHaptics")
+		void TurnOffRegisteredFeedbackFile(UFeedbackFile* Feedback);
 
 	//Enable haptic feedback
 	UFUNCTION(BlueprintCallable,

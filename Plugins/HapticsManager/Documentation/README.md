@@ -1,6 +1,6 @@
 # bHaptics haptic devices Unreal Engine C++ plugin
 This project helps to utilize haptic devices in Unreal Engine 4
-Current version is 1.4.0
+Current version is 1.4.1
 
 ## Prerequisite
 * bHaptics Player has to be installed (Windows)
@@ -40,7 +40,7 @@ PublicDependencyModuleNames.AddRange(
 * The additional two functions add additional options to the alter the feedback file for any dynamic changes needed.
 	* Submitting with Transform adds a RotationOption, with Offset-Angle and Offset-Y, which will transform any Tactot feedback files. The Offset Angle rotates the file around the body counter-clockwise, horizontally, by the given degrees, switching from front to the back when leaving the boundary of the front part of the vest, or vice versa. Similarly, OffsetY transforms the feedback up or down the body. This allows for a single impact feedback to be used anywhere on the body by rotating and transforming the horizontal and vertical components.
 	* Submitting with Intensity and Duration adds a ScaleOption to the previous function, which adds scale variables to alter the original feedback's intensity and duration. For instance an intensity and/or duration scale(s) of 0.5 would halve the original intensity and duration of the feedback, while a value of 2.0 would double it, although the intensity will be capped at a value of 100, and neither value can be less than 0. This can be applied to any device's feedback file.
-     * Both of the above methods also include an AltKey, or Alternative Key, in the case when a submitted feedback file key is already being played. If left blank, the submission call will interrupt the playing feedback and restart it; however if an AltKey is given, the two feedback files will be played together, with the second under the AltKey. This is useful in cases such as when a character is hit twice requiring the same feedback file to be played simultaneously.
+     * Both of the above methods also include an AltKey, or Alternative Key, to identify these altered feedback calls. If left blank, a random key will be generated to ensure uniqueness, otherwise the given AltKey will be used. The AltKey allows developers to keep track of altered feedback files, but keep in mind that feedback effects under the same AltKey will override one another. If a feedback effect should be played more than once at the same time, such as getting hit simultaneously, then have a list of AltKeys and cycle through each one, or leave the field blank to use the randomly-generated keys.
 * These functions allow feedback files to be dynamically altered while in-game, while not affecting the file itself, allowing for a single file to be adapted to multiple situations.
 
 ### Dots
@@ -85,11 +85,17 @@ PublicDependencyModuleNames.AddRange(
 * The ForLoops in blueprints can cause unexpected results with feedback, as it does not natively support delays. A ForLoopWithDelay macro is provided; however, if you are using loops and delays heavily, it is recommended to work in C++ for these functions, or use the designer for the feedback.
 * For further references, you can find our tutorial series at our youtube channel [here](https://www.youtube.com/watch?v=Dy2D4Jnx-Io&t=2s&list=PLfaa78_N6dlvd0Ha0s0Y_LT62-Oqp8N2A&index=3).
 
+## Changelog
+* Keys for Feedback files are now combinations of the file name and a unique ID, to distinguish between files with the same name.
+* Added a function to turn off and check if playing using the Feedback File structure, to support the change in the Keys. The original functions still exist, but may not work correctly now.
+* AltKeys are now automatically generated to ensure uniqueness when not set. If you want to use your own AltKey, check the Boolean variable to 'UseAltKey'.
+
 ## Contact
 * Official Website: http://www.bhaptics.com/
 * E-mail: contact@bhaptics.com
 
-Last update of README.md: Sept. 6th, 2018.
+Last update of README.md: Oct. 10th, 2018.
 
 
 ###### Copyright (c) 2018 bHaptics Inc. All rights reserved.
+

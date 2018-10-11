@@ -42,46 +42,53 @@ void UHapticManagerComponent::SubmitFeedback(UFeedbackFile* Feedback)
 		return;
 	}
 
-	if (!BhapticsLibrary::Lib_IsFeedbackRegistered(Feedback->Key))
+	FString FeedbackKey = Feedback->Key + Feedback->Id.ToString();
+
+	if (!BhapticsLibrary::Lib_IsFeedbackRegistered(FeedbackKey))
 	{
-		BhapticsLibrary::Lib_RegisterFeedback(Feedback->Key, Feedback->ProjectString);
+		BhapticsLibrary::Lib_RegisterFeedback(FeedbackKey, Feedback->ProjectString);
 	}
-	BhapticsLibrary::Lib_SubmitRegistered(Feedback->Key);
+	BhapticsLibrary::Lib_SubmitRegistered(FeedbackKey);
 }
 
-void UHapticManagerComponent::SubmitAlteredFeedbackFile(UFeedbackFile * Feedback, FRotationOption RotationOption, FScaleOption ScaleOption)
-{
-	FString altKey = Feedback->Key + FString::FromInt(FMath::Rand());
-	
-	SubmitFeedbackWithIntensityDuration(Feedback, altKey, RotationOption, ScaleOption);
-}
-
-void UHapticManagerComponent::SubmitFeedbackWithIntensityDuration(UFeedbackFile* Feedback, const FString &AltKey, FRotationOption RotationOption, FScaleOption ScaleOption)
+void UHapticManagerComponent::SubmitFeedbackWithIntensityDuration(UFeedbackFile* Feedback, const FString &AltKey, FRotationOption RotationOption, FScaleOption ScaleOption,bool UseAltKey)
 {
 	if (!IsInitialised || Feedback == NULL)
 	{
 		return;
 	}
 
-	if (!BhapticsLibrary::Lib_IsFeedbackRegistered(Feedback->Key))
+	FString FeedbackKey = Feedback->Key + Feedback->Id.ToString();
+	FString UniqueKey = AltKey;
+
+	if (!UseAltKey)
 	{
-		BhapticsLibrary::Lib_RegisterFeedback(Feedback->Key, Feedback->ProjectString);
+		 UniqueKey = Feedback->Key + FString::FromInt(FMath::Rand());
 	}
 
-	BhapticsLibrary::Lib_SubmitRegistered(Feedback->Key, AltKey, ScaleOption, RotationOption);
+	if (!BhapticsLibrary::Lib_IsFeedbackRegistered(FeedbackKey))
+	{
+		BhapticsLibrary::Lib_RegisterFeedback(FeedbackKey, Feedback->ProjectString);
+	}
+
+	BhapticsLibrary::Lib_SubmitRegistered(FeedbackKey, UniqueKey, ScaleOption, RotationOption);
 }
 
-void UHapticManagerComponent::SubmitFeedbackWithTransform(UFeedbackFile* Feedback, const FString &AltKey, FRotationOption RotationOption)
+void UHapticManagerComponent::SubmitFeedbackWithTransform(UFeedbackFile* Feedback, const FString &AltKey, FRotationOption RotationOption, bool UseAltKey)
 {
 	if (!IsInitialised || Feedback == NULL)
 	{
 		return;
 	}
-	SubmitFeedbackWithIntensityDuration(Feedback, AltKey, RotationOption, FScaleOption(1, 1));
+	SubmitFeedbackWithIntensityDuration(Feedback, AltKey, RotationOption, FScaleOption(1, 1),UseAltKey);
 }
 
 void UHapticManagerComponent::RegisterFeedbackFile(const FString &Key, UFeedbackFile* Feedback)
 {
+	if (Feedback == NULL)
+	{
+		return;
+	}
 	if (!BhapticsLibrary::Lib_IsFeedbackRegistered(Key))
 	{
 		BhapticsLibrary::Lib_RegisterFeedback(Key, Feedback->ProjectString);
@@ -131,6 +138,19 @@ bool UHapticManagerComponent::IsRegisteredPlaying(const FString &Key)
 	return Value;
 }
 
+bool UHapticManagerComponent::IsRegisteredFilePlaying(UFeedbackFile* Feedback)
+{
+	bool Value = false;
+	if (Feedback == NULL)
+	{
+		return Value;
+	}
+	FString FeedbackKey = Feedback->Key + Feedback->Id.ToString();
+
+	Value = BhapticsLibrary::Lib_IsPlaying(FeedbackKey);
+	return Value;
+}
+
 void UHapticManagerComponent::TurnOffAllFeedback()
 {
 	if (!IsInitialised)
@@ -151,13 +171,27 @@ void UHapticManagerComponent::TurnOffRegisteredFeedback(const FString &Key)
 	BhapticsLibrary::Lib_TurnOff(Key);
 }
 
+void UHapticManagerComponent::TurnOffRegisteredFeedbackFile(UFeedbackFile* Feedback)
+{
+	if (!IsInitialised)
+	{
+		return;
+	}
+	if (Feedback == NULL)
+	{
+		return;
+	}
+	FString FeedbackKey = Feedback->Key + Feedback->Id.ToString();
+
+	BhapticsLibrary::Lib_TurnOff(FeedbackKey);
+}
+
 void UHapticManagerComponent::EnableHapticFeedback()
 {
 	if (!IsInitialised)
 	{
 		return;
 	}
-	//bhaptics::HapticPlayer::instance()->enableFeedback();
 	BhapticsLibrary::Lib_EnableFeedback();
 }
 
@@ -167,7 +201,6 @@ void UHapticManagerComponent::DisableHapticFeedback()
 	{
 		return;
 	}
-	//bhaptics::HapticPlayer::instance()->disableFeedback();
 	BhapticsLibrary::Lib_DisableFeedback();
 }
 
@@ -177,7 +210,6 @@ void UHapticManagerComponent::ToggleHapticFeedback()
 	{
 		return;
 	}
-	//bhaptics::HapticPlayer::instance()->toggleFeedback();
 	BhapticsLibrary::Lib_ToggleFeedback();
 }
 
@@ -190,8 +222,8 @@ FRotationOption UHapticManagerComponent::ProjectToVest(FVector Location, UPrimit
 
 	FRotator InverseRotation = HitComponent->GetComponentRotation().GetInverse();
 	FVector HitPoint = InverseRotation.RotateVector(Location - HitComponent->GetComponentLocation());
-	FVector UpVector = InverseRotation.RotateVector(HitComponent->GetUpVector());
-	FVector ForwardVector = InverseRotation.RotateVector(HitComponent->GetForwardVector());
+	FVector UpVector = FVector::UpVector;//InverseRotation.RotateVector(HitComponent->GetUpVector());
+	FVector ForwardVector = FVector::ForwardVector;//InverseRotation.RotateVector(HitComponent->GetForwardVector());
 	FVector Scale = HitComponent->GetComponentScale();
 	float DotProduct, Angle, Y_Offset, A, B;
 	FVector Result;

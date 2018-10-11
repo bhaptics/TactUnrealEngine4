@@ -5,8 +5,7 @@
 #include <map>
 #include <vector>
 #include <string>
-//#include "json.hpp"
-//using json = nlohmann::json;
+
 
 namespace bhaptics
 {
@@ -197,7 +196,7 @@ namespace bhaptics
 
 		std::string to_string()
 		{
-			std::string ret = "{ \\\"intensity\\\" : " + std::to_string(Intensity) + ", \\\"duration\\\" : " + std::to_string(Duration) + "}";
+			std::string ret = "{ \"intensity\" : " + std::to_string(Intensity) + ", \"duration\" : " + std::to_string(Duration) + "}";
 			return ret;
 		}
 	};
@@ -209,7 +208,7 @@ namespace bhaptics
 
 		std::string to_string()
 		{
-			std::string ret = "{ \\\"offsetAngleX\\\" : " + std::to_string(OffsetAngleX) + ", \\\"offsetY\\\" : " + std::to_string(OffsetY) + "}";
+			std::string ret = "{ \"offsetAngleX\" : " + std::to_string(OffsetAngleX) + ", \"offsetY\" : " + std::to_string(OffsetY) + "}";
 			return ret;
 		}
 	};
@@ -239,7 +238,7 @@ namespace bhaptics
 			std::string paramMapStr = "{";
 			for (auto& p : Parameters)
 			{
-				paramMapStr.append("\"" + p.first + "\": \"" + p.second + "\",");
+				paramMapStr.append("\"" + p.first + "\": " + p.second + ",");
 			}
 			paramMapStr.pop_back();
 			paramMapStr.append("}");
