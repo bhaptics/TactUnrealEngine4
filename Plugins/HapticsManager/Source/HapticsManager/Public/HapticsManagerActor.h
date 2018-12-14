@@ -60,8 +60,8 @@ private:
 	static FCriticalSection m_Mutex;
 	bool IsTicking = false;
 	void UpdateFeedback();
-	void VisualiseFeedback(FHapticFeedback Feedback, TArray<USceneComponent*> TactoSuitItem);
-	void InitialiseDots(TArray<USceneComponent*> TactoSuitItem);
+	void VisualiseFeedback(FHapticFeedback Feedback, TArray<USceneComponent*> TactoSuitItem, float DeviceScale = 1.0f);
+	void InitialiseDots(TArray<USceneComponent*> TactoSuitItem, float Scale = 1.0f);
 	FString Id;
 
 };

@@ -100,6 +100,12 @@ void BhapticsLibrary::Lib_Submit(FString Key, EPosition Pos, TArray<uint8> Motor
 	case EPosition::FootR:
 		HapticPosition = bhaptics::Position::FootR;
 		break;
+	case EPosition::ForearmL:
+		HapticPosition = bhaptics::Position::ForearmL;
+		break;
+	case EPosition::ForearmR:
+		HapticPosition = bhaptics::Position::ForearmR;
+		break;
 	case EPosition::Racket:
 		HapticPosition = bhaptics::Position::Racket;
 		break;
@@ -156,6 +162,12 @@ void BhapticsLibrary::Lib_Submit(FString Key, EPosition Pos, TArray<FDotPoint> P
 	case EPosition::FootR:
 		HapticPosition = bhaptics::Position::FootR;
 		break;
+	case EPosition::ForearmL:
+		HapticPosition = bhaptics::Position::ForearmL;
+		break;
+	case EPosition::ForearmR:
+		HapticPosition = bhaptics::Position::ForearmR;
+		break;
 	case EPosition::Racket:
 		HapticPosition = bhaptics::Position::Racket;
 		break;
@@ -205,6 +217,12 @@ void BhapticsLibrary::Lib_Submit(FString Key, EPosition Pos, TArray<FPathPoint> 
 		break;
 	case EPosition::FootR:
 		HapticPosition = bhaptics::Position::FootR;
+		break;
+	case EPosition::ForearmL:
+		HapticPosition = bhaptics::Position::ForearmL;
+		break;
+	case EPosition::ForearmR:
+		HapticPosition = bhaptics::Position::ForearmR;
 		break;
 	case EPosition::Racket:
 		HapticPosition = bhaptics::Position::Racket;
@@ -304,6 +322,12 @@ bool BhapticsLibrary::Lib_IsDevicePlaying(EPosition Pos)
 		break;
 	case EPosition::FootR:
 		device = bhaptics::Position::FootR;
+		break;
+	case EPosition::ForearmL:
+		device = bhaptics::Position::ForearmL;
+		break;
+	case EPosition::ForearmR:
+		device = bhaptics::Position::ForearmR;
 		break;
 	case EPosition::VestFront:
 		device = bhaptics::Position::Vest;

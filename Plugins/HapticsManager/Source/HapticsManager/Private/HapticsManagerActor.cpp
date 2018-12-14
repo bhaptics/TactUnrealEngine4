@@ -36,14 +36,14 @@ void AHapticsManagerActor::BeginPlay()
 	//RegisterConnection(StandardId);
 
 	InitialiseDots(Tactal);
-	InitialiseDots(TactosyLeft);
-	InitialiseDots(TactosyRight);
+	InitialiseDots(TactosyLeft,2.0f);
+	InitialiseDots(TactosyRight,2.0f);
 	InitialiseDots(TactotBack);
 	InitialiseDots(TactotFront);
-	InitialiseDots(TactGloveLeft);
-	InitialiseDots(TactGloveRight);
-	InitialiseDots(TactShoeLeft);
-	InitialiseDots(TactShoeRight);
+	InitialiseDots(TactGloveLeft,2.0f);
+	InitialiseDots(TactGloveRight,2.0f);
+	InitialiseDots(TactShoeLeft,2.0f);
+	InitialiseDots(TactShoeRight,2.0f);
 	InitialiseDots(TactRacket);
 
 }
@@ -69,11 +69,11 @@ void AHapticsManagerActor::Tick(float DeltaTime)
 
 		switch (Feedback.Position)
 		{
-		case EPosition::Right:
-			VisualiseFeedback(Feedback, TactosyRight);
+		case EPosition::ForearmR:
+			VisualiseFeedback(Feedback, TactosyRight,2.0f);
 			break;
-		case EPosition::Left:
-			VisualiseFeedback(Feedback, TactosyLeft);
+		case EPosition::ForearmL:
+			VisualiseFeedback(Feedback, TactosyLeft,2.0f);
 			break;
 		case EPosition::VestFront:
 			VisualiseFeedback(Feedback, TactotFront);
@@ -85,16 +85,16 @@ void AHapticsManagerActor::Tick(float DeltaTime)
 			VisualiseFeedback(Feedback, Tactal);
 			break;
 		case EPosition::HandL:
-			VisualiseFeedback(Feedback, TactGloveLeft);
+			VisualiseFeedback(Feedback, TactGloveLeft,2.0f);
 			break;
 		case EPosition::HandR:
-			VisualiseFeedback(Feedback, TactGloveRight);
+			VisualiseFeedback(Feedback, TactGloveRight,2.0f);
 			break;
 		case EPosition::FootL:
-			VisualiseFeedback(Feedback, TactShoeLeft);
+			VisualiseFeedback(Feedback, TactShoeLeft,2.0f);
 			break;
 		case EPosition::FootR:
-			VisualiseFeedback(Feedback, TactShoeRight);
+			VisualiseFeedback(Feedback, TactShoeRight,2.0f);
 			break;
 		case EPosition::Racket:
 			VisualiseFeedback(Feedback, TactRacket);
@@ -115,7 +115,7 @@ void AHapticsManagerActor::UpdateFeedback()
 	ChangedFeedbacks = BhapticsLibrary::Lib_GetResponseStatus();
 }
 
-void AHapticsManagerActor::InitialiseDots(TArray<USceneComponent*> TactSuitItem)
+void AHapticsManagerActor::InitialiseDots(TArray<USceneComponent*> TactSuitItem, float Scale)
 {
 	for (int i = 0; i < TactSuitItem.Num(); i++)
 	{
@@ -127,11 +127,11 @@ void AHapticsManagerActor::InitialiseDots(TArray<USceneComponent*> TactSuitItem)
 
 		UMaterialInstanceDynamic* DotMaterial = DotMesh->CreateAndSetMaterialInstanceDynamicFromMaterial(0, DotMesh->GetMaterial(0));
 		DotMaterial->SetVectorParameterValue("Base Color", FLinearColor(0.8, 0.8, 0.8, 1.0));
-		DotMesh->SetRelativeScale3D(FVector(0.3, 0.3, 0.5));
+		DotMesh->SetRelativeScale3D(FVector(0.3, 0.3*Scale, 0.5*Scale));
 	}
 }
 
-void AHapticsManagerActor::VisualiseFeedback(FHapticFeedback Feedback, TArray<USceneComponent*> TactSuitItem)
+void AHapticsManagerActor::VisualiseFeedback(FHapticFeedback Feedback, TArray<USceneComponent*> TactSuitItem, float DeviceScale)
 {
 	for (int i = 0; i < TactSuitItem.Num(); i++)
 	{
