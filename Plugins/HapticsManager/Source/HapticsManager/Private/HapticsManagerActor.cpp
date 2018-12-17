@@ -36,14 +36,14 @@ void AHapticsManagerActor::BeginPlay()
 	//RegisterConnection(StandardId);
 
 	InitialiseDots(Tactal);
-	InitialiseDots(TactosyLeft,2.0f);
-	InitialiseDots(TactosyRight,2.0f);
+	InitialiseDots(TactosyLeft);
+	InitialiseDots(TactosyRight);
 	InitialiseDots(TactotBack);
 	InitialiseDots(TactotFront);
-	InitialiseDots(TactGloveLeft,2.0f);
-	InitialiseDots(TactGloveRight,2.0f);
-	InitialiseDots(TactShoeLeft,2.0f);
-	InitialiseDots(TactShoeRight,2.0f);
+	InitialiseDots(TactGloveLeft);
+	InitialiseDots(TactGloveRight);
+	InitialiseDots(TactShoeLeft);
+	InitialiseDots(TactShoeRight);
 	InitialiseDots(TactRacket);
 
 }
@@ -70,10 +70,10 @@ void AHapticsManagerActor::Tick(float DeltaTime)
 		switch (Feedback.Position)
 		{
 		case EPosition::ForearmR:
-			VisualiseFeedback(Feedback, TactosyRight,2.0f);
+			VisualiseFeedback(Feedback, TactosyRight);
 			break;
 		case EPosition::ForearmL:
-			VisualiseFeedback(Feedback, TactosyLeft,2.0f);
+			VisualiseFeedback(Feedback, TactosyLeft);
 			break;
 		case EPosition::VestFront:
 			VisualiseFeedback(Feedback, TactotFront);
@@ -85,16 +85,16 @@ void AHapticsManagerActor::Tick(float DeltaTime)
 			VisualiseFeedback(Feedback, Tactal);
 			break;
 		case EPosition::HandL:
-			VisualiseFeedback(Feedback, TactGloveLeft,2.0f);
+			VisualiseFeedback(Feedback, TactGloveLeft);
 			break;
 		case EPosition::HandR:
-			VisualiseFeedback(Feedback, TactGloveRight,2.0f);
+			VisualiseFeedback(Feedback, TactGloveRight);
 			break;
 		case EPosition::FootL:
-			VisualiseFeedback(Feedback, TactShoeLeft,2.0f);
+			VisualiseFeedback(Feedback, TactShoeLeft);
 			break;
 		case EPosition::FootR:
-			VisualiseFeedback(Feedback, TactShoeRight,2.0f);
+			VisualiseFeedback(Feedback, TactShoeRight);
 			break;
 		case EPosition::Racket:
 			VisualiseFeedback(Feedback, TactRacket);
