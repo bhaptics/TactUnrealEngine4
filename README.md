@@ -1,11 +1,17 @@
 # bHaptics haptic devices Unreal Engine C++ plugin
 This project helps to utilize haptic devices in Unreal Engine 4
-Current version is 1.3.2
+Current version is 1.4.2
 
 ## Prerequisite
 * bHaptics Player has to be installed (Windows)
    * The app can be found at
    bHaptics webpage: [http://www.bhaptics.com](http://bhaptics.com/app.html)
+
+## Changes
+* Updated UI for new devices.
+* Added ForearmL and ForearmR for latest version of Tactosy
+  * Replaces Left and Right positions for the latest Tactosy device.
+  * Previous versions are still supported through the Left and Right positions.
 
 ## How to integrate the plugin into existing projects
 * If you have installed from the UE4 Marketplace, you can skip this section and go to the ['How to use the plugin'](#how-to-use-the-plugin) section.
@@ -70,9 +76,6 @@ PublicDependencyModuleNames.AddRange(
 * The blueprint allows you to select any feedback files in the project, and to play and alter the feedback using the Play Feedback, Play Feedback With Intensity Duration and Submit Feedback With Transform functions, altering their respective variables under the default category in the details panel.
 * You can also test out simple DotPoint and PathPoint patterns, by creating the points using the variables in the details panel, and setting the duration and device to play the feedback on, and then calling their respective functions to play the feedback.
 * Using these functions you can get a good idea of how the haptic feedback will feel, as well as to test new ideas, especially testing any changes to existing feedback files.
-
-## Packaging
-* The plugin also uses a dll (bHapticUtility64.dll) to run the bHaptics Player if it is installed; however, this dll is not copied when packaging and must be done manually into the Plugins/HapticsManager/DLL directory. This functionality is optional and will not affect the haptic feedback.
 
 ## Samples 
 * You can reference the blueprints in this project for how to implement different haptic feedback effects, as well as how to use the Feedback Files.
