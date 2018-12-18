@@ -106,9 +106,6 @@ void BhapticsLibrary::Lib_Submit(FString Key, EPosition Pos, TArray<uint8> Motor
 	case EPosition::ForearmR:
 		HapticPosition = bhaptics::Position::ForearmR;
 		break;
-	case EPosition::Racket:
-		HapticPosition = bhaptics::Position::Racket;
-		break;
 	default:
 		break;
 	}
@@ -168,9 +165,6 @@ void BhapticsLibrary::Lib_Submit(FString Key, EPosition Pos, TArray<FDotPoint> P
 	case EPosition::ForearmR:
 		HapticPosition = bhaptics::Position::ForearmR;
 		break;
-	case EPosition::Racket:
-		HapticPosition = bhaptics::Position::Racket;
-		break;
 	default:
 		break;
 	}
@@ -223,9 +217,6 @@ void BhapticsLibrary::Lib_Submit(FString Key, EPosition Pos, TArray<FPathPoint> 
 		break;
 	case EPosition::ForearmR:
 		HapticPosition = bhaptics::Position::ForearmR;
-		break;
-	case EPosition::Racket:
-		HapticPosition = bhaptics::Position::Racket;
 		break;
 	default:
 		break;
@@ -308,9 +299,6 @@ bool BhapticsLibrary::Lib_IsDevicePlaying(EPosition Pos)
 	case EPosition::Head:
 		device = bhaptics::Position::Head;
 		break;
-	case EPosition::Racket:
-		device = bhaptics::Position::Racket;
-		break;
 	case EPosition::HandL:
 		device = bhaptics::Position::HandL;
 		break;
@@ -335,9 +323,6 @@ bool BhapticsLibrary::Lib_IsDevicePlaying(EPosition Pos)
 	case EPosition::VestBack:
 		device = bhaptics::Position::Vest;
 		break;
-	case EPosition::Vest:
-		device = bhaptics::Position::Vest;
-		break;
 	default:
 		return false;
 		break;
@@ -351,11 +336,11 @@ bool BhapticsLibrary::Lib_IsDevicePlaying(EPosition Pos)
 TArray<FHapticFeedback> BhapticsLibrary::Lib_GetResponseStatus()
 {
 	TArray<FHapticFeedback> ChangedFeedbacks;
-	std::string Positions [] = {"Left","Right","Head", "VestFront", "VestBack", "Racket", "HandL", "HandR", "FootL", "FootR"};
+	std::string Positions [] = {"ForearmL","ForearmR","Head", "VestFront", "VestBack", "HandL", "HandR", "FootL", "FootR"};
 	TArray<EPosition> PositionEnum =
-		{ EPosition::Left,EPosition::Right,EPosition::Head,EPosition::VestFront,EPosition::VestBack,EPosition::Racket,EPosition::HandL, EPosition::HandR, EPosition::FootL, EPosition::FootR };
+		{ EPosition::ForearmL,EPosition::ForearmR,EPosition::Head, EPosition::VestFront,EPosition::VestBack,EPosition::HandL, EPosition::HandR, EPosition::FootL, EPosition::FootR };
 
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 9; i++)
 	{
 		std::vector<int> values;
 		values.resize(20);

@@ -46,15 +46,13 @@ public:
 
 	TArray<USceneComponent*> TactShoeRight;
 
-	TArray<USceneComponent*> TactRacket;
-
 	//For use in the UI to set the dots used in visualisation.
 	UFUNCTION(BlueprintCallable,
 		meta = (DisplayName = "Set TactSuit Variables",
 			Keywords = "bHaptics"),
 		Category = "bHaptics")
 		void SetTactSuit(USceneComponent* SleeveLeft, USceneComponent* SleeveRight, USceneComponent* Head, USceneComponent* VestFront, USceneComponent* VestBack,
-			USceneComponent* GloveLeft, USceneComponent* GloveRight, USceneComponent* ShoeLeft, USceneComponent* ShoeRight, USceneComponent* Racket);
+			USceneComponent* GloveLeft, USceneComponent* GloveRight, USceneComponent* ShoeLeft, USceneComponent* ShoeRight);
 
 private:
 	static FCriticalSection m_Mutex;

@@ -44,8 +44,7 @@ void AHapticsManagerActor::BeginPlay()
 	InitialiseDots(TactGloveRight);
 	InitialiseDots(TactShoeLeft);
 	InitialiseDots(TactShoeRight);
-	InitialiseDots(TactRacket);
-
+	
 }
 
 // Called every frame
@@ -96,8 +95,6 @@ void AHapticsManagerActor::Tick(float DeltaTime)
 		case EPosition::FootR:
 			VisualiseFeedback(Feedback, TactShoeRight);
 			break;
-		case EPosition::Racket:
-			VisualiseFeedback(Feedback, TactRacket);
 		default:
 			printf("Position not found.");
 			break;
@@ -153,7 +150,7 @@ void AHapticsManagerActor::VisualiseFeedback(FHapticFeedback Feedback, TArray<US
 }
 
 void AHapticsManagerActor::SetTactSuit(USceneComponent * SleeveLeft, USceneComponent * SleeveRight, USceneComponent * Head, USceneComponent * VestFront,
-	USceneComponent * VestBack, USceneComponent * GloveLeft, USceneComponent * GloveRight, USceneComponent * ShoeLeft, USceneComponent * ShoeRight, USceneComponent * Racket)
+	USceneComponent * VestBack, USceneComponent * GloveLeft, USceneComponent * GloveRight, USceneComponent * ShoeLeft, USceneComponent * ShoeRight)
 {
 	if (SleeveLeft != NULL)
 	{
@@ -198,8 +195,4 @@ void AHapticsManagerActor::SetTactSuit(USceneComponent * SleeveLeft, USceneCompo
 		ShoeRight->GetChildrenComponents(false, TactShoeRight);
 	}
 
-	if (Racket != NULL)
-	{
-		Racket->GetChildrenComponents(false, TactRacket);
-	}
 }
