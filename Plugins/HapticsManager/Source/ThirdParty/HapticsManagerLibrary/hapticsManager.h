@@ -46,6 +46,14 @@ namespace bhaptics
 				{
 					p.ConnectedPositions.push_back(Position::Right);
 				}
+				if (DeviceValue == "ForearmL")
+				{
+					p.ConnectedPositions.push_back(Position::Left);
+				}
+				else if (DeviceValue == "ForearmR")
+				{
+					p.ConnectedPositions.push_back(Position::Right);
+				}
 				else if (DeviceValue == "Vest")
 				{
 					p.ConnectedPositions.push_back(Position::Vest);

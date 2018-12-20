@@ -1,11 +1,17 @@
 # bHaptics haptic devices C++ SDK
 This project helps to utilize haptic devices in C++ engines
-Current version is 1.4.0
+Current version is 1.4.2
 
 ## Prerequisite
 * bHaptics Player has to be installed (Windows)
    * The app can be found at
    bHaptics webpage: [http://www.bhaptics.com](https://www.bhaptics.com/download/)
+
+## Change List
+* Added support for latest version of the Tactosy.
+  * New positions added: ForearmL and ForearmR.
+  * These two positions replace the previous Left and Right positions for the new version of the Tactosy.
+  * Previous versions of the Tactosy are still supported through the Left and Right positions.
 
 ## Haptic Player
 * To simplify device management and feedback calls, this SDK connects to the bHaptics Player, which will manage the devices and send the Haptic signals to each device.
@@ -131,7 +137,7 @@ ProjectToVest ( Vector ImpactLocation, Vector PlayerChestLocation, PlayerObject 
 * Official Website: http://www.bhaptics.com/
 * E-mail: contact@bhaptics.com
 
-Last update of README.md: Oct. 1st, 2018.
+Last update of README.md: Dc. 17th, 2018.
 
 
 ###### Copyright (c) 2018 bHaptics Inc. All rights reserved.

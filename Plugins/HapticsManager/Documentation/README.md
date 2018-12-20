@@ -1,11 +1,17 @@
 # bHaptics haptic devices Unreal Engine C++ plugin
 This project helps to utilize haptic devices in Unreal Engine 4
-Current version is 1.4.1
+Current version is 1.4.2
 
 ## Prerequisite
 * bHaptics Player has to be installed (Windows)
    * The app can be found at
    bHaptics webpage: [http://www.bhaptics.com](http://bhaptics.com/app.html)
+
+## Changes
+* Updated UI for new devices.
+* Added ForearmL and ForearmR for latest version of Tactosy
+  * Replaces Left and Right positions for the latest Tactosy device.
+  * Previous versions are still supported through the Left and Right positions.
 
 ## How to integrate the plugin into existing projects
 * If you have installed from the UE4 Marketplace, you can skip this section and go to the ['How to use the plugin'](#how-to-use-the-plugin) section.

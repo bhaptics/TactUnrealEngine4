@@ -44,8 +44,7 @@ void AHapticsManagerActor::BeginPlay()
 	InitialiseDots(TactGloveRight);
 	InitialiseDots(TactShoeLeft);
 	InitialiseDots(TactShoeRight);
-	InitialiseDots(TactRacket);
-
+	
 }
 
 // Called every frame
@@ -69,10 +68,10 @@ void AHapticsManagerActor::Tick(float DeltaTime)
 
 		switch (Feedback.Position)
 		{
-		case EPosition::Right:
+		case EPosition::ForearmR:
 			VisualiseFeedback(Feedback, TactosyRight);
 			break;
-		case EPosition::Left:
+		case EPosition::ForearmL:
 			VisualiseFeedback(Feedback, TactosyLeft);
 			break;
 		case EPosition::VestFront:
@@ -96,8 +95,6 @@ void AHapticsManagerActor::Tick(float DeltaTime)
 		case EPosition::FootR:
 			VisualiseFeedback(Feedback, TactShoeRight);
 			break;
-		case EPosition::Racket:
-			VisualiseFeedback(Feedback, TactRacket);
 		default:
 			printf("Position not found.");
 			break;
@@ -115,7 +112,7 @@ void AHapticsManagerActor::UpdateFeedback()
 	ChangedFeedbacks = BhapticsLibrary::Lib_GetResponseStatus();
 }
 
-void AHapticsManagerActor::InitialiseDots(TArray<USceneComponent*> TactSuitItem)
+void AHapticsManagerActor::InitialiseDots(TArray<USceneComponent*> TactSuitItem, float Scale)
 {
 	for (int i = 0; i < TactSuitItem.Num(); i++)
 	{
@@ -127,11 +124,11 @@ void AHapticsManagerActor::InitialiseDots(TArray<USceneComponent*> TactSuitItem)
 
 		UMaterialInstanceDynamic* DotMaterial = DotMesh->CreateAndSetMaterialInstanceDynamicFromMaterial(0, DotMesh->GetMaterial(0));
 		DotMaterial->SetVectorParameterValue("Base Color", FLinearColor(0.8, 0.8, 0.8, 1.0));
-		DotMesh->SetRelativeScale3D(FVector(0.3, 0.3, 0.5));
+		DotMesh->SetRelativeScale3D(FVector(0.3, 0.3*Scale, 0.5*Scale));
 	}
 }
 
-void AHapticsManagerActor::VisualiseFeedback(FHapticFeedback Feedback, TArray<USceneComponent*> TactSuitItem)
+void AHapticsManagerActor::VisualiseFeedback(FHapticFeedback Feedback, TArray<USceneComponent*> TactSuitItem, float DeviceScale)
 {
 	for (int i = 0; i < TactSuitItem.Num(); i++)
 	{
@@ -153,7 +150,7 @@ void AHapticsManagerActor::VisualiseFeedback(FHapticFeedback Feedback, TArray<US
 }
 
 void AHapticsManagerActor::SetTactSuit(USceneComponent * SleeveLeft, USceneComponent * SleeveRight, USceneComponent * Head, USceneComponent * VestFront,
-	USceneComponent * VestBack, USceneComponent * GloveLeft, USceneComponent * GloveRight, USceneComponent * ShoeLeft, USceneComponent * ShoeRight, USceneComponent * Racket)
+	USceneComponent * VestBack, USceneComponent * GloveLeft, USceneComponent * GloveRight, USceneComponent * ShoeLeft, USceneComponent * ShoeRight)
 {
 	if (SleeveLeft != NULL)
 	{
@@ -198,8 +195,4 @@ void AHapticsManagerActor::SetTactSuit(USceneComponent * SleeveLeft, USceneCompo
 		ShoeRight->GetChildrenComponents(false, TactShoeRight);
 	}
 
-	if (Racket != NULL)
-	{
-		Racket->GetChildrenComponents(false, TactRacket);
-	}
 }

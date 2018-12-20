@@ -46,22 +46,20 @@ public:
 
 	TArray<USceneComponent*> TactShoeRight;
 
-	TArray<USceneComponent*> TactRacket;
-
 	//For use in the UI to set the dots used in visualisation.
 	UFUNCTION(BlueprintCallable,
 		meta = (DisplayName = "Set TactSuit Variables",
 			Keywords = "bHaptics"),
 		Category = "bHaptics")
 		void SetTactSuit(USceneComponent* SleeveLeft, USceneComponent* SleeveRight, USceneComponent* Head, USceneComponent* VestFront, USceneComponent* VestBack,
-			USceneComponent* GloveLeft, USceneComponent* GloveRight, USceneComponent* ShoeLeft, USceneComponent* ShoeRight, USceneComponent* Racket);
+			USceneComponent* GloveLeft, USceneComponent* GloveRight, USceneComponent* ShoeLeft, USceneComponent* ShoeRight);
 
 private:
 	static FCriticalSection m_Mutex;
 	bool IsTicking = false;
 	void UpdateFeedback();
-	void VisualiseFeedback(FHapticFeedback Feedback, TArray<USceneComponent*> TactoSuitItem);
-	void InitialiseDots(TArray<USceneComponent*> TactoSuitItem);
+	void VisualiseFeedback(FHapticFeedback Feedback, TArray<USceneComponent*> TactoSuitItem, float DeviceScale = 1.0f);
+	void InitialiseDots(TArray<USceneComponent*> TactoSuitItem, float Scale = 1.0f);
 	FString Id;
 
 };

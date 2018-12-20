@@ -106,11 +106,15 @@ DLLEXPORT void GetResponseForPosition(std::vector<int>& retValues, std::string& 
 {
 	if (!bhaptics::HapticPlayer::instance()->getResponseStatus().empty())
 	{
-		std::vector<int> response = bhaptics::HapticPlayer::instance()->getResponseStatus().at(pos);
-		/*retValues = response.at(pos);*/
-		for (int i = 0; i < retValues.size(); i++)
+		std::map<std::string, std::vector<int>> responseMap = bhaptics::HapticPlayer::instance()->getResponseStatus();
+		if (responseMap.find(pos) != responseMap.end())
 		{
-			retValues[i] = response.at(i);
+			std::vector<int> response = bhaptics::HapticPlayer::instance()->getResponseStatus().at(pos);
+			/*retValues = response.at(pos);*/
+			for (int i = 0; i < retValues.size(); i++)
+			{
+				retValues[i] = response.at(i);
+			}
 		}
 	}
 }
@@ -120,7 +124,7 @@ DLLEXPORT void GetResponseStatus(std::vector<bhaptics::HapticFeedback>& retValue
 	std::map<std::string, std::vector<int>> response = bhaptics::HapticPlayer::instance()->getResponseStatus();
 	for (auto& Device : response)
 	{
-		bhaptics::Position Position = bhaptics::Position::Left;
+		bhaptics::Position Position = bhaptics::Position::ForearmL;
 
 		if (Device.first == "Left")
 		{
@@ -129,6 +133,14 @@ DLLEXPORT void GetResponseStatus(std::vector<bhaptics::HapticFeedback>& retValue
 		else if (Device.first == "Right")
 		{
 			Position = bhaptics::Position::Right;
+		}
+		if (Device.first == "ForearmL")
+		{
+			Position = bhaptics::Position::ForearmL;
+		}
+		else if (Device.first == "ForearmR")
+		{
+			Position = bhaptics::Position::ForearmR;
 		}
 		else if (Device.first == "Head")
 		{

@@ -166,6 +166,14 @@ namespace bhaptics
 		{
 			return Position::Right;
 		}
+		if (deviceName == "ForearmL")
+		{
+			return Position::ForearmL;
+		}
+		else if (deviceName == "ForearmR")
+		{
+			return Position::ForearmR;
+		}
 		else if (deviceName == "Vest")
 		{
 			return Position::Vest;
