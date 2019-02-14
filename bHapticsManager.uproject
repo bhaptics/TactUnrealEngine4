@@ -15,15 +15,6 @@
 			"Name": "HapticsManager",
 			"Enabled": true,
 			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/content/f2d84866699e419fbb97cddc7d6530b9"
-		},
-		{
-			"Name": "IKinema",
-			"Enabled": false
-		},
-		{
-			"Name": "PlayUp",
-			"Enabled": false,
-			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/content/1b3f6c0fc07648b18758f7b883358b3e"
 		}
 	]
 }

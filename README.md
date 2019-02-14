@@ -16,6 +16,8 @@ Current version is 1.4.2
 ## How to integrate the plugin into existing projects
 * If you have installed from the UE4 Marketplace, you can skip this section and go to the ['How to use the plugin'](#how-to-use-the-plugin) section.
 * Copy the Plugins folder of the bHapticsManger project and paste it into either your project folder or into the Engine/Plugins folder.
+* Navigate to the Source/ThirdParty/HapticsManagerLibrary folder in the plugin, and build the HapticLibrary.sln found there.
+    * This will generate the library and DLL files necessary to work with the C++ library in UE4.
 * You should now have the plugin source code in either Plugins folder, as well as blueprints in the Plugins/HapticsManager/Content folder.
 * For blueprint-only projects, in the case of any compiling errors, you may need to create a C++ class to generate the solution files for your project and rebuild the plugin.
 
@@ -95,7 +97,7 @@ PublicDependencyModuleNames.AddRange(
 * Official Website: http://www.bhaptics.com/
 * E-mail: contact@bhaptics.com
 
-Last update of README.md: April. 24th, 2018.
+Last update of README.md: Feb. 14th, 2019.
 
 
-###### Copyright (c) 2018 bHaptics Inc. All rights reserved.
+###### Copyright (c) 2017-2019 bHaptics Inc. All rights reserved.
