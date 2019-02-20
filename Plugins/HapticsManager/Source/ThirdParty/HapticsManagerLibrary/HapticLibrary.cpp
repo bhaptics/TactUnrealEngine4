@@ -12,6 +12,45 @@
     #define DLLEXPORT
 #endif
 
+static bool isInit = false;
+static const char* exeFilePath = "";
+
+//char* getExePath
+DLLEXPORT const char* getExePath()
+{
+	if (isInit)
+	{
+		return exeFilePath;
+	}
+	isInit = true;
+#if defined _WIN32 || defined _WIN64
+	HKEY hKey;
+	WCHAR szBuffer[512];
+	DWORD dwBufferSize = sizeof(szBuffer);
+	LONG resultFirstKey = RegOpenKeyExW(HKEY_CLASSES_ROOT, L"bhaptics-app\\shell\\open\\command", 0, KEY_READ, &hKey);
+	LONG result = RegQueryValueEx(hKey, L"", 0, NULL, (LPBYTE)szBuffer, &dwBufferSize);
+	RegCloseKey(hKey);
+	if (result == ERROR_SUCCESS)
+	{
+		std::wstring path = szBuffer;
+		int size = WideCharToMultiByte(CP_UTF8, 0, path.c_str(), -1, NULL, 0, NULL, NULL);
+
+		char *buffer = new char[size + 1];
+		WideCharToMultiByte(CP_UTF8, 0, path.c_str(), -1, buffer, size, NULL, NULL);
+
+		std::string str(buffer);
+		delete[]buffer;
+		exeFilePath = str.c_str();
+
+		return exeFilePath;
+	}
+
+	return "";
+#else
+	return "";
+#endif
+}
+
 DLLEXPORT void Initialise()
 {
 	bhaptics::HapticPlayer::instance()->registerConnection("Plugin");
@@ -19,7 +58,8 @@ DLLEXPORT void Initialise()
 
 DLLEXPORT void Destroy()
 {
-	bhaptics::HapticPlayer::instance()->unregisterConnection("Plugin");
+	//bhaptics::HapticPlayer::instance()->unregisterConnection("Plugin");
+	bhaptics::HapticPlayer::instance()->destroy();
 }
 
 DLLEXPORT void RegisterFeedback(std::string& Key, std::string& ProjectJson)
@@ -109,7 +149,7 @@ DLLEXPORT void GetResponseForPosition(std::vector<int>& retValues, std::string& 
 		std::map<std::string, std::vector<int>> responseMap = bhaptics::HapticPlayer::instance()->getResponseStatus();
 		if (responseMap.find(pos) != responseMap.end())
 		{
-			std::vector<int> response = bhaptics::HapticPlayer::instance()->getResponseStatus().at(pos);
+			std::vector<int> response = responseMap.at(pos);//bhaptics::HapticPlayer::instance()->getResponseStatus().at(pos);
 			/*retValues = response.at(pos);*/
 			for (int i = 0; i < retValues.size(); i++)
 			{

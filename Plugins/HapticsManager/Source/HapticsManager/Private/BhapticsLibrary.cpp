@@ -1,21 +1,18 @@
-//Copyright bHaptics Inc. 2018
+//Copyright bHaptics Inc. 2017 - 2019
 
-#if (ENGINE_MINOR_VERSION < 16)
-//#include "HapticsManager.h"
-#endif
 #include "BhapticsLibrary.h"
 #include "Interfaces/IPluginManager.h"
 
-#if (ENGINE_MINOR_VERSION >= 16)
+#include "Misc/FileHelper.h"
 #include "Core/Public/Misc/Paths.h"
-#endif
 
 #include "ThirdParty/HapticsManagerLibrary/HapticLibrary.h"
 #include "HapticsManager.h"
 
 bool BhapticsLibrary::IsInitialised = false;
-
-void *v_dllLibraryHandle;
+bool BhapticsLibrary::IsLoaded = false;
+FProcHandle BhapticsLibrary::Handle;
+bool BhapticsLibrary::Success = false;
 
 BhapticsLibrary::BhapticsLibrary()
 {
@@ -28,19 +25,101 @@ BhapticsLibrary::~BhapticsLibrary()
 
 }
 
+void BhapticsLibrary::SetLibraryLoaded()
+{
+	IsLoaded = true;
+}
+
 bool BhapticsLibrary::InitialiseConnection()
 {
+	if (!IsLoaded)
+	{
+		return false;
+	}
+
+	if (IsInitialised)
+	{
+		return Success;
+	}
+	IsInitialised = true;
+
+	FString ConfigPath = *FPaths::ProjectContentDir();
+	ConfigPath.Append("/ConfigFiles/HapticPlayer.txt");
+	if (FPaths::FileExists(ConfigPath)) {
+		FString ExeLocation;
+		FFileHelper::LoadFileToString(ExeLocation, *ConfigPath);
+		if (FPaths::FileExists(ExeLocation)) {
+			//if (!BhapticsUtilities::IsExternalPlayerRunning(ExeLocation))
+			FString ExeName = FPaths::GetBaseFilename(*ExeLocation);
+
+			if (!FPlatformProcess::IsApplicationRunning(*ExeName))
+			{
+				Handle = FPlatformProcess::CreateProc(*ExeLocation, nullptr, true, true, false, nullptr, 0, nullptr, nullptr);
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Log, TEXT("Could not launch: %s."), *ExeLocation);
+		}
+	}
+	else
+	{
+		//FString ExePath(BhapticsUtilities::GetExecutablePath());
+		FString ExePath(getExePath());
+
+		if (!ExePath.IsEmpty() && FPaths::FileExists(ExePath))
+		{
+			FString ExeName = FPaths::GetBaseFilename(ExePath);
+			UE_LOG(LogTemp, Log, TEXT("Exelocated: %s. %s"), *ExePath, *ExeName);
+			UE_LOG(LogTemp, Log, TEXT("Player is installed"));
+
+			if (!FPlatformProcess::IsApplicationRunning(*ExeName))
+			{
+				UE_LOG(LogTemp, Log, TEXT("Player is not running - launching"));
+
+				Handle = FPlatformProcess::CreateProc(*ExePath, nullptr, true, true, false, nullptr, 0, nullptr, nullptr);
+
+			}
+			else
+			{
+				UE_LOG(LogTemp, Log, TEXT("Player is running"));
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Log, TEXT("Player is not Installed"));
+			return false;
+		}
+
+	}
+
 	Initialise();
+	Success = true;
 	return true;
 }
 
 void BhapticsLibrary::Free()
 {
+	if (!IsLoaded)
+	{
+		return;
+	}
+
 	Destroy();
+
+	if (Handle.IsValid())
+	{
+		FPlatformProcess::TerminateProc(Handle);
+		FPlatformProcess::CloseProc(Handle);
+	}
 }
 
 void BhapticsLibrary::Lib_RegisterFeedback(FString Key, FString ProjectJson)
 {
+	if (!IsLoaded)
+	{
+		return;
+	}
 	std::string StandardKey(TCHAR_TO_UTF8(*Key));
 	std::string ProjectString = (TCHAR_TO_UTF8(*ProjectJson));
 	RegisterFeedback(StandardKey, ProjectString);
@@ -48,12 +127,20 @@ void BhapticsLibrary::Lib_RegisterFeedback(FString Key, FString ProjectJson)
 
 void BhapticsLibrary::Lib_SubmitRegistered(FString Key)
 {
+	if (!IsLoaded)
+	{
+		return;
+	}
 	std::string StandardKey(TCHAR_TO_UTF8(*Key));
 	SubmitRegistered(StandardKey);
 }
 
 void BhapticsLibrary::Lib_SubmitRegistered(FString Key, FString AltKey, FScaleOption ScaleOpt, FRotationOption RotOption)
 {
+	if (!IsLoaded)
+	{
+		return;
+	}
 	std::string StandardKey(TCHAR_TO_UTF8(*Key));
 	std::string StandardAltKey(TCHAR_TO_UTF8(*AltKey));
 	bhaptics::RotationOption RotateOption;
@@ -68,6 +155,10 @@ void BhapticsLibrary::Lib_SubmitRegistered(FString Key, FString AltKey, FScaleOp
 
 void BhapticsLibrary::Lib_Submit(FString Key, EPosition Pos, TArray<uint8> MotorBytes, int DurationMillis)
 {
+	if (!IsLoaded)
+	{
+		return;
+	}
 	bhaptics::Position HapticPosition = bhaptics::Position::All;
 	std::string StandardKey(TCHAR_TO_UTF8(*Key));
 
@@ -128,6 +219,10 @@ void BhapticsLibrary::Lib_Submit(FString Key, EPosition Pos, TArray<uint8> Motor
 
 void BhapticsLibrary::Lib_Submit(FString Key, EPosition Pos, TArray<FDotPoint> Points, int DurationMillis)
 {
+	if (!IsLoaded)
+	{
+		return;
+	}
 	bhaptics::Position HapticPosition = bhaptics::Position::All;
 	std::string StandardKey(TCHAR_TO_UTF8(*Key));
 	switch (Pos)
@@ -181,6 +276,10 @@ void BhapticsLibrary::Lib_Submit(FString Key, EPosition Pos, TArray<FDotPoint> P
 
 void BhapticsLibrary::Lib_Submit(FString Key, EPosition Pos, TArray<FPathPoint> Points, int DurationMillis)
 {
+	if (!IsLoaded)
+	{
+		return;
+	}
 	bhaptics::Position HapticPosition = bhaptics::Position::All;
 	std::string StandardKey(TCHAR_TO_UTF8(*Key));
 	switch (Pos)
@@ -237,6 +336,10 @@ void BhapticsLibrary::Lib_Submit(FString Key, EPosition Pos, TArray<FPathPoint> 
 
 bool BhapticsLibrary::Lib_IsFeedbackRegistered(FString key)
 {
+	if (!IsLoaded)
+	{
+		return false;
+	}
 	std::string StandardKey(TCHAR_TO_UTF8(*key));
 	bool Value = false;
 	Value = IsFeedbackRegistered(StandardKey);
@@ -245,6 +348,10 @@ bool BhapticsLibrary::Lib_IsFeedbackRegistered(FString key)
 
 bool BhapticsLibrary::Lib_IsPlaying()
 {
+	if (!IsLoaded)
+	{
+		return false;
+	}
 	bool Value = false;
 	Value = IsPlaying();
 	return Value;
@@ -252,6 +359,10 @@ bool BhapticsLibrary::Lib_IsPlaying()
 
 bool BhapticsLibrary::Lib_IsPlaying(FString Key)
 {
+	if (!IsLoaded)
+	{
+		return false;
+	}
 	std::string StandardKey(TCHAR_TO_UTF8(*Key));
 	bool Value = false;
 	Value = IsPlayingKey(StandardKey);
@@ -260,32 +371,56 @@ bool BhapticsLibrary::Lib_IsPlaying(FString Key)
 
 void BhapticsLibrary::Lib_TurnOff()
 {
+	if (!IsLoaded)
+	{
+		return;
+	}
 	TurnOff();
 }
 
 void BhapticsLibrary::Lib_TurnOff(FString Key)
 {
+	if (!IsLoaded)
+	{
+		return;
+	}
 	std::string StandardKey(TCHAR_TO_UTF8(*Key));
 	TurnOffKey(StandardKey);
 }
 
 void BhapticsLibrary::Lib_EnableFeedback()
 {
+	if (!IsLoaded)
+	{
+		return;
+	}
 	EnableFeedback();
 }
 
 void BhapticsLibrary::Lib_DisableFeedback()
 {
+	if (!IsLoaded)
+	{
+		return;
+	}
 	DisableFeedback();
 }
 
 void BhapticsLibrary::Lib_ToggleFeedback()
 {
+	if (!IsLoaded)
+	{
+		return;
+	}
 	ToggleFeedback();
 }
 
 bool BhapticsLibrary::Lib_IsDevicePlaying(EPosition Pos)
 {
+	if (!IsLoaded)
+	{
+		return false;
+	}
 	bhaptics::Position device = bhaptics::Position::All;
 
 	switch (Pos)
@@ -336,6 +471,10 @@ bool BhapticsLibrary::Lib_IsDevicePlaying(EPosition Pos)
 TArray<FHapticFeedback> BhapticsLibrary::Lib_GetResponseStatus()
 {
 	TArray<FHapticFeedback> ChangedFeedbacks;
+	if (!IsLoaded)
+	{
+		return ChangedFeedbacks;
+	}
 	std::string Positions [] = {"ForearmL","ForearmR","Head", "VestFront", "VestBack", "HandL", "HandR", "FootL", "FootR"};
 	TArray<EPosition> PositionEnum =
 		{ EPosition::ForearmL,EPosition::ForearmR,EPosition::Head, EPosition::VestFront,EPosition::VestBack,EPosition::HandL, EPosition::HandR, EPosition::FootL, EPosition::FootR };

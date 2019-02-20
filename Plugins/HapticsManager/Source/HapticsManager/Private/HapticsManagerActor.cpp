@@ -1,8 +1,4 @@
-//Copyright bHaptics Inc. 2018
-
-#if (ENGINE_MINOR_VERSION < 16)
-//#include "HapticsManager.h"
-#endif
+//Copyright bHaptics Inc. 2017-2019
 
 #include "HapticsManagerActor.h"
 #include "HapticStructures.h"
@@ -31,9 +27,6 @@ void AHapticsManagerActor::BeginPlay()
 {
 	Super::BeginPlay();
 	ChangedFeedbacks = {};
-
-	//bhaptics::HapticPlayer::instance()->registerConnection(StandardId);
-	//RegisterConnection(StandardId);
 
 	InitialiseDots(Tactal);
 	InitialiseDots(TactosyLeft);

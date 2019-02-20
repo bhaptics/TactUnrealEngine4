@@ -1,0 +1,18 @@
+﻿  easywsclient.cpp
+d:\bhapticsmanager\masterreleases\bhapticsmanagerv20\plugins\hapticsmanager\source\thirdparty\hapticsmanagerlibrary\easywsclient.cpp(451): warning C4244: 'argument': conversion from 'uint64_t' to 'const int', possible loss of data
+  d:\bhapticsmanager\masterreleases\bhapticsmanagerv20\plugins\hapticsmanager\source\thirdparty\hapticsmanagerlibrary\easywsclient.cpp(364): note: see reference to function template instantiation 'void easywsclient::_RealWebSocket::sendData<std::_String_iterator<std::_String_val<std::_Simple_types<_Ty>>>>(easywsclient::_RealWebSocket::wsheader_type::opcode_type,uint64_t,Iterator,Iterator)' being compiled
+          with
+          [
+              _Ty=char,
+              Iterator=std::_String_iterator<std::_String_val<std::_Simple_types<char>>>
+          ]
+  HapticLibrary.cpp
+d:\bhapticsmanager\masterreleases\bhapticsmanagerv20\plugins\hapticsmanager\source\thirdparty\hapticsmanagerlibrary\hapticlibrary.cpp(154): warning C4018: '<': signed/unsigned mismatch
+  hapticsManager.cpp
+  timer.cpp
+  util.cpp
+     Creating library D:\bHapticsManager\MasterReleases\bHapticsManagerV20\Plugins\HapticsManager\Source\ThirdParty\HapticsManagerLibrary\Release\HapticLibrary.lib and object D:\bHapticsManager\MasterReleases\bHapticsManagerV20\Plugins\HapticsManager\Source\ThirdParty\HapticsManagerLibrary\Release\HapticLibrary.exp
+  Generating code
+  All 2450 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Finished generating code
+  ExampleLibrary.vcxproj -> D:\bHapticsManager\MasterReleases\bHapticsManagerV20\Plugins\HapticsManager\Source\ThirdParty\HapticsManagerLibrary\Release\HapticLibrary.dll

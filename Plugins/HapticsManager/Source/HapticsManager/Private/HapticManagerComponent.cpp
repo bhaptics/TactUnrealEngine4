@@ -1,8 +1,5 @@
-//Copyright bHaptics Inc. 2018
+//Copyright bHaptics Inc. 2017-2019
 
-#if (ENGINE_MINOR_VERSION < 16)
-//#include "HapticsManager.h"
-#endif
 #include "HapticManagerComponent.h"
 #include "HapticStructures.h"
 #include "BhapticsUtilities.h"
@@ -31,7 +28,10 @@ void UHapticManagerComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	IsInitialised = true;
+	m_Mutex.Lock();
+	IsInitialised = BhapticsLibrary::InitialiseConnection();
+	m_Mutex.Unlock();
+	//IsInitialised = true;
 }
 
 
@@ -85,7 +85,7 @@ void UHapticManagerComponent::SubmitFeedbackWithTransform(UFeedbackFile* Feedbac
 
 void UHapticManagerComponent::RegisterFeedbackFile(const FString &Key, UFeedbackFile* Feedback)
 {
-	if (Feedback == NULL)
+	if (!IsInitialised || Feedback == NULL)
 	{
 		return;
 	}
@@ -125,6 +125,10 @@ void UHapticManagerComponent::SubmitPath(const FString &Key, EPosition PositionE
 
 bool UHapticManagerComponent::IsAnythingPlaying()
 {
+	if (!IsInitialised)
+	{
+		return false;
+	}
 	bool Value = false;
 	//return bhaptics::HapticPlayer::instance()->isPlaying();
 	Value = BhapticsLibrary::Lib_IsPlaying();
@@ -133,6 +137,10 @@ bool UHapticManagerComponent::IsAnythingPlaying()
 
 bool UHapticManagerComponent::IsRegisteredPlaying(const FString &Key)
 {
+	if (!IsInitialised)
+	{
+		return false;
+	}
 	bool Value = false;
 	Value = BhapticsLibrary::Lib_IsPlaying(Key);
 	return Value;
@@ -306,7 +314,10 @@ FRotationOption UHapticManagerComponent::CustomProjectToVest(FVector Location, U
 
 bool UHapticManagerComponent::IsDeviceConnected(EPosition device)
 {
-
+	if (!IsInitialised)
+	{
+		return false;
+	}
 	bool Value = false;
 	Value = BhapticsLibrary::Lib_IsDevicePlaying(device);
 	return Value;
