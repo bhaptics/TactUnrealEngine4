@@ -1,7 +1,9 @@
-//Copyright bHaptics Inc. 2017
+//Copyright bHaptics Inc. 2017-2019
 
 #pragma once
 
+#include "CoreTypes.h"
+#include "CoreMinimal.h"
 #include "Factories/Factory.h"
 #include "UObject/ObjectMacros.h"
 #include "FeedbackFileFactory.generated.h"

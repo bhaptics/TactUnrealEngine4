@@ -2,9 +2,12 @@
 
 #include "FeedbackFileEditor.h"
 
-#include "IPluginManager.h"
-#include "SlateCore.h"
-#include "SlateStyleRegistry.h"
+#include "Interfaces/IPluginManager.h"
+
+#include "Styling/SlateStyleRegistry.h"
+#include "Styling/SlateStyle.h"
+
+#include "Templates/SharedPointer.h"
 #include "AssetTools/FeedbackFileActions.h"
 #include "AssetTools/TactosyFileActions.h"
 #include "AssetTools/TactotFileActions.h"

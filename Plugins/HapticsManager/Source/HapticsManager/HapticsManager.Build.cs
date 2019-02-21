@@ -8,24 +8,20 @@ using UnrealBuildTool;
 
 public class HapticsManager : ModuleRules
 {
-#if VERSION_BELOW_16
-    public HapticsManager(TargetInfo Target)
-    {
-#else
     public HapticsManager(ReadOnlyTargetRules Target) : base (Target)
 	{
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
-#endif
+
         PublicIncludePaths.AddRange(
 			new string[] {
-                "HapticsManager/Public"
+                //"HapticsManager/Public"
 				// ... add public include paths required here ...
 			}
 			);
 				
 		PrivateIncludePaths.AddRange(
 			new string[] {
-                "HapticsManager/Private",
+                //"HapticsManager/Private",
 				// ... add other private include paths required here ...
 			}
 			);
@@ -69,13 +65,11 @@ public class HapticsManager : ModuleRules
 
         if (Target.Platform == UnrealTargetPlatform.Win64)
         {
-#if VERSION_BELOW_16 || VERSION_BELOW_19
-            RuntimeDependencies.Add(new RuntimeDependency(Path.Combine(ModuleDirectory, "../../DLLs/HapticLibrary.dll")));
-            RuntimeDependencies.Add(new RuntimeDependency(Path.Combine(ModuleDirectory, "../../DLLs/bHapticUtility64.dll")));
-#else
             RuntimeDependencies.Add(Path.Combine(ModuleDirectory, "../../DLLs/HapticLibrary.dll"));
-            RuntimeDependencies.Add(Path.Combine(ModuleDirectory, "../../DLLs/bHapticUtility64.dll"));
-#endif
+        }
+        else if (Target.Platform == UnrealTargetPlatform.Win32)
+        {
+            RuntimeDependencies.Add(Path.Combine(ModuleDirectory, "../../DLLs/x86/HapticLibrary.dll"));
         }
 
     }

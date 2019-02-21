@@ -3,7 +3,6 @@
 #include "HapticsManagerActor.h"
 #include "HapticStructures.h"
 #include "BhapticsLibrary.h"
-#include "BhapticsUtilities.h"
 
 FCriticalSection AHapticsManagerActor::m_Mutex;
 

@@ -1,16 +1,23 @@
-//Copyright bHaptics Inc. 2018
-
-#if (ENGINE_MINOR_VERSION < 16)
-//#include "FeedbackFileEditor.h"
-#endif
+//Copyright bHaptics Inc. 2017-2019
 
 #include "FeedbackFileFactory.h"
 #include "Containers/UnrealString.h"
 #include "FeedbackFile.h"
 #include "Misc/FileHelper.h"
-#include "TactotFeedbackFile.h"
-#include "TactosyFeedbackFile.h"
-#include "TactalFeedbackFile.h"
+
+#include "Templates/SharedPointer.h"
+
+#include "Json/Public/Dom/JsonObject.h"
+#include "Json/Public/Serialization/JsonReader.h"
+#include "Json/Public/Serialization/JsonSerializer.h"
+#include "Json/Public/Serialization/JsonWriter.h"
+#include "Json/Public/Policies/CondensedJsonPrintPolicy.h"
+
+#include "FeedbackFile.h"
+#include "Feedback/TactotFeedbackFile.h"
+#include "Feedback/TactosyFeedbackFile.h"
+#include "Feedback/TactalFeedbackFile.h"
+#include "Feedback/TactalFeedbackFile.h"
 
 UFeedbackFileFactory::UFeedbackFileFactory(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {

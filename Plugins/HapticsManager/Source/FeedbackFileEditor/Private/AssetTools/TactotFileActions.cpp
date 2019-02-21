@@ -1,13 +1,9 @@
-//Copyright bHaptics Inc. 2018
-
-#if (ENGINE_MINOR_VERSION < 16)
-//#include "FeedbackFileEditor.h"
-#endif
+//Copyright bHaptics Inc. 2017-2019
 
 #include "TactotFileActions.h"
 
 #include "Framework/MultiBox/MultiBoxBuilder.h"
-#include "TactotFeedbackFile.h"
+#include "Feedback/TactotFeedbackFile.h"
 #include "Styling/SlateStyle.h"
 
 
@@ -35,7 +31,8 @@ UClass * FTactotFileActions::GetSupportedClass() const
 
 FColor FTactotFileActions::GetTypeColor() const
 {
-	return FColor::Orange;
+	//return FColor::Orange;
+	return FColor::Yellow;
 }
 
 bool FTactotFileActions::CanFilter()

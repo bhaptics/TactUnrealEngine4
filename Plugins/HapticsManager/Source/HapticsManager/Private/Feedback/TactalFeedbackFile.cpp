@@ -1,10 +1,6 @@
-//Copyright bHaptics Inc. 2018
+//Copyright bHaptics Inc. 2017-2019
 
-#if (ENGINE_MINOR_VERSION < 16)
-//#include "HapticsManager.h"
-#endif
-
-#include "TactalFeedbackFile.h"
+#include "Feedback/TactalFeedbackFile.h"
 
 
 

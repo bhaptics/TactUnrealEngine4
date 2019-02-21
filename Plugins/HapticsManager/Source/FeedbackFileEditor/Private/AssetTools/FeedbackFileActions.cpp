@@ -1,8 +1,4 @@
-//Copyright bHaptics Inc. 2018
-
-#if(ENGINE_MINOR_VERSION < 16)
-//#include "FeedbackFileEditor.h"
-#endif
+//Copyright bHaptics Inc. 2017-2019
 
 #include "FeedbackFileActions.h"
 
@@ -87,7 +83,8 @@ UClass * FFeedbackFileActions::GetSupportedClass() const
 
 FColor FFeedbackFileActions::GetTypeColor() const
 {
-	return FColor::Magenta;
+	//return FColor::Magenta;
+	return FColor::Blue;
 }
 
 bool FFeedbackFileActions::HasActions(const TArray<UObject*>& InObjects) const

@@ -2,7 +2,6 @@
 
 #include "HapticManagerComponent.h"
 #include "HapticStructures.h"
-#include "BhapticsUtilities.h"
 
 #include "BhapticsLibrary.h"
 
