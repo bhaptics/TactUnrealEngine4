@@ -32,8 +32,7 @@ UClass * FTactalFileActions::GetSupportedClass() const
 
 FColor FTactalFileActions::GetTypeColor() const
 {
-	//return FColor::Cyan;
-	return FColor::Purple;
+	return FColor::Yellow;
 }
 
 bool FTactalFileActions::CanFilter()

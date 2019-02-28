@@ -12,8 +12,10 @@
 #include "AssetTools/TactosyFileActions.h"
 #include "AssetTools/TactotFileActions.h"
 #include "AssetTools/TactalFileActions.h"
+#include "AssetTools/HandFileActions.h"
+#include "AssetTools/FootFileActions.h"
 
-
+TArray<TSharedRef<IAssetTypeActions>> RegisteredAssetTypeActions;
 
 #define LOCTEXT_NAMESPACE "FFeedbackFileEditorModule"
 
@@ -31,10 +33,12 @@ void FFeedbackFileEditorModule::StartupModule()
 	StyleSet->SetContentRoot(ContentDir);
 
 	//Create a brush from the icon
-	FSlateImageBrush* ThumbnailBrush = new FSlateImageBrush(StyleSet->RootToContentDir(TEXT("Resources/icon_bet600"), TEXT(".png")), FVector2D(128.f, 128.f));
-	FSlateImageBrush* ThumbnailBrushArm = new FSlateImageBrush(StyleSet->RootToContentDir(TEXT("Resources/icon_tactosy600"), TEXT(".png")), FVector2D(128.f, 128.f));
-	FSlateImageBrush* ThumbnailBrushHead = new FSlateImageBrush(StyleSet->RootToContentDir(TEXT("Resources/icon_tactal600"), TEXT(".png")), FVector2D(128.f, 128.f));
-	FSlateImageBrush* ThumbnailBrushBody = new FSlateImageBrush(StyleSet->RootToContentDir(TEXT("Resources/icon_tactot600"), TEXT(".png")), FVector2D(128.f, 128.f));
+	FSlateImageBrush* ThumbnailBrush = new FSlateImageBrush(StyleSet->RootToContentDir(TEXT("Resources/icon128"), TEXT(".png")), FVector2D(128.f, 128.f));
+	FSlateImageBrush* ThumbnailBrushArm = new FSlateImageBrush(StyleSet->RootToContentDir(TEXT("Resources/icon_tactosy600"), TEXT(".png")), FVector2D(256.f, 256.f));
+	FSlateImageBrush* ThumbnailBrushHead = new FSlateImageBrush(StyleSet->RootToContentDir(TEXT("Resources/icon_tactal600"), TEXT(".png")), FVector2D(256.f, 256.f));
+	FSlateImageBrush* ThumbnailBrushBody = new FSlateImageBrush(StyleSet->RootToContentDir(TEXT("Resources/icon_tactot600"), TEXT(".png")), FVector2D(256.f, 256.f));
+	FSlateImageBrush* ThumbnailBrushHand = new FSlateImageBrush(StyleSet->RootToContentDir(TEXT("Resources/icon_hand600"), TEXT(".png")), FVector2D(256.f, 256.f));
+	FSlateImageBrush* ThumbnailBrushFoot = new FSlateImageBrush(StyleSet->RootToContentDir(TEXT("Resources/icon_Foot600"), TEXT(".png")), FVector2D(256.f, 256.f));
 
 	if (ThumbnailBrush)
 	{
@@ -57,22 +61,38 @@ void FFeedbackFileEditorModule::StartupModule()
 		StyleSet->Set("ClassThumbnail.TactalFeedbackFile", ThumbnailBrushHead);
 	}
 
+	if (ThumbnailBrushHand)
+	{
+		StyleSet->Set("ClassThumbnail.HandFeedbackFile", ThumbnailBrushHand);
+	}
+
+	if (ThumbnailBrushFoot)
+	{
+		StyleSet->Set("ClassThumbnail.FootFeedbackFile", ThumbnailBrushFoot);
+	}
+
 	IAssetTools& AssetTools = FModuleManager::LoadModuleChecked<FAssetToolsModule>("AssetTools").Get();
 	
 	auto Action = MakeShareable(new FFeedbackFileActions(StyleSet.ToSharedRef()));
 	auto ActionVest = MakeShareable(new FTactotFileActions(StyleSet.ToSharedRef()));
 	auto ActionArm = MakeShareable(new FTactosyFileActions(StyleSet.ToSharedRef()));
 	auto ActionHead = MakeShareable(new FTactalFileActions(StyleSet.ToSharedRef()));
+	auto ActionHand = MakeShareable(new FHandFileActions(StyleSet.ToSharedRef()));
+	auto ActionFoot = MakeShareable(new FFootFileActions(StyleSet.ToSharedRef()));
 
 	AssetTools.RegisterAssetTypeActions(Action);
 	AssetTools.RegisterAssetTypeActions(ActionVest);
 	AssetTools.RegisterAssetTypeActions(ActionArm);
 	AssetTools.RegisterAssetTypeActions(ActionHead);
+	AssetTools.RegisterAssetTypeActions(ActionHand);
+	AssetTools.RegisterAssetTypeActions(ActionFoot);
 
 	RegisteredAssetTypeActions.Add(Action);
 	RegisteredAssetTypeActions.Add(ActionVest);
 	RegisteredAssetTypeActions.Add(ActionArm);
 	RegisteredAssetTypeActions.Add(ActionHead);
+	RegisteredAssetTypeActions.Add(ActionHand);
+	RegisteredAssetTypeActions.Add(ActionFoot);
 
 	FSlateStyleRegistry::RegisterSlateStyle(*StyleSet);
 }

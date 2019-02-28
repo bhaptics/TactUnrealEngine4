@@ -31,7 +31,6 @@ UClass * FTactotFileActions::GetSupportedClass() const
 
 FColor FTactotFileActions::GetTypeColor() const
 {
-	//return FColor::Orange;
 	return FColor::Yellow;
 }
 

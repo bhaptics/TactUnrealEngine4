@@ -15,6 +15,7 @@ UHapticManagerComponent::UHapticManagerComponent()
 	PrimaryComponentTick.bCanEverTick = true;
 	FGuid Gui = FGuid::NewGuid();
 	Id = Gui.ToString();
+
 }
 
 // Called every frame

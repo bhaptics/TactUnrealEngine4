@@ -1,6 +1,6 @@
 # bHaptics haptic devices Unreal Engine C++ plugin
 This project helps to utilize haptic devices in Unreal Engine 4
-Current version is 1.4.2
+Current version is 1.4.3
 
 ## Prerequisite
 * bHaptics Player has to be installed (Windows)
@@ -8,6 +8,11 @@ Current version is 1.4.2
    bHaptics webpage: [http://www.bhaptics.com](http://bhaptics.com/app.html)
 
 ## Changes
+* Revised code for launching the bHaptics Player.
+* Integrated 32-Bit support
+* Does not initialise web socket if bHaptics Player is not installed or running.
+
+### 1.4.2
 * Updated UI for new devices.
 * Added ForearmL and ForearmR for latest version of Tactosy
   * Replaces Left and Right positions for the latest Tactosy device.
@@ -17,6 +22,8 @@ Current version is 1.4.2
 * If you have installed from the UE4 Marketplace, you can skip this section and go to the ['How to use the plugin'](#how-to-use-the-plugin) section.
 * Copy the Plugins folder of the bHapticsManger project and paste it into either your project folder or into the Engine/Plugins folder.
 * You should now have the plugin source code in either Plugins folder, as well as blueprints in the Plugins/HapticsManager/Content folder.
+* Navigate to the Source/ThirdParty/HapticsManagerLibrary folder in the plugin, and build the HapticLibrary.sln found there.
+  * This will generate the library and DLL files necessary to work with the C++ library in UE4.
 * For blueprint-only projects, in the case of any compiling errors, you may need to create a C++ class to generate the solution files for your project and rebuild the plugin.
 
 ## How to use the plugin
@@ -100,7 +107,7 @@ PublicDependencyModuleNames.AddRange(
 * Official Website: http://www.bhaptics.com/
 * E-mail: contact@bhaptics.com
 
-Last update of README.md: Oct. 10th, 2018.
+Last update of README.md: Feb 21st 2019
 
 
 ###### Copyright (c) 2018 bHaptics Inc. All rights reserved.

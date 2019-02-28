@@ -7,6 +7,7 @@
 #include "Core/Public/Misc/Paths.h"
 
 #include "ThirdParty/HapticsManagerLibrary/HapticLibrary.h"
+
 #include "HapticsManager.h"
 
 bool BhapticsLibrary::IsInitialised = false;
@@ -41,6 +42,18 @@ bool BhapticsLibrary::InitialiseConnection()
 	{
 		return Success;
 	}
+
+	bool bLaunch = true;
+	if (GConfig)
+	{
+		GConfig->GetBool(
+			TEXT("/Script/HapticsManager.HapticSettings"),
+			TEXT("bShouldLaunch"),
+			bLaunch,
+			GGameIni
+		);
+	}
+
 	IsInitialised = true;
 
 	FString ConfigPath = *FPaths::ProjectContentDir();
@@ -52,7 +65,7 @@ bool BhapticsLibrary::InitialiseConnection()
 			//if (!BhapticsUtilities::IsExternalPlayerRunning(ExeLocation))
 			FString ExeName = FPaths::GetBaseFilename(*ExeLocation);
 
-			if (!FPlatformProcess::IsApplicationRunning(*ExeName))
+			if (!FPlatformProcess::IsApplicationRunning(*ExeName) && bLaunch)
 			{
 				Handle = FPlatformProcess::CreateProc(*ExeLocation, nullptr, true, true, false, nullptr, 0, nullptr, nullptr);
 			}
@@ -73,7 +86,7 @@ bool BhapticsLibrary::InitialiseConnection()
 			UE_LOG(LogTemp, Log, TEXT("Exelocated: %s. %s"), *ExePath, *ExeName);
 			UE_LOG(LogTemp, Log, TEXT("Player is installed"));
 
-			if (!FPlatformProcess::IsApplicationRunning(*ExeName))
+			if (!FPlatformProcess::IsApplicationRunning(*ExeName) && bLaunch)
 			{
 				UE_LOG(LogTemp, Log, TEXT("Player is not running - launching"));
 

@@ -4,6 +4,7 @@
 #include "CoreMinimal.h"
 #include "Modules/ModuleManager.h"
 #include "Styling/SlateStyle.h"
+#include "EditorStyle.h"
 
 class FFeedbackFileEditorModule : public IModuleInterface
 {
@@ -15,5 +16,4 @@ public:
 	virtual void StartupModule() override;
 	virtual void ShutdownModule() override;
 
-	TArray<TSharedRef<IAssetTypeActions>> RegisteredAssetTypeActions;
 };

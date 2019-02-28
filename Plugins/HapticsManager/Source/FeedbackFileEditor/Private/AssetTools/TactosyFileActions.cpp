@@ -31,8 +31,7 @@ UClass * FTactosyFileActions::GetSupportedClass() const
 
 FColor FTactosyFileActions::GetTypeColor() const
 {
-	//return FColor::Green;
-	return FColor::Emerald;
+	return FColor::Yellow;
 }
 
 bool FTactosyFileActions::CanFilter()

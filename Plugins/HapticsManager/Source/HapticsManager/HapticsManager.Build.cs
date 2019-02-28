@@ -1,7 +1,5 @@
 ﻿// Copyright 1998-2016 Epic Games, Inc. All Rights Reserved.
 
-//#define VERSION_BELOW_16
-#define VERSION_BELOW_19
 using System;
 using System.IO;
 using UnrealBuildTool;
