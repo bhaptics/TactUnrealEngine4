@@ -1,6 +1,6 @@
 # bHaptics haptic devices Unreal Engine C++ plugin
 This project helps to utilize haptic devices in Unreal Engine 4
-Current version is 1.4.2
+Current version is 1.4.3
 
 ## Prerequisite
 * bHaptics Player has to be installed (Windows)
@@ -8,10 +8,10 @@ Current version is 1.4.2
    bHaptics webpage: [http://www.bhaptics.com](http://bhaptics.com/app.html)
 
 ## Changes
-* Updated UI for new devices.
-* Added ForearmL and ForearmR for latest version of Tactosy
-  * Replaces Left and Right positions for the latest Tactosy device.
-  * Previous versions are still supported through the Left and Right positions.
+* Revised code for launching the bHaptics Player.
+  * Addded a ShouldLaunch boolean to Project Settings to control whether the project should launch the bHaptics Player
+* Integrated 32-Bit support
+* Does not initialise web socket if bHaptics Player is not installed or running.
 
 ## How to integrate the plugin into existing projects
 * If you have installed from the UE4 Marketplace, you can skip this section and go to the ['How to use the plugin'](#how-to-use-the-plugin) section.
@@ -69,6 +69,9 @@ PublicDependencyModuleNames.AddRange(
 * For example, checks for whether a specified feedback effect is playing are provided as well as functions to cease the feedback effect.
 * These can be used to add effects such as interrupting feedback effects, or even to loop a certain feedback effect.
 * The ProjectToVest function is provided to simplify collision, taking a location and component and converting it to Cylindrical coordinates and returning as a RotationOption. You can use this and the customisable CustomProjectToVest to quickly give feedback to the vest.
+* By default, loading an actor with a HapticManagerComponent will launch the bHaptics Player desktop application automatically.
+  * If the bHaptics Player was launched in this way, it will also be closed when the game or editor is closed as well.
+  * To disable this functionality go to Project Settings > Game > Haptic Settings and set the ShouldLaunch variable to false.
 * All the functions for the plugin can be found in the bHaptics category in blueprints, or in the HapticsManagerComponent.h file in the plugin.
 
 ## Testing
@@ -97,7 +100,7 @@ PublicDependencyModuleNames.AddRange(
 * Official Website: http://www.bhaptics.com/
 * E-mail: contact@bhaptics.com
 
-Last update of README.md: Feb. 14th, 2019.
+Last update of README.md: March 5th, 2019.
 
 
 ###### Copyright (c) 2017-2019 bHaptics Inc. All rights reserved.
