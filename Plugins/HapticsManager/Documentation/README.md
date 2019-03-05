@@ -12,12 +12,6 @@ Current version is 1.4.3
 * Integrated 32-Bit support
 * Does not initialise web socket if bHaptics Player is not installed or running.
 
-### 1.4.2
-* Updated UI for new devices.
-* Added ForearmL and ForearmR for latest version of Tactosy
-  * Replaces Left and Right positions for the latest Tactosy device.
-  * Previous versions are still supported through the Left and Right positions.
-
 ## How to integrate the plugin into existing projects
 * If you have installed from the UE4 Marketplace, you can skip this section and go to the ['How to use the plugin'](#how-to-use-the-plugin) section.
 * Copy the Plugins folder of the bHapticsManger project and paste it into either your project folder or into the Engine/Plugins folder.
@@ -75,6 +69,9 @@ PublicDependencyModuleNames.AddRange(
 * These can be used to add effects such as interrupting feedback effects, or even to loop a certain feedback effect.
 * The ProjectToVest function is provided to simplify collision, taking a location and component and converting it to Cylindrical coordinates and returning as a RotationOption. You can use this and the customisable CustomProjectToVest to quickly give feedback to the vest.
 * All the functions for the plugin can be found in the bHaptics category in blueprints, or in the HapticsManagerComponent.h file in the plugin.
+* By default, loading an actor with a HapticManagerComponent will launch the bHaptics Player desktop application automatically.
+  * If the bHaptics Player was launched in this way, it will also be closed when the game or editor is closed as well.
+  * To disable this functionality go to Project Settings > Game > Haptic Settings and set the ShouldLaunch variable to false.
 
 ## Testing
 * In the HapticsManager Blueprint, some functionality has been implemented to help test and experiment with the functions outlined above.
@@ -94,20 +91,17 @@ PublicDependencyModuleNames.AddRange(
 * Be careful of naming the feedback effects, as 2 feedback effects with the same name will interrupt each other. Use the IsPlaying function to check if a specifc feedback effect is finished before sending the same feedback effect again, or submit with an AltKey so both feedback files play together.
 * Be aware of the duration of your effects. You may need to add delays to ensure the submitted feedback has finished playing before submitting the next, in the case of a series of feedback calls to create the effect (ie. explosion, moving feedback).
 * For the Submit Key With Transform, you can consider the torso as a cylinder and project the haptic feedback file onto that. You can then change the horizontal offset by finding the angle offset from the forward vector, and the OffsetY from the height on the cylinder to play. This will help the feedback feel more continuous as it moves from the front to the back or vice versa. You can see the KeyDummy blueprint for an example of how to do this.
+* AltKeys are automatically generated to ensure uniqueness when not set. If you want to use your own AltKey, check the Boolean variable to 'UseAltKey'
 * Some simple examples are provided in the Plugin's Content/Blueprints folder, with Dummies for collision detection examples, as well some simple macro effects in the Macro Effect Library .
 * The ForLoops in blueprints can cause unexpected results with feedback, as it does not natively support delays. A ForLoopWithDelay macro is provided; however, if you are using loops and delays heavily, it is recommended to work in C++ for these functions, or use the designer for the feedback.
 * For further references, you can find our tutorial series at our youtube channel [here](https://www.youtube.com/watch?v=Dy2D4Jnx-Io&t=2s&list=PLfaa78_N6dlvd0Ha0s0Y_LT62-Oqp8N2A&index=3).
-
-## Changelog
-* Keys for Feedback files are now combinations of the file name and a unique ID, to distinguish between files with the same name.
-* Added a function to turn off and check if playing using the Feedback File structure, to support the change in the Keys. The original functions still exist, but may not work correctly now.
-* AltKeys are now automatically generated to ensure uniqueness when not set. If you want to use your own AltKey, check the Boolean variable to 'UseAltKey'.
+.
 
 ## Contact
 * Official Website: http://www.bhaptics.com/
 * E-mail: contact@bhaptics.com
 
-Last update of README.md: Feb 21st 2019
+Last update of README.md: March 5th 2019
 
 
 ###### Copyright (c) 2018 bHaptics Inc. All rights reserved.
