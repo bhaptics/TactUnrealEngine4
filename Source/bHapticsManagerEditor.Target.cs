@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 public class bHapticsManagerEditorTarget : TargetRules
 {
-	public bHapticsManagerEditorTarget(TargetInfo Target)
+	public bHapticsManagerEditorTarget(TargetInfo Target):base(Target)
 	{
 		Type = TargetType.Editor;
         ExtraModuleNames.AddRange(new string[] { "bHapticsManager" });

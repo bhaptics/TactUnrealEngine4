@@ -1,13 +1,10 @@
 //Copyright bHaptics Inc. 2018
 
-#if (ENGINE_MINOR_VERSION < 16)
-//#include "FeedbackFileEditor.h"
-#endif
 
 #include "TactalFileActions.h"
 
 #include "Framework/MultiBox/MultiBoxBuilder.h"
-#include "TactalFeedbackFile.h"
+#include "Feedback/TactalFeedbackFile.h"
 #include "Styling/SlateStyle.h"
 
 
@@ -35,7 +32,7 @@ UClass * FTactalFileActions::GetSupportedClass() const
 
 FColor FTactalFileActions::GetTypeColor() const
 {
-	return FColor::Cyan;
+	return FColor::Yellow;
 }
 
 bool FTactalFileActions::CanFilter()

@@ -34,7 +34,7 @@ void HapticTimer::workerFunc()
     {
         std::chrono::steady_clock::time_point current = std::chrono::steady_clock::now();
                 
-        int values = std::chrono::duration_cast<std::chrono::milliseconds>(current - prev).count();
+        //int values = (int) std::chrono::duration_cast<std::chrono::milliseconds>(current - prev).count();
 		bool isIntervalOver = (current > (prev + std::chrono::milliseconds(interval)));
 
 		if(callbackFunc && isIntervalOver)

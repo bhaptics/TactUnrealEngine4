@@ -1,4 +1,4 @@
-//Copyright bHaptics Inc. 2018
+//Copyright bHaptics Inc. 2017-2019
 
 #pragma once
 #include "Developer/AssetTools/Public/AssetTypeActions_Base.h"

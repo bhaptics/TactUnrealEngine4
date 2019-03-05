@@ -1,6 +1,6 @@
 # bHaptics haptic devices C++ SDK
 This project helps to utilize haptic devices in C++ engines
-Current version is 1.4.2
+Current version is 1.4.3
 
 ## Prerequisite
 * bHaptics Player has to be installed (Windows)
@@ -124,8 +124,7 @@ ProjectToVest ( Vector ImpactLocation, Vector PlayerChestLocation, PlayerObject 
         "Parameters": 
           {
             "altKey": "GunShot1",
-            "rotationOption": { "offsetAngleX" : -61.428627, "offsetY" : -0.137965},
-            "scaleOption": { "intensity" : 1.000000, "duration" : 1.000000}
+            "rotationOption": "{ \"offsetAngleX\" : -11.664018, \"offsetY\" : 0.237115}","scaleOption": "{ \"intensity\" : 1.000000, \"duration\" : 1.000000}"
           },
         "Frame" : { "DurationMillis":0, "Position": 53995, "Texture": 0, "DotPoints": [], "PathPoints": []}
       }
@@ -137,7 +136,7 @@ ProjectToVest ( Vector ImpactLocation, Vector PlayerChestLocation, PlayerObject 
 * Official Website: http://www.bhaptics.com/
 * E-mail: contact@bhaptics.com
 
-Last update of README.md: Dc. 17th, 2018.
+Last update of README.md: Feb. 19th, 2019.
 
 
-###### Copyright (c) 2018 bHaptics Inc. All rights reserved.
+###### Copyright (c) 2017-2019 bHaptics Inc. All rights reserved.

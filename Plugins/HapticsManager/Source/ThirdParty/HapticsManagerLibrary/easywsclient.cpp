@@ -95,7 +95,7 @@ namespace easywsclient {
 		{
 			sockfd = socket(p->ai_family, p->ai_socktype, p->ai_protocol);
 			if (sockfd == INVALID_SOCKET) { continue; }
-			if (connect(sockfd, p->ai_addr, p->ai_addrlen) != SOCKET_ERROR) {
+			if (connect(sockfd, p->ai_addr, (int)p->ai_addrlen) != SOCKET_ERROR) {
 				break;
 			}
 			closesocket(sockfd);
@@ -182,11 +182,11 @@ namespace easywsclient {
 				FD_ZERO(&wfds);
 				FD_SET(sockfd, &rfds);
 				if (txbuf.size()) { FD_SET(sockfd, &wfds); }
-				select(sockfd + 1, &rfds, &wfds, 0, timeout > 0 ? &tv : 0);
+				select((int)(sockfd + 1), &rfds, &wfds, 0, timeout > 0 ? &tv : 0);
 			}
 			while (true) {
 				// FD_ISSET(0, &rfds) will be true
-				int N = rxbuf.size();
+				int N = (int)rxbuf.size();
 				ssize_t ret;
 				rxbuf.resize(N + 1500);
 				ret = recv(sockfd, (char*)&rxbuf[0] + N, 1500, 0);
@@ -207,7 +207,7 @@ namespace easywsclient {
 				}
 			}
 			while (txbuf.size()) {
-				int ret = ::send(sockfd, (char*)&txbuf[0], txbuf.size(), 0);
+				int ret = ::send(sockfd, (char*)&txbuf[0], (int)txbuf.size(), 0);
 				if (false) {} // ??
 				else if (ret < 0 && (socketerrno == SOCKET_EWOULDBLOCK || socketerrno == SOCKET_EAGAIN_EINPROGRESS)) {
 					break;
@@ -497,21 +497,21 @@ namespace easywsclient {
 			// XXX: this should be done non-blocking,
 			char line[256];
 			int i;
-			snprintf(line, 256, "GET /%s HTTP/1.1\r\n", path); ::send(sockfd, line, strlen(line), 0);
+			snprintf(line, 256, "GET /%s HTTP/1.1\r\n", path); ::send(sockfd, line, (int)strlen(line), 0);
 			if (port == 80) {
-				snprintf(line, 256, "Host: %s\r\n", host); ::send(sockfd, line, strlen(line), 0);
+				snprintf(line, 256, "Host: %s\r\n", host); ::send(sockfd, line, (int)strlen(line), 0);
 			}
 			else {
-				snprintf(line, 256, "Host: %s:%d\r\n", host, port); ::send(sockfd, line, strlen(line), 0);
+				snprintf(line, 256, "Host: %s:%d\r\n", host, port); ::send(sockfd, line, (int)strlen(line), 0);
 			}
-			snprintf(line, 256, "Upgrade: websocket\r\n"); ::send(sockfd, line, strlen(line), 0);
-			snprintf(line, 256, "Connection: Upgrade\r\n"); ::send(sockfd, line, strlen(line), 0);
+			snprintf(line, 256, "Upgrade: websocket\r\n"); ::send(sockfd, line, (int)strlen(line), 0);
+			snprintf(line, 256, "Connection: Upgrade\r\n"); ::send(sockfd, line, (int)strlen(line), 0);
 			if (!origin.empty()) {
-				snprintf(line, 256, "Origin: %s\r\n", origin.c_str()); ::send(sockfd, line, strlen(line), 0);
+				snprintf(line, 256, "Origin: %s\r\n", origin.c_str()); ::send(sockfd, line, (int)strlen(line), 0);
 			}
-			snprintf(line, 256, "Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==\r\n"); ::send(sockfd, line, strlen(line), 0);
-			snprintf(line, 256, "Sec-WebSocket-Version: 13\r\n"); ::send(sockfd, line, strlen(line), 0);
-			snprintf(line, 256, "\r\n"); ::send(sockfd, line, strlen(line), 0);
+			snprintf(line, 256, "Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==\r\n"); ::send(sockfd, line,(int) strlen(line), 0);
+			snprintf(line, 256, "Sec-WebSocket-Version: 13\r\n"); ::send(sockfd, line,(int) strlen(line), 0);
+			snprintf(line, 256, "\r\n"); ::send(sockfd, line, (int)strlen(line), 0);
 			for (i = 0; i < 2 || (i < 255 && line[i - 2] != '\r' && line[i - 1] != '\n'); ++i)
 			{
 				if (recv(sockfd, line + i, 1, 0) == 0)

@@ -1,4 +1,4 @@
-//Copyright bHaptics Inc. 2017
+//Copyright bHaptics Inc. 2017-2019
 #include "util.h"
 
 #include <fstream>

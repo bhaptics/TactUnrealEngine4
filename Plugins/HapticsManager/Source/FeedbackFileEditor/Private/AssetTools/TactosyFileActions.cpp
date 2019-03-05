@@ -1,13 +1,9 @@
-//Copyright bHaptics Inc. 2018
-
-#if (ENGINE_MINOR_VERSION < 16)
-//#include "FeedbackFileEditor.h"
-#endif
+//Copyright bHaptics Inc. 2017-2019
 
 #include "TactosyFileActions.h"
 
 #include "Framework/MultiBox/MultiBoxBuilder.h"
-#include "TactosyFeedbackFile.h"
+#include "Feedback/TactosyFeedbackFile.h"
 #include "Styling/SlateStyle.h"
 
 
@@ -35,7 +31,7 @@ UClass * FTactosyFileActions::GetSupportedClass() const
 
 FColor FTactosyFileActions::GetTypeColor() const
 {
-	return FColor::Green;
+	return FColor::Yellow;
 }
 
 bool FTactosyFileActions::CanFilter()

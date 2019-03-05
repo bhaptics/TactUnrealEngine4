@@ -1,8 +1,10 @@
 // Copyright 1998-2016 Epic Games, Inc. All Rights Reserved.
 
 #pragma once
-#include "Engine.h"
-#include "ModuleManager.h"
+#include "CoreMinimal.h"
+#include "Modules/ModuleManager.h"
+#include "Styling/SlateStyle.h"
+#include "EditorStyle.h"
 
 class FFeedbackFileEditorModule : public IModuleInterface
 {
@@ -14,5 +16,4 @@ public:
 	virtual void StartupModule() override;
 	virtual void ShutdownModule() override;
 
-	TArray<TSharedRef<IAssetTypeActions>> RegisteredAssetTypeActions;
 };

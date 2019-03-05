@@ -7,6 +7,8 @@
 #include "model.h"
 #include <vector>
 
+DLLIMPORT const char* getExePath();
+
 // Initialises a connection to the bHaptics Player. Should only be called once: when the game starts.
 DLLIMPORT void Initialise();
 

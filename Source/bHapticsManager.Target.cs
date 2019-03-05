@@ -1,14 +1,15 @@
-//Copyright bHaptics Inc. 2017
+//Copyright bHaptics Inc. 2017-2019
 
 using UnrealBuildTool;
 using System.Collections.Generic;
 
 public class bHapticsManagerTarget : TargetRules
 {
-	public bHapticsManagerTarget(TargetInfo Target)
+	public bHapticsManagerTarget(TargetInfo Target): base(Target)
 	{
 		Type = TargetType.Game;
-        UEBuildConfiguration.bForceEnableExceptions = true;
+        //UEBuildConfiguration.bForceEnableExceptions = true;
+        ExtraModuleNames.AddRange(new string[] { "bHapticsManager" });
     }
 
     //

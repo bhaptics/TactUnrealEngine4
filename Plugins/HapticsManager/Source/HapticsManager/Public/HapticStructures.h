@@ -1,4 +1,4 @@
-//Copyright bHaptics Inc. 2017
+//Copyright bHaptics Inc. 2017-2019
 
 #pragma once
 #include "Engine.h"
@@ -7,9 +7,9 @@
 UENUM(BlueprintType)
 enum class EPosition : uint8
 {
+	Default = 0 UMETA(Hidden),
 	Left = 1, Right = 2,
 	Head = 4,
-	
 	HandL = 6, HandR = 7,
 	FootL = 8, FootR = 9,
 	ForearmL = 10, ForearmR = 11,

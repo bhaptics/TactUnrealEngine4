@@ -1,6 +1,5 @@
 ﻿// Copyright 1998-2016 Epic Games, Inc. All Rights Reserved.
 
-//#define VERSION_BELOW_16
 
 using System;
 using System.IO;
@@ -8,14 +7,9 @@ using UnrealBuildTool;
 
 public class FeedbackFileEditor : ModuleRules
 {
-#if VERSION_BELOW_16
-    public FeedbackFileEditor(TargetInfo Target)
-    {
-#else
     public FeedbackFileEditor(ReadOnlyTargetRules Target) : base (Target)
 	{
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
-#endif
 
         PrivateIncludePaths.AddRange(
 			new string[] {
@@ -47,7 +41,8 @@ public class FeedbackFileEditor : ModuleRules
                 "JsonUtilities",
                 "Projects",
                 "InputCore",
-                "HapticsManager"
+                "HapticsManager",
+                "EditorStyle"
                 //"Sockets",
 				// ... add private dependencies that you statically link with here ...	
 			}

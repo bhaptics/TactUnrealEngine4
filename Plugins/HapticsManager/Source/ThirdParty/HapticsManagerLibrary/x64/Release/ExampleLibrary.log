@@ -1,29 +1,11 @@
 ﻿  easywsclient.cpp
-d:\bhapticsmanager\bhapticsrelease - gitlab\plugins\hapticsmanager\source\thirdparty\hapticsmanagerlibrary\easywsclient.cpp(98): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
-d:\bhapticsmanager\bhapticsrelease - gitlab\plugins\hapticsmanager\source\thirdparty\hapticsmanagerlibrary\easywsclient.cpp(185): warning C4244: 'argument': conversion from 'socket_t' to 'int', possible loss of data
-d:\bhapticsmanager\bhapticsrelease - gitlab\plugins\hapticsmanager\source\thirdparty\hapticsmanagerlibrary\easywsclient.cpp(189): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
-d:\bhapticsmanager\bhapticsrelease - gitlab\plugins\hapticsmanager\source\thirdparty\hapticsmanagerlibrary\easywsclient.cpp(210): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
-d:\bhapticsmanager\bhapticsrelease - gitlab\plugins\hapticsmanager\source\thirdparty\hapticsmanagerlibrary\easywsclient.cpp(500): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
-d:\bhapticsmanager\bhapticsrelease - gitlab\plugins\hapticsmanager\source\thirdparty\hapticsmanagerlibrary\easywsclient.cpp(502): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
-d:\bhapticsmanager\bhapticsrelease - gitlab\plugins\hapticsmanager\source\thirdparty\hapticsmanagerlibrary\easywsclient.cpp(505): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
-d:\bhapticsmanager\bhapticsrelease - gitlab\plugins\hapticsmanager\source\thirdparty\hapticsmanagerlibrary\easywsclient.cpp(507): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
-d:\bhapticsmanager\bhapticsrelease - gitlab\plugins\hapticsmanager\source\thirdparty\hapticsmanagerlibrary\easywsclient.cpp(508): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
-d:\bhapticsmanager\bhapticsrelease - gitlab\plugins\hapticsmanager\source\thirdparty\hapticsmanagerlibrary\easywsclient.cpp(510): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
-d:\bhapticsmanager\bhapticsrelease - gitlab\plugins\hapticsmanager\source\thirdparty\hapticsmanagerlibrary\easywsclient.cpp(512): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
-d:\bhapticsmanager\bhapticsrelease - gitlab\plugins\hapticsmanager\source\thirdparty\hapticsmanagerlibrary\easywsclient.cpp(513): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
-d:\bhapticsmanager\bhapticsrelease - gitlab\plugins\hapticsmanager\source\thirdparty\hapticsmanagerlibrary\easywsclient.cpp(514): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
   HapticLibrary.cpp
   hapticsManager.cpp
   timer.cpp
-d:\bhapticsmanager\bhapticsrelease - gitlab\plugins\hapticsmanager\source\thirdparty\hapticsmanagerlibrary\timer.cpp(37): warning C4244: 'initializing': conversion from '_Rep' to 'int', possible loss of data
-          with
-          [
-              _Rep=__int64
-          ]
   util.cpp
      Creating library D:\bHapticsManager\bHapticsRelease - Gitlab\Plugins\HapticsManager\Source\ThirdParty\HapticsManagerLibrary\x64\Release\HapticLibrary.lib and object D:\bHapticsManager\bHapticsRelease - Gitlab\Plugins\HapticsManager\Source\ThirdParty\HapticsManagerLibrary\x64\Release\HapticLibrary.exp
   Generating code
-  All 2405 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  All 2450 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
   Finished generating code
   ExampleLibrary.vcxproj -> D:\bHapticsManager\bHapticsRelease - Gitlab\Plugins\HapticsManager\Source\ThirdParty\HapticsManagerLibrary\x64\Release\HapticLibrary.dll
           1 file(s) copied.

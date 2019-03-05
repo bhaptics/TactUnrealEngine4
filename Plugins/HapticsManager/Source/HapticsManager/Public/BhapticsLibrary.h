@@ -1,10 +1,6 @@
-//Copyright bHaptics Inc. 2018
+//Copyright bHaptics Inc. 2017-2019
 
 #pragma once
-
-#if(ENGINE_MINOR_VERSION >= 16)
-#include "CoreMinimal.h"
-#endif
 
 #include "HapticStructures.h"
 #include "Engine/Engine.h"
@@ -48,9 +44,14 @@ public:
 	static void Lib_ToggleFeedback();
 
 	static bool Lib_IsDevicePlaying(EPosition Pos);
+	
+	static void SetLibraryLoaded();
 
 	static TArray<FHapticFeedback> Lib_GetResponseStatus();
 
 private:
+	static bool IsLoaded;
 	static bool IsInitialised;
+	static FProcHandle Handle;
+	static bool Success;
 };

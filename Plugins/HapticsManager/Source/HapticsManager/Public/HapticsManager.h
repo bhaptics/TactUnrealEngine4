@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "ModuleManager.h"
+#include "Modules/ModuleManager.h"
 
 class FHapticsManagerModule : public IModuleInterface
 {
@@ -15,4 +15,5 @@ public:
 private:
 	/** Handle to the test dll we will load */
 	void*	HapticLibraryHandle;
+
 };
