@@ -4,14 +4,11 @@ using UnrealBuildTool;
 
 public class bHapticsManager : ModuleRules
 {
-#if VERSION_BELOW_16
-    public bHapticsManager(TargetInfo Target)
-    {
-#else
     public bHapticsManager(ReadOnlyTargetRules Target) : base(Target)
     {
-#endif
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore" });
+        PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
+
+        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 

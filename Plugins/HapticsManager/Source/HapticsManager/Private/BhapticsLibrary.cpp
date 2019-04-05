@@ -6,7 +6,7 @@
 #include "Misc/FileHelper.h"
 #include "Core/Public/Misc/Paths.h"
 
-#include "ThirdParty/HapticsManagerLibrary/HapticLibrary.h"
+#include "HapticLibrary/HapticLibrary.h"
 
 #include "HapticsManager.h"
 
@@ -101,7 +101,7 @@ bool BhapticsLibrary::InitialiseConnection()
 		else
 		{
 			UE_LOG(LogTemp, Log, TEXT("Player is not Installed"));
-			return false;
+			//return false;
 		}
 
 	}
@@ -135,7 +135,7 @@ void BhapticsLibrary::Lib_RegisterFeedback(FString Key, FString ProjectJson)
 	}
 	std::string StandardKey(TCHAR_TO_UTF8(*Key));
 	std::string ProjectString = (TCHAR_TO_UTF8(*ProjectJson));
-	RegisterFeedback(StandardKey, ProjectString);
+	RegisterFeedback(StandardKey.c_str(), ProjectString.c_str());
 }
 
 void BhapticsLibrary::Lib_SubmitRegistered(FString Key)
@@ -145,7 +145,7 @@ void BhapticsLibrary::Lib_SubmitRegistered(FString Key)
 		return;
 	}
 	std::string StandardKey(TCHAR_TO_UTF8(*Key));
-	SubmitRegistered(StandardKey);
+	SubmitRegistered(StandardKey.c_str());
 }
 
 void BhapticsLibrary::Lib_SubmitRegistered(FString Key, FString AltKey, FScaleOption ScaleOpt, FRotationOption RotOption)
@@ -163,7 +163,7 @@ void BhapticsLibrary::Lib_SubmitRegistered(FString Key, FString AltKey, FScaleOp
 
 	Option.Intensity = ScaleOpt.Intensity;
 	Option.Duration = ScaleOpt.Duration;
-	SubmitRegisteredAlt(StandardKey, StandardAltKey, Option, RotateOption);
+	SubmitRegisteredAlt(StandardKey.c_str(), StandardAltKey.c_str(), Option, RotateOption);
 }
 
 void BhapticsLibrary::Lib_Submit(FString Key, EPosition Pos, TArray<uint8> MotorBytes, int DurationMillis)
@@ -172,43 +172,44 @@ void BhapticsLibrary::Lib_Submit(FString Key, EPosition Pos, TArray<uint8> Motor
 	{
 		return;
 	}
-	bhaptics::Position HapticPosition = bhaptics::Position::All;
+
+	bhaptics::PositionType HapticPosition = bhaptics::PositionType::All;
 	std::string StandardKey(TCHAR_TO_UTF8(*Key));
 
 	switch (Pos)
 	{
 	case EPosition::Left:
-		HapticPosition = bhaptics::Position::Left;
+		HapticPosition = bhaptics::PositionType::Left;
 		break;
 	case EPosition::Right:
-		HapticPosition = bhaptics::Position::Right;
+		HapticPosition = bhaptics::PositionType::Right;
 		break;
 	case EPosition::Head:
-		HapticPosition = bhaptics::Position::Head;
+		HapticPosition = bhaptics::PositionType::Head;
 		break;
 	case EPosition::VestFront:
-		HapticPosition = bhaptics::Position::VestFront;
+		HapticPosition = bhaptics::PositionType::VestFront;
 		break;
 	case EPosition::VestBack:
-		HapticPosition = bhaptics::Position::VestBack;
+		HapticPosition = bhaptics::PositionType::VestBack;
 		break;
 	case EPosition::HandL:
-		HapticPosition = bhaptics::Position::HandL;
+		HapticPosition = bhaptics::PositionType::HandL;
 		break;
 	case EPosition::HandR:
-		HapticPosition = bhaptics::Position::HandR;
+		HapticPosition = bhaptics::PositionType::HandR;
 		break;
 	case EPosition::FootL:
-		HapticPosition = bhaptics::Position::FootL;
+		HapticPosition = bhaptics::PositionType::FootL;
 		break;
 	case EPosition::FootR:
-		HapticPosition = bhaptics::Position::FootR;
+		HapticPosition = bhaptics::PositionType::FootR;
 		break;
 	case EPosition::ForearmL:
-		HapticPosition = bhaptics::Position::ForearmL;
+		HapticPosition = bhaptics::PositionType::ForearmL;
 		break;
 	case EPosition::ForearmR:
-		HapticPosition = bhaptics::Position::ForearmR;
+		HapticPosition = bhaptics::PositionType::ForearmR;
 		break;
 	default:
 		break;
@@ -227,7 +228,7 @@ void BhapticsLibrary::Lib_Submit(FString Key, EPosition Pos, TArray<uint8> Motor
 		SubmittedDots[i] = MotorBytes[i];
 	}
 
-	Submit(StandardKey, HapticPosition, SubmittedDots, DurationMillis);
+	Submit(StandardKey.c_str(), HapticPosition, SubmittedDots, DurationMillis);
 }
 
 void BhapticsLibrary::Lib_Submit(FString Key, EPosition Pos, TArray<FDotPoint> Points, int DurationMillis)
@@ -236,42 +237,42 @@ void BhapticsLibrary::Lib_Submit(FString Key, EPosition Pos, TArray<FDotPoint> P
 	{
 		return;
 	}
-	bhaptics::Position HapticPosition = bhaptics::Position::All;
+	bhaptics::PositionType HapticPosition = bhaptics::PositionType::All;
 	std::string StandardKey(TCHAR_TO_UTF8(*Key));
 	switch (Pos)
 	{
 	case EPosition::Left:
-		HapticPosition = bhaptics::Position::Left;
+		HapticPosition = bhaptics::PositionType::Left;
 		break;
 	case EPosition::Right:
-		HapticPosition = bhaptics::Position::Right;
+		HapticPosition = bhaptics::PositionType::Right;
 		break;
 	case EPosition::Head:
-		HapticPosition = bhaptics::Position::Head;
+		HapticPosition = bhaptics::PositionType::Head;
 		break;
 	case EPosition::VestFront:
-		HapticPosition = bhaptics::Position::VestFront;
+		HapticPosition = bhaptics::PositionType::VestFront;
 		break;
 	case EPosition::VestBack:
-		HapticPosition = bhaptics::Position::VestBack;
+		HapticPosition = bhaptics::PositionType::VestBack;
 		break;
 	case EPosition::HandL:
-		HapticPosition = bhaptics::Position::HandL;
+		HapticPosition = bhaptics::PositionType::HandL;
 		break;
 	case EPosition::HandR:
-		HapticPosition = bhaptics::Position::HandR;
+		HapticPosition = bhaptics::PositionType::HandR;
 		break;
 	case EPosition::FootL:
-		HapticPosition = bhaptics::Position::FootL;
+		HapticPosition = bhaptics::PositionType::FootL;
 		break;
 	case EPosition::FootR:
-		HapticPosition = bhaptics::Position::FootR;
+		HapticPosition = bhaptics::PositionType::FootR;
 		break;
 	case EPosition::ForearmL:
-		HapticPosition = bhaptics::Position::ForearmL;
+		HapticPosition = bhaptics::PositionType::ForearmL;
 		break;
 	case EPosition::ForearmR:
-		HapticPosition = bhaptics::Position::ForearmR;
+		HapticPosition = bhaptics::PositionType::ForearmR;
 		break;
 	default:
 		break;
@@ -284,7 +285,7 @@ void BhapticsLibrary::Lib_Submit(FString Key, EPosition Pos, TArray<FDotPoint> P
 		SubmittedDots.push_back(bhaptics::DotPoint(Points[i].Index, Points[i].Intensity));
 	}
 
-	SubmitDot(StandardKey, HapticPosition, SubmittedDots, DurationMillis);
+	SubmitDot(StandardKey.c_str(), HapticPosition, SubmittedDots, DurationMillis);
 }
 
 void BhapticsLibrary::Lib_Submit(FString Key, EPosition Pos, TArray<FPathPoint> Points, int DurationMillis)
@@ -293,42 +294,42 @@ void BhapticsLibrary::Lib_Submit(FString Key, EPosition Pos, TArray<FPathPoint> 
 	{
 		return;
 	}
-	bhaptics::Position HapticPosition = bhaptics::Position::All;
+	bhaptics::PositionType HapticPosition = bhaptics::PositionType::All;
 	std::string StandardKey(TCHAR_TO_UTF8(*Key));
 	switch (Pos)
 	{
 	case EPosition::Left:
-		HapticPosition = bhaptics::Position::Left;
+		HapticPosition = bhaptics::PositionType::Left;
 		break;
 	case EPosition::Right:
-		HapticPosition = bhaptics::Position::Right;
+		HapticPosition = bhaptics::PositionType::Right;
 		break;
 	case EPosition::Head:
-		HapticPosition = bhaptics::Position::Head;
+		HapticPosition = bhaptics::PositionType::Head;
 		break;
 	case EPosition::VestFront:
-		HapticPosition = bhaptics::Position::VestFront;
+		HapticPosition = bhaptics::PositionType::VestFront;
 		break;
 	case EPosition::VestBack:
-		HapticPosition = bhaptics::Position::VestBack;
+		HapticPosition = bhaptics::PositionType::VestBack;
 		break;
 	case EPosition::HandL:
-		HapticPosition = bhaptics::Position::HandL;
+		HapticPosition = bhaptics::PositionType::HandL;
 		break;
 	case EPosition::HandR:
-		HapticPosition = bhaptics::Position::HandR;
+		HapticPosition = bhaptics::PositionType::HandR;
 		break;
 	case EPosition::FootL:
-		HapticPosition = bhaptics::Position::FootL;
+		HapticPosition = bhaptics::PositionType::FootL;
 		break;
 	case EPosition::FootR:
-		HapticPosition = bhaptics::Position::FootR;
+		HapticPosition = bhaptics::PositionType::FootR;
 		break;
 	case EPosition::ForearmL:
-		HapticPosition = bhaptics::Position::ForearmL;
+		HapticPosition = bhaptics::PositionType::ForearmL;
 		break;
 	case EPosition::ForearmR:
-		HapticPosition = bhaptics::Position::ForearmR;
+		HapticPosition = bhaptics::PositionType::ForearmR;
 		break;
 	default:
 		break;
@@ -344,7 +345,7 @@ void BhapticsLibrary::Lib_Submit(FString Key, EPosition Pos, TArray<FPathPoint> 
 		PathVector.push_back(Point);
 	}
 
-	SubmitPath(StandardKey, HapticPosition, PathVector, DurationMillis);
+	SubmitPath(StandardKey.c_str(), HapticPosition, PathVector, DurationMillis);
 }
 
 bool BhapticsLibrary::Lib_IsFeedbackRegistered(FString key)
@@ -355,7 +356,7 @@ bool BhapticsLibrary::Lib_IsFeedbackRegistered(FString key)
 	}
 	std::string StandardKey(TCHAR_TO_UTF8(*key));
 	bool Value = false;
-	Value = IsFeedbackRegistered(StandardKey);
+	Value = IsFeedbackRegistered(StandardKey.c_str());
 	return Value;
 }
 
@@ -378,7 +379,7 @@ bool BhapticsLibrary::Lib_IsPlaying(FString Key)
 	}
 	std::string StandardKey(TCHAR_TO_UTF8(*Key));
 	bool Value = false;
-	Value = IsPlayingKey(StandardKey);
+	Value = IsPlayingKey(StandardKey.c_str());
 	return Value;
 }
 
@@ -398,7 +399,7 @@ void BhapticsLibrary::Lib_TurnOff(FString Key)
 		return;
 	}
 	std::string StandardKey(TCHAR_TO_UTF8(*Key));
-	TurnOffKey(StandardKey);
+	TurnOffKey(StandardKey.c_str());
 }
 
 void BhapticsLibrary::Lib_EnableFeedback()
@@ -434,42 +435,42 @@ bool BhapticsLibrary::Lib_IsDevicePlaying(EPosition Pos)
 	{
 		return false;
 	}
-	bhaptics::Position device = bhaptics::Position::All;
+	bhaptics::PositionType device = bhaptics::PositionType::All;
 
 	switch (Pos)
 	{
 	case EPosition::Left:
-		device = bhaptics::Position::Left;
+		device = bhaptics::PositionType::Left;
 		break;
 	case EPosition::Right:
-		device = bhaptics::Position::Right;
+		device = bhaptics::PositionType::Right;
 		break;
 	case EPosition::Head:
-		device = bhaptics::Position::Head;
+		device = bhaptics::PositionType::Head;
 		break;
 	case EPosition::HandL:
-		device = bhaptics::Position::HandL;
+		device = bhaptics::PositionType::HandL;
 		break;
 	case EPosition::HandR:
-		device = bhaptics::Position::HandR;
+		device = bhaptics::PositionType::HandR;
 		break;
 	case EPosition::FootL:
-		device = bhaptics::Position::FootL;
+		device = bhaptics::PositionType::FootL;
 		break;
 	case EPosition::FootR:
-		device = bhaptics::Position::FootR;
+		device = bhaptics::PositionType::FootR;
 		break;
 	case EPosition::ForearmL:
-		device = bhaptics::Position::ForearmL;
+		device = bhaptics::PositionType::ForearmL;
 		break;
 	case EPosition::ForearmR:
-		device = bhaptics::Position::ForearmR;
+		device = bhaptics::PositionType::ForearmR;
 		break;
 	case EPosition::VestFront:
-		device = bhaptics::Position::Vest;
+		device = bhaptics::PositionType::Vest;
 		break;
 	case EPosition::VestBack:
-		device = bhaptics::Position::Vest;
+		device = bhaptics::PositionType::Vest;
 		break;
 	default:
 		return false;
@@ -496,7 +497,7 @@ TArray<FHapticFeedback> BhapticsLibrary::Lib_GetResponseStatus()
 	{
 		std::vector<int> values;
 		values.resize(20);
-		GetResponseForPosition(values, Positions[i]);
+		GetResponseForPosition(values, Positions[i].c_str());
 		TArray<uint8> val;
 		for (size_t j = 0; j < values.size(); j++)
 		{
