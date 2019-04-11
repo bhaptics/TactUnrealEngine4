@@ -83,7 +83,7 @@ bool BhapticsLibrary::InitialiseConnection()
 		if (!ExePath.IsEmpty() && FPaths::FileExists(ExePath))
 		{
 			FString ExeName = FPaths::GetBaseFilename(ExePath);
-			UE_LOG(LogTemp, Log, TEXT("Exelocated: %s. %s"), *ExePath, *ExeName);
+			UE_LOG(LogTemp, Log, TEXT("Exelocated: %s."), *ExePath);
 			UE_LOG(LogTemp, Log, TEXT("Player is installed"));
 
 			if (!FPlatformProcess::IsApplicationRunning(*ExeName) && bLaunch)
@@ -101,7 +101,7 @@ bool BhapticsLibrary::InitialiseConnection()
 		else
 		{
 			UE_LOG(LogTemp, Log, TEXT("Player is not Installed"));
-			//return false;
+			return false;
 		}
 
 	}
@@ -489,7 +489,10 @@ TArray<FHapticFeedback> BhapticsLibrary::Lib_GetResponseStatus()
 	{
 		return ChangedFeedbacks;
 	}
-	std::string Positions [] = {"ForearmL","ForearmR","Head", "VestFront", "VestBack", "HandL", "HandR", "FootL", "FootR"};
+	//std::string Positions [] = {"ForearmL","ForearmR","Head", "VestFront", "VestBack", "HandL", "HandR", "FootL", "FootR"};
+	bhaptics::PositionType Positions [] =
+		{ bhaptics::PositionType::ForearmL,bhaptics::PositionType::ForearmR,bhaptics::PositionType::Head, bhaptics::PositionType::VestFront,bhaptics::PositionType::VestBack,
+		bhaptics::PositionType::HandL, bhaptics::PositionType::HandR, bhaptics::PositionType::FootL, bhaptics::PositionType::FootR };
 	TArray<EPosition> PositionEnum =
 		{ EPosition::ForearmL,EPosition::ForearmR,EPosition::Head, EPosition::VestFront,EPosition::VestBack,EPosition::HandL, EPosition::HandR, EPosition::FootL, EPosition::FootR };
 
@@ -497,11 +500,13 @@ TArray<FHapticFeedback> BhapticsLibrary::Lib_GetResponseStatus()
 	{
 		std::vector<int> values;
 		values.resize(20);
-		GetResponseForPosition(values, Positions[i].c_str());
+		status stat;
+		//bool res = TryGetResponseForPosition(values, Positions[i].c_str());
+		bool res = TryGetResponseForPosition(Positions[i],stat);
 		TArray<uint8> val;
 		for (size_t j = 0; j < values.size(); j++)
 		{
-			val.Add(values[j]);
+			val.Add(stat.values[j]);
 		}
 
 		FHapticFeedback Feedback = FHapticFeedback(PositionEnum[i], val, EFeedbackMode::DOT_MODE);

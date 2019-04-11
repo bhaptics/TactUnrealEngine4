@@ -42,9 +42,10 @@ struct point {
     int motorCount;
 };
 
+struct status {
+    int values[20];
+};
 
-DLL_PUBLIC void submit(const char* key, bhaptics::PositionType Pos, unsigned char* buf, size_t length, int durationMillis);
-DLL_PUBLIC void submitPath(const char* key, bhaptics::PositionType Pos, point* points, size_t length, int durationMillis);
 
 DLL_PUBLIC const char* getExePath();
 
@@ -61,6 +62,8 @@ DLL_PUBLIC void RegisterFeedback(const char* key, const char* projectJson);
 
 DLL_PUBLIC void RegisterFeedbackFromTactFile(const char* key, const char* tactFileStr);
 
+DLL_PUBLIC void RegisterFeedbackFromTactFileReflected(const char* key, const char* tactFileStr);
+
 // Register a preset .tact feedback file, created using the bHaptics Designer.
 // Registered files can then be called and played back using the given key.
 // File Path is given, and feedback file is parsed and processed by the SDK.
@@ -76,6 +79,12 @@ DLL_PUBLIC void SubmitRegistered(const char* key);
 DLL_PUBLIC void SubmitRegisteredAlt(const char* Key, const char* AltKey, bhaptics::ScaleOption ScaleOpt, bhaptics::RotationOption RotOption);
 
 DLL_PUBLIC void SubmitRegisteredWithOption(const char* Key, const char* AltKey, float intensity, float duration, float offsetAngleX, float offsetAngleY);
+
+DLL_PUBLIC void SubmitByteArray(const char *key, bhaptics::PositionType Pos, unsigned char *buf, size_t length,
+                                int durationMillis);
+
+DLL_PUBLIC void SubmitPathArray(const char *key, bhaptics::PositionType Pos, point *points, size_t length,
+                                int durationMillis);
 
 // Submit an array of 20 integers, representing the strength of each motor vibration, ranging from 0 to 100.
 // Specify the Position (playback device) as well as the duration of the feedback effect in milliseconds.
@@ -119,11 +128,12 @@ DLL_PUBLIC bool IsDevicePlaying(bhaptics::PositionType Pos);
 
 // Returns an array of the current status of each device.
 // Used for UI to ensure that haptic feedback is playing.
-DLL_PUBLIC void GetResponseStatus(std::vector<bhaptics::HapticFeedback>& retValues);
+//DLL_PUBLIC void GetResponseStatus(std::vector<bhaptics::HapticFeedback>& retValues);
 
 // Returns the current motor values for a given device.
 // Used for UI to ensure that haptic feedback is playing.
-DLL_PUBLIC void GetResponseForPosition(std::vector<int>& retValues, const char* pos);
+// return value is 20
+DLL_PUBLIC bool TryGetResponseForPosition(bhaptics::PositionType Pos, status& s);
 
 #ifdef __cplusplus
 }
