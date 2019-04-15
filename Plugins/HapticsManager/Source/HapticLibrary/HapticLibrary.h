@@ -3,7 +3,7 @@
 
 
 #if defined _WIN32 || defined __CYGWIN__
-#ifdef BUILDING_DLL
+#ifdef BHAPTICS_BUILDING_DLL
 #ifdef __GNUC__
       #define DLL_PUBLIC __attribute__ ((dllexport))
     #else
@@ -46,8 +46,11 @@ struct status {
     int values[20];
 };
 
+DLL_PUBLIC void ChangeUrl(const char* url);
 
-DLL_PUBLIC const char* getExePath();
+DLL_PUBLIC bool TryGetExePath(char* buf, int& size);
+
+DLL_PUBLIC const char* GetExePath();
 
 // Initialises a connection to the bHaptics Player. Should only be called once: when the game starts.
 DLL_PUBLIC void Initialise();

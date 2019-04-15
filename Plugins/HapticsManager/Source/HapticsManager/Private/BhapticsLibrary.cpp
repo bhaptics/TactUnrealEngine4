@@ -78,30 +78,40 @@ bool BhapticsLibrary::InitialiseConnection()
 	else
 	{
 		//FString ExePath(BhapticsUtilities::GetExecutablePath());
-		FString ExePath(getExePath());
-
-		if (!ExePath.IsEmpty() && FPaths::FileExists(ExePath))
+		char Path [100];
+		int Size = 0;
+		bool Result = TryGetExePath(Path, Size);
+		FString ExePath(Path);
+		if (Result)
 		{
-			FString ExeName = FPaths::GetBaseFilename(ExePath);
-			UE_LOG(LogTemp, Log, TEXT("Exelocated: %s."), *ExePath);
-			UE_LOG(LogTemp, Log, TEXT("Player is installed"));
-
-			if (!FPlatformProcess::IsApplicationRunning(*ExeName) && bLaunch)
+			if (!ExePath.IsEmpty() && FPaths::FileExists(ExePath))
 			{
-				UE_LOG(LogTemp, Log, TEXT("Player is not running - launching"));
+				FString ExeName = FPaths::GetBaseFilename(ExePath);
+				UE_LOG(LogTemp, Log, TEXT("Exelocated: %s."), *ExePath);
+				UE_LOG(LogTemp, Log, TEXT("Player is installed"));
 
-				Handle = FPlatformProcess::CreateProc(*ExePath, nullptr, true, true, false, nullptr, 0, nullptr, nullptr);
+				if (!FPlatformProcess::IsApplicationRunning(*ExeName) && bLaunch)
+				{
+					UE_LOG(LogTemp, Log, TEXT("Player is not running - launching"));
 
+					Handle = FPlatformProcess::CreateProc(*ExePath, nullptr, true, true, false, nullptr, 0, nullptr, nullptr);
+
+				}
+				else
+				{
+					UE_LOG(LogTemp, Log, TEXT("Player is running"));
+				}
 			}
 			else
 			{
-				UE_LOG(LogTemp, Log, TEXT("Player is running"));
+				UE_LOG(LogTemp, Log, TEXT("Player is not Installed"));
+				return false;
 			}
+			
 		}
 		else
 		{
-			UE_LOG(LogTemp, Log, TEXT("Player is not Installed"));
-			return false;
+			UE_LOG(LogTemp, Log, TEXT("Registry check failed - Initialising"));
 		}
 
 	}
@@ -490,23 +500,24 @@ TArray<FHapticFeedback> BhapticsLibrary::Lib_GetResponseStatus()
 		return ChangedFeedbacks;
 	}
 	//std::string Positions [] = {"ForearmL","ForearmR","Head", "VestFront", "VestBack", "HandL", "HandR", "FootL", "FootR"};
-	bhaptics::PositionType Positions [] =
+	TArray<bhaptics::PositionType> Positions =
 		{ bhaptics::PositionType::ForearmL,bhaptics::PositionType::ForearmR,bhaptics::PositionType::Head, bhaptics::PositionType::VestFront,bhaptics::PositionType::VestBack,
 		bhaptics::PositionType::HandL, bhaptics::PositionType::HandR, bhaptics::PositionType::FootL, bhaptics::PositionType::FootR };
 	TArray<EPosition> PositionEnum =
 		{ EPosition::ForearmL,EPosition::ForearmR,EPosition::Head, EPosition::VestFront,EPosition::VestBack,EPosition::HandL, EPosition::HandR, EPosition::FootL, EPosition::FootR };
 
-	for (int i = 0; i < 9; i++)
+	for (int i = 0; i < Positions.Num(); i++)
 	{
-		std::vector<int> values;
-		values.resize(20);
 		status stat;
-		//bool res = TryGetResponseForPosition(values, Positions[i].c_str());
-		bool res = TryGetResponseForPosition(Positions[i],stat);
+		bool res = TryGetResponseForPosition(Positions[i], stat);
 		TArray<uint8> val;
-		for (size_t j = 0; j < values.size(); j++)
+		val.Init(0, 20);
+		if (res)
 		{
-			val.Add(stat.values[j]);
+			for (int j = 0; j < val.Num(); j++)
+			{
+				val[j] = stat.values[j];
+			}
 		}
 
 		FHapticFeedback Feedback = FHapticFeedback(PositionEnum[i], val, EFeedbackMode::DOT_MODE);
