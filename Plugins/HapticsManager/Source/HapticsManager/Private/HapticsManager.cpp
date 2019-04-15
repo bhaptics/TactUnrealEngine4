@@ -16,12 +16,12 @@ void FHapticsManagerModule::StartupModule()
 	FString LibraryPath;
 #if PLATFORM_WINDOWS
 #if PLATFORM_32BITS
-	LibraryPath = FPaths::Combine(*BaseDir, TEXT("DLLs/x86/HapticLibrary.dll"));
+	LibraryPath = FPaths::Combine(*BaseDir, TEXT("DLLs/win32/haptic_library.dll"));
 #else
-	LibraryPath = FPaths::Combine(*BaseDir, TEXT("DLLs/HapticLibrary.dll"));
+	LibraryPath = FPaths::Combine(*BaseDir, TEXT("DLLs/win64/haptic_library.dll"));
 #endif
 #elif PLATFORM_MAC
-	LibraryPath = FPaths::Combine(*BaseDir, TEXT("Source/ThirdParty/HapticsManagerLibrary/Mac/Release/libExampleLibrary.dylib"));
+	//LibraryPath = FPaths::Combine(*BaseDir, TEXT("Source/ThirdParty/HapticsManagerLibrary/Mac/Release/libExampleLibrary.dylib"));
 #endif // PLATFORM_WINDOWS
 
 	HapticLibraryHandle = !LibraryPath.IsEmpty() ? FPlatformProcess::GetDllHandle(*LibraryPath) : nullptr;

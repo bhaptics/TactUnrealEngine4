@@ -47,7 +47,7 @@ public class HapticsManager : ModuleRules
                 "JsonUtilities",
                 "Projects",
                 "InputCore",
-                "HapticsManagerLibrary",
+                "HapticLibrary"
                 //"Sockets",
 				// ... add private dependencies that you statically link with here ...	
 			}
@@ -63,11 +63,11 @@ public class HapticsManager : ModuleRules
 
         if (Target.Platform == UnrealTargetPlatform.Win64)
         {
-            RuntimeDependencies.Add(Path.Combine(ModuleDirectory, "../../DLLs/HapticLibrary.dll"));
+            RuntimeDependencies.Add(Path.Combine(ModuleDirectory, "../../DLLs/win64/haptic_library.dll"));
         }
         else if (Target.Platform == UnrealTargetPlatform.Win32)
         {
-            RuntimeDependencies.Add(Path.Combine(ModuleDirectory, "../../DLLs/x86/HapticLibrary.dll"));
+            RuntimeDependencies.Add(Path.Combine(ModuleDirectory, "../../DLLs/win32/haptic_library.dll"));
         }
 
     }
