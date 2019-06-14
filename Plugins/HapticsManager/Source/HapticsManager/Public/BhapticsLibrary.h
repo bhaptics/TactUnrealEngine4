@@ -4,6 +4,7 @@
 
 #include "HapticStructures.h"
 #include "Engine/Engine.h"
+#include "AbstractHapticPlayer.h"
 
 class HAPTICSMANAGER_API BhapticsLibrary
 {
@@ -27,7 +28,7 @@ public:
 
 	static void Lib_Submit(FString Key, EPosition Pos, TArray<FPathPoint> Points, int DurationMillis);
 
-	static bool Lib_IsFeedbackRegistered(FString key);
+	static bool Lib_IsFeedbackRegistered(FString Key);
 
 	static bool Lib_IsPlaying();
 
@@ -51,7 +52,8 @@ public:
 
 private:
 	static bool IsLoaded;
-	static bool IsInitialised;
-	static FProcHandle Handle;
-	static bool Success;
+	//static bool IsInitialised;
+	//static FProcHandle Handle;
+	//static bool Success;
+	static AbstractHapticPlayer* Player;
 };

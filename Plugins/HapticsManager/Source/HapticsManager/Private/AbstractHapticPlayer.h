@@ -1,42 +1,39 @@
 // Copyright bHaptics Inc. 2017-2019
 
 #pragma once
-
+#include "HapticStructures.h"
 #include "CoreMinimal.h"
-#include "UObject/Interface.h"
-#include "AbstractHapticPlayer.generated.h"
-
-// This class does not need to be modified.
-UINTERFACE(MinimalAPI)
-class UAbstractHapticPlayer : public UInterface
-{
-	GENERATED_BODY()
-};
 
 /**
  * 
  */
-class IAbstractHapticPlayer
+class AbstractHapticPlayer
 {
-	GENERATED_BODY()
-
 public:
-	void Initialise();
-	void Destroy();
+	virtual bool Initialise()=0;
+	virtual void Destroy()=0;
 
-	void RegisterFeedback();
-	void SubmitRegistered();
-	void Submit();
-	void TurnOff();
+	virtual void RegisterFeedback(FString Key, FString ProjectJson) =0;
+	virtual void SubmitRegistered(FString Key) = 0;
+	virtual void SubmitRegistered(FString Key, FString AltKey, FScaleOption ScaleOpt, FRotationOption RotOption)=0;
+	virtual void SubmitFeedback(FString Key, EPosition Pos, TArray<uint8> MotorBytes, int DurationMillis)=0;
+	virtual void SubmitFeedback(FString Key, EPosition Pos, TArray<FDotPoint> Points, int DurationMillis)=0;
+	virtual void SubmitFeedback(FString Key, EPosition Pos, TArray<FPathPoint> Points, int DurationMillis)=0;
+	virtual void TurnOff()=0;
+	virtual void TurnOff(FString Key) = 0;
 
-	bool IsRegistered();
-	bool IsPlaying();
-	bool IsDeviceConnected();
 
-	void EnableFeedback();
-	void DisableFeedback();
-	void ToggleFeedback();
+	virtual bool IsRegistered(FString Key)=0;
+	virtual bool IsPlaying()=0;
+	virtual bool IsPlaying(FString Key) = 0;
+	virtual bool IsDeviceConnected(EPosition Pos)=0;
 
-	void startScan();
-	void stopScan();
+	virtual TArray<FHapticFeedback> GetResponseStatus() =0;
+
+	virtual void EnableFeedback()=0;
+	virtual void DisableFeedback()=0;
+	virtual void ToggleFeedback()=0;
+
+	virtual void startScan()=0;
+	virtual void stopScan()=0;
 };
