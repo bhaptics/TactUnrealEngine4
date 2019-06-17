@@ -103,19 +103,19 @@ void HapticPlayer::Destroy()
 	}
 }
 
-void HapticPlayer::RegisterFeedback(FString Key, FString ProjectJson) {
+void HapticPlayer::RegisterFeedbackProject(FString Key, FString ProjectJson) {
 	std::string StandardKey(TCHAR_TO_UTF8(*Key));
 	std::string ProjectString = (TCHAR_TO_UTF8(*ProjectJson));
 	RegisterFeedback(StandardKey.c_str(), ProjectString.c_str());
 }
 
-void HapticPlayer::SubmitRegistered(FString Key)
+void HapticPlayer::SubmitRegisteredFeedback(FString Key)
 {
 	std::string StandardKey(TCHAR_TO_UTF8(*Key));
 	SubmitRegistered(StandardKey.c_str());
 }
 
-void HapticPlayer::SubmitRegistered(FString Key, FString AltKey, FScaleOption ScaleOpt, FRotationOption RotOption)
+void HapticPlayer::SubmitRegisteredFeedback(FString Key, FString AltKey, FScaleOption ScaleOpt, FRotationOption RotOption)
 {
 	std::string StandardKey(TCHAR_TO_UTF8(*Key));
 	std::string StandardAltKey(TCHAR_TO_UTF8(*AltKey));

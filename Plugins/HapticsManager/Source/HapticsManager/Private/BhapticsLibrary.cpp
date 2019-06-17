@@ -61,7 +61,7 @@ void BhapticsLibrary::Lib_RegisterFeedback(FString Key, FString ProjectJson)
 		return;
 	}
 
-	Player->RegisterFeedback(Key, ProjectJson);
+	Player->RegisterFeedbackProject(Key, ProjectJson);
 
 }
 
@@ -72,7 +72,7 @@ void BhapticsLibrary::Lib_SubmitRegistered(FString Key)
 		return;
 	}
 
-	Player->SubmitRegistered(Key);
+	Player->SubmitRegisteredFeedback(Key);
 }
 
 void BhapticsLibrary::Lib_SubmitRegistered(FString Key, FString AltKey, FScaleOption ScaleOpt, FRotationOption RotOption)
@@ -82,7 +82,7 @@ void BhapticsLibrary::Lib_SubmitRegistered(FString Key, FString AltKey, FScaleOp
 		return;
 	}
 	
-	Player->SubmitRegistered(Key, AltKey, ScaleOpt, RotOption);
+	Player->SubmitRegisteredFeedback(Key, AltKey, ScaleOpt, RotOption);
 }
 
 void BhapticsLibrary::Lib_Submit(FString Key, EPosition Pos, TArray<uint8> MotorBytes, int DurationMillis)

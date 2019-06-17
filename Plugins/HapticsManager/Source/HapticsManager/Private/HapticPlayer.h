@@ -13,9 +13,9 @@ public:
 	bool Initialise();
 	void Destroy();
 
-	void RegisterFeedback(FString Key, FString ProjectJson);
-	void SubmitRegistered(FString Key);
-	void SubmitRegistered(FString Key, FString AltKey, FScaleOption ScaleOpt, FRotationOption RotOption);
+	void RegisterFeedbackProject(FString Key, FString ProjectJson);
+	void SubmitRegisteredFeedback(FString Key);
+	void SubmitRegisteredFeedback(FString Key, FString AltKey, FScaleOption ScaleOpt, FRotationOption RotOption);
 	void SubmitFeedback(FString Key, EPosition Pos, TArray<uint8> MotorBytes, int DurationMillis);
 	void SubmitFeedback(FString Key, EPosition Pos, TArray<FDotPoint> Points, int DurationMillis);
 	void SubmitFeedback(FString Key, EPosition Pos, TArray<FPathPoint> Points, int DurationMillis);

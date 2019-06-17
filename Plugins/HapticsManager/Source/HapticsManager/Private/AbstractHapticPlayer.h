@@ -13,9 +13,9 @@ public:
 	virtual bool Initialise()=0;
 	virtual void Destroy()=0;
 
-	virtual void RegisterFeedback(FString Key, FString ProjectJson) =0;
-	virtual void SubmitRegistered(FString Key) = 0;
-	virtual void SubmitRegistered(FString Key, FString AltKey, FScaleOption ScaleOpt, FRotationOption RotOption)=0;
+	virtual void RegisterFeedbackProject(FString Key, FString ProjectJson) =0;
+	virtual void SubmitRegisteredFeedback(FString Key) = 0;
+	virtual void SubmitRegisteredFeedback(FString Key, FString AltKey, FScaleOption ScaleOpt, FRotationOption RotOption)=0;
 	virtual void SubmitFeedback(FString Key, EPosition Pos, TArray<uint8> MotorBytes, int DurationMillis)=0;
 	virtual void SubmitFeedback(FString Key, EPosition Pos, TArray<FDotPoint> Points, int DurationMillis)=0;
 	virtual void SubmitFeedback(FString Key, EPosition Pos, TArray<FPathPoint> Points, int DurationMillis)=0;
