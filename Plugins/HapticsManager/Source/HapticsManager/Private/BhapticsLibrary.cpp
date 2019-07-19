@@ -40,7 +40,7 @@ bool BhapticsLibrary::InitialiseConnection()
 
 	//Initialise();
 
-	return Player->Initialise();;
+	return Player->InitialiseConnection();
 }
 
 void BhapticsLibrary::Free()
@@ -51,7 +51,7 @@ void BhapticsLibrary::Free()
 	}
 
 	//Destroy();
-	Player->Destroy();
+	Player->DestroyConnection();
 }
 
 void BhapticsLibrary::Lib_RegisterFeedback(FString Key, FString ProjectJson)

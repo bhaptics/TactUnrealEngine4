@@ -9,7 +9,7 @@ bool HapticPlayer::IsInitialised = false;
 FProcHandle HapticPlayer::Handle;
 bool HapticPlayer::Success = false;
 
-bool HapticPlayer::Initialise()
+bool HapticPlayer::InitialiseConnection()
 {
 	if (IsInitialised)
 	{
@@ -93,7 +93,7 @@ bool HapticPlayer::Initialise()
 	return true;
 }
 
-void HapticPlayer::Destroy() 
+void HapticPlayer::DestroyConnection()
 {
 	Destroy();
 	if (Handle.IsValid())

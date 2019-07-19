@@ -10,8 +10,8 @@
 class AbstractHapticPlayer
 {
 public:
-	virtual bool Initialise()=0;
-	virtual void Destroy()=0;
+	virtual bool InitialiseConnection()=0;
+	virtual void DestroyConnection()=0;
 
 	virtual void RegisterFeedbackProject(FString Key, FString ProjectJson) =0;
 	virtual void SubmitRegisteredFeedback(FString Key) = 0;

@@ -10,8 +10,8 @@
 class HapticPlayer : public AbstractHapticPlayer
 {
 public:
-	bool Initialise();
-	void Destroy();
+	bool InitialiseConnection();
+	void DestroyConnection();
 
 	void RegisterFeedbackProject(FString Key, FString ProjectJson);
 	void SubmitRegisteredFeedback(FString Key);
