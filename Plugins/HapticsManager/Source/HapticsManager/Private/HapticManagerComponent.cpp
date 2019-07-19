@@ -130,7 +130,6 @@ bool UHapticManagerComponent::IsAnythingPlaying()
 		return false;
 	}
 	bool Value = false;
-	//return bhaptics::HapticPlayer::instance()->isPlaying();
 	Value = BhapticsLibrary::Lib_IsPlaying();
 	return Value;
 }
@@ -165,7 +164,6 @@ void UHapticManagerComponent::TurnOffAllFeedback()
 	{
 		return;
 	}
-	//bhaptics::HapticPlayer::instance()->turnOff();
 	BhapticsLibrary::Lib_TurnOff();
 }
 
@@ -175,7 +173,6 @@ void UHapticManagerComponent::TurnOffRegisteredFeedback(const FString &Key)
 	{
 		return;
 	}
-	//bhaptics::HapticPlayer::instance()->turnOff(StandardKey);
 	BhapticsLibrary::Lib_TurnOff(Key);
 }
 

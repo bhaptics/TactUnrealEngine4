@@ -69,6 +69,11 @@ public class HapticsManager : ModuleRules
         {
             RuntimeDependencies.Add(Path.Combine(ModuleDirectory, "../../DLLs/win32/haptic_library.dll"));
         }
+        else if (Target.Platform == UnrealTargetPlatform.Android)
+        {
+            string PluginPath = Utils.MakePathRelativeTo(ModuleDirectory, Target.RelativeEnginePath);
+            AdditionalPropertiesForReceipt.Add(new ReceiptProperty("AndroidPlugin", Path.Combine(PluginPath, "HapticManager_APL.xml")));
+        }
 
     }
 
