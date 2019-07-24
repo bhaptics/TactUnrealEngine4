@@ -6,12 +6,11 @@
 #include "Misc/FileHelper.h"
 #include "Core/Public/Misc/Paths.h"
 
-#include "HapticLibrary/HapticLibrary.h"
 
 #if PLATFORM_ANDROID
-
 #include "AndroidHapticLibrary.h"
-
+#else
+#include "HapticLibrary/HapticLibrary.h"
 #endif // PLATFORM_ANDROID
 
 
@@ -23,7 +22,11 @@ bool BhapticsLibrary::IsLoaded = false;
 FProcHandle BhapticsLibrary::Handle;
 bool BhapticsLibrary::Success = false;
 
+#if PLATFORM_ANDROID
+#else
 static bhaptics::PositionType PositionEnumToPositionType(EPosition Position);
+#endif
+
 static FString PositionEnumToString(EPosition Position);
 
 BhapticsLibrary::BhapticsLibrary()
@@ -139,7 +142,7 @@ void BhapticsLibrary::Free()
 {
 #if PLATFORM_ANDROID
 
-	UAndroidHapticLibaray::AndroidThunkCpp_StopScanning();
+	UAndroidHapticLibrary::AndroidThunkCpp_StopScanning();
 #else
 	if (!IsLoaded)
 	{
@@ -167,7 +170,8 @@ void BhapticsLibrary::Lib_RegisterFeedback(FString Key, FString ProjectJson)
 		UE_LOG(LogTemp, Log, TEXT("Deserialisation failed."));
 		return;
 	}
-
+	FRegisterRequest RegisterRequest = FRegisterRequest();
+	RegisterRequest.Key = Key;
 	RegisterRequest.Project = JsonObject;
 	UAndroidHapticLibrary::SubmitRequestToPlayer(RegisterRequest);
 #else
@@ -233,7 +237,7 @@ void BhapticsLibrary::Lib_Submit(FString Key, EPosition Pos, TArray<uint8> Motor
 	TArray<FDotPoint> Points = TArray<FDotPoint>();
 	for (int i = 0; i < MotorBytes.Num(); i++)
 	{
-		if (InputBytes[i] > 0)
+		if (MotorBytes[i] > 0)
 		{
 			Points.Add(FDotPoint(i, MotorBytes[i]));
 		}
@@ -300,7 +304,7 @@ void BhapticsLibrary::Lib_Submit(FString Key, EPosition Pos, TArray<FPathPoint> 
 	SubmissionFrame.DotPoints = TArray<FDotPoint>();
 	SubmissionFrame.Position = PositionEnumToString(Pos);
 	SubmissionFrame.PathPoints = Points;
-	SubmissionFrame.DurationMillis = DurationInMilliSecs;
+	SubmissionFrame.DurationMillis = DurationMillis;
 	UAndroidHapticLibrary::SubmitFrame(Key, SubmissionFrame);
 #else
 	if (!IsLoaded)
@@ -324,7 +328,7 @@ void BhapticsLibrary::Lib_Submit(FString Key, EPosition Pos, TArray<FPathPoint> 
 #endif
 }
 
-bool BhapticsLibrary::Lib_IsFeedbackRegistered(FString key)
+bool BhapticsLibrary::Lib_IsFeedbackRegistered(FString Key)
 {
 	bool Value = false;
 #if PLATFORM_ANDROID
@@ -335,7 +339,7 @@ bool BhapticsLibrary::Lib_IsFeedbackRegistered(FString key)
 	{
 		return false;
 	}
-	std::string StandardKey(TCHAR_TO_UTF8(*key));
+	std::string StandardKey(TCHAR_TO_UTF8(*Key));
 	Value = IsFeedbackRegistered(StandardKey.c_str());
 #endif
 	return Value;
@@ -447,7 +451,7 @@ bool BhapticsLibrary::Lib_IsDevicePlaying(EPosition Pos)
 {
 	bool Value = false;
 #if PLATFORM_ANDROID
-	FString DeviceString = PositionEnumToString(Device);
+	FString DeviceString = PositionEnumToString(Pos);
 	FPlayerResponse Response = UAndroidHapticLibrary::GetCurrentResponse();
 	Value = Response.ConnectedPositions.Find(DeviceString) != INDEX_NONE;
 #else
@@ -500,6 +504,7 @@ TArray<FHapticFeedback> BhapticsLibrary::Lib_GetResponseStatus()
 	return ChangedFeedback;
 }
 
+#if !PLATFORM_ANDROID
 static bhaptics::PositionType PositionEnumToPositionType(EPosition Position)
 {
 	bhaptics::PositionType Device = bhaptics::PositionType::All;
@@ -545,6 +550,7 @@ static bhaptics::PositionType PositionEnumToPositionType(EPosition Position)
 	}
 	return Device;
 }
+#endif // PLATFORM_ANDROID
 
 FString PositionEnumToString(EPosition Position)
 {

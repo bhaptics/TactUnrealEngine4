@@ -23,8 +23,14 @@ public class HapticsManager : ModuleRules
 				// ... add other private include paths required here ...
 			}
 			);
-			
-		PublicDependencyModuleNames.AddRange(
+
+        PrivateIncludePathModuleNames.AddRange(
+            new string[] {
+                        "Settings",
+                        "Launch",
+            }
+            );
+        PublicDependencyModuleNames.AddRange(
 			new string[]
 			{
 				"Core",
@@ -72,7 +78,7 @@ public class HapticsManager : ModuleRules
         else if (Target.Platform == UnrealTargetPlatform.Android)
         {
             string PluginPath = Utils.MakePathRelativeTo(ModuleDirectory, Target.RelativeEnginePath);
-            AdditionalPropertiesForReceipt.Add(new ReceiptProperty("AndroidPlugin", Path.Combine(PluginPath, "HapticManager_APL.xml")));
+            AdditionalPropertiesForReceipt.Add(new ReceiptProperty("AndroidPlugin", Path.Combine(PluginPath, "HapticsManager_APL.xml")));
         }
 
     }

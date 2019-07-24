@@ -26,7 +26,7 @@ class UAndroidHapticLibrary : public UBlueprintFunctionLibrary
 	static void UpdateDevices(TArray<FDevice> DeviceList);
 	static void ParsePlayerResponse(FString ResponseString);
 
-	UFUNCTION(BlueprintCallable, meta = (DisplayName = "GetCurrentDevices", Keywords = "Haptics"), Category = "Haptics")
+	UFUNCTION(BlueprintPure, meta = (DisplayName = "GetCurrentDevices", Keywords = "Haptics"), Category = "Haptics")
 		static TArray<FDevice> GetCurrentDevices() { return FoundDevices; };
 
 	//UFUNCTION(BlueprintCallable, meta = (DisplayName = "GetCurrentResponse", Keywords = "Haptics"), Category = "Haptics")

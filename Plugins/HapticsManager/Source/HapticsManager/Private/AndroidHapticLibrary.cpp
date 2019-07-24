@@ -28,7 +28,7 @@ JNI_METHOD void Java_com_epicgames_ue4_GameActivity_nativeOnDeviceFound(JNIEnv* 
 	TArray<FDevice> DeviceList;
 	if (FJsonObjectConverter::JsonArrayStringToUStruct(DevicesListString, &DeviceList, 0, 0))
 	{
-		UAndroidHapticPlayerBPLibrary::UpdateDevices(DeviceList);
+		UAndroidHapticLibrary::UpdateDevices(DeviceList);
 	}
 	else
 	{
@@ -49,7 +49,7 @@ JNI_METHOD void Java_com_epicgames_ue4_GameActivity_nativeOnChangeResponse(JNIEn
 	const char *nativeChangeResponse = jenv->GetStringUTFChars(changeResponse, 0);
 	FString Response = FString(nativeChangeResponse);
 	jenv->ReleaseStringUTFChars(changeResponse, nativeChangeResponse);
-	UAndroidHapticPlayerBPLibrary::ParsePlayerResponse(Response);
+	UAndroidHapticLibrary::ParsePlayerResponse(Response);
 }
 
 #endif //  PLATFORM_ANDROID
