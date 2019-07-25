@@ -13,8 +13,6 @@
 #include "HapticLibrary/HapticLibrary.h"
 #endif // PLATFORM_ANDROID
 
-
-
 #include "HapticsManager.h"
 
 bool BhapticsLibrary::IsInitialised = false;
