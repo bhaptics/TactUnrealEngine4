@@ -548,7 +548,7 @@ static bhaptics::PositionType PositionEnumToPositionType(EPosition Position)
 	}
 	return Device;
 }
-#endif // PLATFORM_ANDROID
+#endif // !PLATFORM_ANDROID
 
 FString PositionEnumToString(EPosition Position)
 {
@@ -595,4 +595,3 @@ FString PositionEnumToString(EPosition Position)
 
 	return PositionString;
 }
-
