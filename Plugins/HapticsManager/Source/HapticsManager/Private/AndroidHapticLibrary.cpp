@@ -107,20 +107,14 @@ void UAndroidHapticLibrary::ParsePlayerResponse(FString ResponseString)
 				Motors.Add(MotorValues[i]->AsNumber());
 			}
 			MotorsToUpdate.Add(FHapticFeedback(StringToPosition(PositionName), Motors, EFeedbackMode::PATH_MODE));
-			//Response.Status.Add(PositionName, Motors);
 			
 		}
 		Response.Status = MotorsToUpdate;
-		UE_LOG(LogTemp, Log, TEXT("SetResponse"));
-
 		m_Mutex.Lock();
 		CurrentResponse = Response;
 		m_Mutex.Unlock();
 
-		UE_LOG(LogTemp, Log, TEXT("Execute delegate"));
-
 		UpdateDeviceStatusDelegate.ExecuteIfBound(MotorsToUpdate);
-		UE_LOG(LogTemp, Log, TEXT("ParsingResponse done"));
 	}
 }
 

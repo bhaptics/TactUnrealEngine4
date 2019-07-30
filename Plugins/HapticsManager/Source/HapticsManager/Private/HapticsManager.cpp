@@ -21,7 +21,6 @@ void FHapticsManagerModule::StartupModule()
 	LibraryPath = FPaths::Combine(*BaseDir, TEXT("DLLs/win64/haptic_library.dll"));
 #endif
 #elif PLATFORM_MAC
-	//LibraryPath = FPaths::Combine(*BaseDir, TEXT("Source/ThirdParty/HapticsManagerLibrary/Mac/Release/libExampleLibrary.dylib"));
 #endif // PLATFORM_WINDOWS
 
 	HapticLibraryHandle = !LibraryPath.IsEmpty() ? FPlatformProcess::GetDllHandle(*LibraryPath) : nullptr;
