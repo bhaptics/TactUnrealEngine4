@@ -62,8 +62,6 @@ void UAndroidHapticLibrary::UpdateDevices(TArray<FDevice> DeviceList)
 
 void UAndroidHapticLibrary::ParsePlayerResponse(FString ResponseString)
 {
-	UE_LOG(LogTemp, Log, TEXT("ParsingResponse"));
-
 	TSharedPtr<FJsonObject> JsonObject;
 	TSharedRef<TJsonReader<>> JsonReader = TJsonReaderFactory<>::Create(ResponseString);
 	if (!FJsonSerializer::Deserialize(JsonReader, JsonObject) || !JsonObject.IsValid())
