@@ -1,6 +1,6 @@
 # bHaptics haptic devices Unreal Engine C++ plugin
 This project helps to utilize haptic devices in Unreal Engine 4
-Current version is 1.4.4
+Current version is 1.4.5
 
 ## Prerequisite
 * bHaptics Player has to be installed (Windows)
@@ -71,6 +71,20 @@ PublicDependencyModuleNames.AddRange(
   * If the bHaptics Player was launched in this way, it will also be closed when the game or editor is closed as well.
   * To disable this functionality go to Project Settings > Game > Haptic Settings and set the ShouldLaunch variable to false.
 
+### Android
+* The plugin now supports Android devices, and also the Oculus Go and Quest HMD devices.
+* When setting up the project, make sure to set the Minimum and Target SDKs to greater than Version 18, as the plugin requires at least these versions to function.
+* To best support Mobile devices, the device management functionality is incorporated into the Mobile SDK. As such, a settings option needs to be included to allow users to pair haptic devices with their Android device.
+  * Example setting UIs are provided with the plugin under HapticsManager Content > Blueprints > UMG > AndroidUI with the HapticSettingUI and HapticSettingUI_Dark as examples of UIs and their functionality.
+  * You can also use the blueprint HapticDeviceUI_World_BP for a world ui example
+* If you wish to create your own setting ui, please check the AndroidHapticLibrary.h file for main functions for the android library.
+* A summary for the flow of how to get the devices is as follows:
+  * Start scanning so that devices can be found.
+  * Call GetCurrentResponse to fetch a list of the currently found haptic devices. This should be constantly checked as it may take a while for all available devices to be detected.
+  * A list of device structures will be returned, which can be either dealt with directly using the address for function calls, or passed into a HapticDevice UObject for more easy use of library functions (pair/unpair, position changing, etc).
+  * Pair with the necessary devices, and set the positions to suit your needs (in the case of left and right tactosy devices).
+* If you have any questions or requests with the Android side of the plugin please contact us at contact@bhaptics.com.
+
 ## Testing
 * In the HapticsManager Blueprint, some functionality has been implemented to help test and experiment with the functions outlined above.
 * To view the feedback in-game, with or without the devices connected, add the HapticsManager blueprint in the plugin's Content/Blueprints folder, which functions as both a UI to view the feedback, as well as test simple functionality.
@@ -99,7 +113,7 @@ PublicDependencyModuleNames.AddRange(
 * Official Website: http://www.bhaptics.com/
 * E-mail: contact@bhaptics.com
 
-Last update of README.md: April 12th 2019
+Last update of README.md: August 3rd 2019
 
 
 ###### Copyright (c) 2017-2019 bHaptics Inc. All rights reserved.
