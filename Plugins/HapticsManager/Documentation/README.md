@@ -8,7 +8,7 @@ Current version is 1.4.5
    bHaptics webpage: [http://www.bhaptics.com](http://bhaptics.com/app.html)
 
 ## Changes
-* Revised HapticLibrary functionality
+* Added Android support.
 
 ## How to integrate the plugin into existing projects
 * If you have installed from the UE4 Marketplace, you can skip this section and go to the ['How to use the plugin'](#how-to-use-the-plugin) section.
@@ -76,7 +76,7 @@ PublicDependencyModuleNames.AddRange(
 * When setting up the project, make sure to set the Minimum and Target SDKs to greater than Version 18, as the plugin requires at least these versions to function.
 * To best support Mobile devices, the device management functionality is incorporated into the Mobile SDK. As such, a settings option needs to be included to allow users to pair haptic devices with their Android device.
   * Example setting UIs are provided with the plugin under HapticsManager Content > Blueprints > UMG > AndroidUI with the HapticSettingUI and HapticSettingUI_Dark as examples of UIs and their functionality.
-  * You can also use the blueprint HapticDeviceUI_World_BP for a world ui example
+  * You can also use the blueprint HapticDeviceUI_World_BP for a world ui example.
 * If you wish to create your own setting ui, please check the AndroidHapticLibrary.h file for main functions for the android library.
 * A summary for the flow of how to get the devices is as follows:
   * Start scanning so that devices can be found.
@@ -107,7 +107,7 @@ PublicDependencyModuleNames.AddRange(
 * Some simple examples are provided in the Plugin's Content/Blueprints folder, with Dummies for collision detection examples, as well some simple macro effects in the Macro Effect Library .
 * The ForLoops in blueprints can cause unexpected results with feedback, as it does not natively support delays. A ForLoopWithDelay macro is provided; however, if you are using loops and delays heavily, it is recommended to work in C++ for these functions, or use the designer for the feedback.
 * For further references, you can find our tutorial series at our youtube channel [here](https://www.youtube.com/watch?v=Dy2D4Jnx-Io&t=2s&list=PLfaa78_N6dlvd0Ha0s0Y_LT62-Oqp8N2A&index=3).
-.
+
 
 ## Contact
 * Official Website: http://www.bhaptics.com/

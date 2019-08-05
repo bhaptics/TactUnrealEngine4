@@ -1,7 +1,10 @@
 //Copyright bHaptics Inc. 2017-2019
 
 #pragma once
-#include "Engine.h"
+#include "CoreTypes.h"
+#include "CoreMinimal.h"
+#include "UObject/ObjectMacros.h"
+#include "Json/Public/Dom/JsonObject.h"
 #include "HapticStructures.generated.h"
 
 UENUM(BlueprintType)

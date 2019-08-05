@@ -2,7 +2,9 @@
 
 #include "AndroidHapticLibrary.h"
 #include "HapticsManager.h"
-#include "JsonUtilities/Public/JsonUtilities.h"
+#include "JsonObjectConverter.h"
+#include "Json/Public/Serialization/JsonWriter.h"
+#include "Json/Public/Policies/CondensedJsonPrintPolicy.h"
 
 TArray<FDevice> UAndroidHapticLibrary::FoundDevices;
 FPlayerResponse UAndroidHapticLibrary::CurrentResponse;
