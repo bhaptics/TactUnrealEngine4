@@ -1,7 +1,10 @@
 //Copyright bHaptics Inc. 2017-2019
 
 #pragma once
-#include "Engine.h"
+#include "CoreTypes.h"
+#include "CoreMinimal.h"
+#include "UObject/ObjectMacros.h"
+#include "Json/Public/Dom/JsonObject.h"
 #include "HapticStructures.generated.h"
 
 UENUM(BlueprintType)
@@ -155,6 +158,11 @@ struct FRotationOption
 		OffsetAngleX = AngleX;
 		OffsetY = FMath::Clamp(Y,-1.0f,1.0f);
 	}
+
+	FString ToString()
+	{
+		return "{ \"offsetAngleX\" : " + FString::SanitizeFloat(OffsetAngleX) + ", \"offsetY\" : " + FString::SanitizeFloat(OffsetY) + "}";
+	}
 };
 
 //Stores the scaled values when altering a feedback file's intensity and duration.
@@ -166,8 +174,7 @@ struct FScaleOption
 	FScaleOption()
 	{
 		Duration = 1.0;
-		Intensity = 1.0;
-	}
+ 	}
 
 	//Multiplier to scale the intensity of the feedback, where 0.5 halves the intensity
 	//and a value of 2.0 doubles it. Cannot be negative.
@@ -184,6 +191,133 @@ struct FScaleOption
 		Intensity = FMath::Clamp(intensity,0.01f,100.0f);
 		Duration = FMath::Clamp(duration, 0.01f, 100.0f);
 	}
+
+	FString ToString()
+	{
+		return "{ \"intensity\" : " + FString::SanitizeFloat(Intensity) + ", \"duration\" : " + FString::SanitizeFloat(Duration) + "}";
+	}
+};
+
+USTRUCT(BlueprintType)
+struct FDevice {
+
+	GENERATED_BODY()
+
+		UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Android|Haptic")
+		FString DeviceName;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Android|Haptic")
+		FString Address;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Android|Haptic")
+		FString Position;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Android|Haptic")
+		int Battery;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Android|Haptic")
+		FString ConnectionStatus;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Android|Haptic")
+		bool IsPaired;
+};
+
+USTRUCT()
+struct FRegisterRequest {
+
+	GENERATED_BODY()
+
+		UPROPERTY()
+		FString Key;
+
+	//UPROPERTY()
+	TSharedPtr<FJsonObject> Project;
+
+	void ToJsonObject(FJsonObject& JsonObject)
+	{
+		JsonObject.SetStringField("Key", Key);
+		JsonObject.SetObjectField("Project", Project);
+	}
+};
+
+USTRUCT()
+struct FHapticFrame {
+
+	GENERATED_BODY()
+
+		UPROPERTY()
+		int DurationMillis;
+
+	UPROPERTY()
+		FString Position;
+
+	UPROPERTY()
+		TArray<FPathPoint> PathPoints;
+
+	UPROPERTY()
+		TArray<FDotPoint> DotPoints;
+};
+
+
+USTRUCT()
+struct FSubmitRequest {
+
+	GENERATED_BODY()
+
+		FSubmitRequest()
+	{
+		Type = "turnoff";
+		Key = "";
+		Parameters = TMap<FString, FString>();
+	}
+
+	FSubmitRequest(FString SubmissionKey, FString SubmissionType, FHapticFrame SubmissionFrame)
+	{
+		Type = SubmissionType;
+		Key = SubmissionKey;
+		Frame = SubmissionFrame;
+		Parameters = TMap<FString, FString>();
+	}
+
+	UPROPERTY()
+		FString Type;
+
+	UPROPERTY()
+		FString Key;
+
+	UPROPERTY()
+		TMap<FString, FString> Parameters;
+
+	UPROPERTY()
+		FHapticFrame Frame;
+};
+
+USTRUCT()
+struct FPlayerResponse {
+
+	GENERATED_BODY()
+
+		TArray<FString> RegisteredKeys;
+
+	TArray<FString> ActiveKeys;
+
+	int ConnectedDeviceCount;
+
+	TArray<FString> ConnectedPositions;
+
+	TArray<FHapticFeedback> Status;
+};
+
+USTRUCT()
+struct FPlayerRequest {
+
+	GENERATED_BODY()
+
+		UPROPERTY()
+		TArray<FRegisterRequest> Register;
+
+	UPROPERTY()
+		TArray<FSubmitRequest> Submit;
 };
 
 class HAPTICSMANAGER_API HapticStructures
