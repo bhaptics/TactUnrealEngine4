@@ -4,6 +4,7 @@
 #include "Interfaces/IPluginManager.h"
 
 #include "Misc/FileHelper.h"
+#include "Misc/ConfigCacheIni.h"
 #include "Core/Public/Misc/Paths.h"
 
 
@@ -129,8 +130,18 @@ bool BhapticsLibrary::InitialiseConnection()
 		}
 
 	}
-
-	Initialise();
+	FString ProjectName;
+	if (GConfig) {
+		GConfig->GetString(
+			TEXT("/Script/EngineSettings.GeneralProjectSettings"),
+			TEXT("ProjectName"),
+			ProjectName,
+			GGameIni
+		);
+	}
+	
+	std::string StandardName(TCHAR_TO_UTF8(*ProjectName));
+	Initialise(StandardName.c_str(), StandardName.c_str());
 	Success = true;
 #endif // !PLATFORM_ANDROID
 	return true;
