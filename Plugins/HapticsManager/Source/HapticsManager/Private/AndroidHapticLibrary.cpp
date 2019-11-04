@@ -175,6 +175,21 @@ void UAndroidHapticLibrary::AndroidThunkCpp_Pair(FString DeviceAddress)
 #endif // PLATFORM_ANDROID
 }
 
+void UAndroidHapticLibrary::AndroidThunkCpp_PairFromPosition(FString DeviceAddress, FString DevicePosition)
+{
+#if PLATFORM_ANDROID
+	if (JNIEnv* Env = FAndroidApplication::GetJavaEnv())
+	{
+		static jmethodID PairMethod = FJavaWrapper::FindMethod(Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_PairFromPosition", "(Ljava/lang/String;Ljava/lang/String;)V", false);
+		jstring DeviceAddressJava = Env->NewStringUTF(TCHAR_TO_UTF8(*DeviceAddress));
+		jstring DevicePositionJava = Env->NewStringUTF(TCHAR_TO_UTF8(*DevicePosition));
+		FJavaWrapper::CallVoidMethod(Env, FJavaWrapper::GameActivityThis, PairMethod, DeviceAddressJava, DevicePositionJava);
+		Env->DeleteLocalRef(DeviceAddressJava);
+		Env->DeleteLocalRef(DevicePositionJava);
+	}
+#endif // PLATFORM_ANDROID
+}
+
 void UAndroidHapticLibrary::AndroidThunkCpp_Unpair(FString DeviceAddress)
 {
 #if PLATFORM_ANDROID

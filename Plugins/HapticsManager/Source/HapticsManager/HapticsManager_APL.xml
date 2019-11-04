@@ -40,14 +40,14 @@
 
   <prebuildCopies>
     <log text="Copying example java method directory to staging before build"/>
-    <copyFile src="$S(PluginDir)/Library/bhaptics_ble_1.01.aar"
-            dst="$S(BuildDir)/gradle/bhaptics_ble_1.01.aar" />
-    <copyFile src="$S(PluginDir)/Library/bhaptics_commons_1.01.aar"
-            dst="$S(BuildDir)/gradle/bhaptics_commons_1.01.aar" />
-    <copyFile src="$S(PluginDir)/Library/bhaptics_core_1.01.aar"
-            dst="$S(BuildDir)/gradle/bhaptics_core_1.01.aar" />
-    <copyFile src="$S(PluginDir)/Library/bhaptics_manager_1.01.aar"
-            dst="$S(BuildDir)/gradle/bhaptics_manager_1.01.aar" />
+    <copyFile src="$S(PluginDir)/Library/bhaptics_ble_1.03.aar"
+            dst="$S(BuildDir)/gradle/bhaptics_ble_1.03.aar" />
+    <copyFile src="$S(PluginDir)/Library/bhaptics_commons_1.03.aar"
+            dst="$S(BuildDir)/gradle/bhaptics_commons_1.03.aar" />
+    <copyFile src="$S(PluginDir)/Library/bhaptics_core_1.03.aar"
+            dst="$S(BuildDir)/gradle/bhaptics_core_1.03.aar" />
+    <copyFile src="$S(PluginDir)/Library/bhaptics_manager_1.03.aar"
+            dst="$S(BuildDir)/gradle/bhaptics_manager_1.03.aar" />
   </prebuildCopies>
 
   <AARImports>
@@ -56,10 +56,10 @@
   <buildGradleAdditions>
     <insert>
       dependencies {
-        implementation files('../bhaptics_ble_1.01.aar')
-        implementation files('../bhaptics_core_1.01.aar')
-        implementation files('../bhaptics_commons_1.01.aar')
-        implementation files('../bhaptics_manager_1.01.aar')
+        implementation files('../bhaptics_ble_1.03.aar')
+        implementation files('../bhaptics_core_1.03.aar')
+        implementation files('../bhaptics_commons_1.03.aar')
+        implementation files('../bhaptics_manager_1.03.aar')
       }
     </insert>
   </buildGradleAdditions>
@@ -194,6 +194,11 @@
       public void AndroidThunkJava_Pair(String address) {
         bhapticsManager.pair(address);
       }
+      
+      // Pair Device with positoin
+      public void AndroidThunkJava_PairFromPosition(String address, String position) {
+        bhapticsManager.pair(address, com.bhaptics.commons.model.PositionType.valueOf(position));
+      }
 
       public void AndroidThunkJava_Unpair(String address) {
         bhapticsManager.unpair(address);
@@ -203,8 +208,8 @@
         bhapticsManager.unpairAll();
       }
 
-      public void AndroidThunkJava_ChangePosition(String address, String pos){
-        bhapticsManager.changePosition(address, com.bhaptics.commons.model.PositionType.valueOf(pos));
+      public void AndroidThunkJava_ChangePosition(String address, String position){
+        bhapticsManager.changePosition(address, com.bhaptics.commons.model.PositionType.valueOf(position));
       }
 
       public void AndroidThunkJava_TogglePosition(String address) {
