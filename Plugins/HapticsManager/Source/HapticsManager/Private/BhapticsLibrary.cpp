@@ -1,12 +1,11 @@
-//Copyright bHaptics Inc. 2017 - 2019
+//Copyright bHaptics Inc. 2017-2019
 
 #include "BhapticsLibrary.h"
 #include "Interfaces/IPluginManager.h"
 
-#include "Misc/FileHelper.h"
-#include "Misc/ConfigCacheIni.h"
+#include "Core/Public/Misc/ConfigCacheIni.h"
 #include "Core/Public/Misc/Paths.h"
-
+#include "Core/Public/Misc/FileHelper.h"
 
 #if PLATFORM_ANDROID
 #include "AndroidHapticLibrary.h"
@@ -23,16 +22,17 @@ bool BhapticsLibrary::Success = false;
 
 #if PLATFORM_ANDROID
 #else
+static bhaptics::PositionType PositionEnumToDeviceType(EPosition Position);
 static bhaptics::PositionType PositionEnumToPositionType(EPosition Position);
 #endif
 
 static FString PositionEnumToString(EPosition Position);
+static FString PositionEnumToDeviceString(EPosition Position);
 
 BhapticsLibrary::BhapticsLibrary()
 {
 
 }
-
 
 BhapticsLibrary::~BhapticsLibrary()
 {
@@ -93,7 +93,7 @@ bool BhapticsLibrary::InitialiseConnection()
 	else
 	{
 		//FString ExePath(BhapticsUtilities::GetExecutablePath());
-		char Path [100];
+		char Path[100];
 		int Size = 0;
 		bool Result = TryGetExePath(Path, Size);
 		FString ExePath(Path);
@@ -122,7 +122,7 @@ bool BhapticsLibrary::InitialiseConnection()
 				UE_LOG(LogTemp, Log, TEXT("Player is not Installed"));
 				return false;
 			}
-			
+
 		}
 		else
 		{
@@ -139,7 +139,7 @@ bool BhapticsLibrary::InitialiseConnection()
 			GGameIni
 		);
 	}
-	
+
 	std::string StandardName(TCHAR_TO_UTF8(*ProjectName));
 	Initialise(StandardName.c_str(), StandardName.c_str());
 	Success = true;
@@ -165,10 +165,9 @@ void BhapticsLibrary::Free()
 		FPlatformProcess::TerminateProc(Handle);
 		FPlatformProcess::CloseProc(Handle);
 	}
+
 #endif // PLATFORM_ANDROID
-
 }
-
 void BhapticsLibrary::Lib_RegisterFeedback(FString Key, FString ProjectJson)
 {
 #if PLATFORM_ANDROID
@@ -327,8 +326,8 @@ void BhapticsLibrary::Lib_Submit(FString Key, EPosition Pos, TArray<FPathPoint> 
 
 	for (int32 i = 0; i < Points.Num(); i++)
 	{
-		int XVal = Points[i].X*1000;
-		int YVal = Points[i].Y*1000;
+		int XVal = Points[i].X * 1000;
+		int YVal = Points[i].Y * 1000;
 		bhaptics::PathPoint Point(XVal, YVal, Points[i].Intensity, Points[i].MotorCount);
 		PathVector.push_back(Point);
 	}
@@ -460,7 +459,7 @@ bool BhapticsLibrary::Lib_IsDevicePlaying(EPosition Pos)
 {
 	bool Value = false;
 #if PLATFORM_ANDROID
-	FString DeviceString = PositionEnumToString(Pos);
+	FString DeviceString = PositionEnumToDeviceString(Pos);
 	FPlayerResponse Response = UAndroidHapticLibrary::GetCurrentResponse();
 	Value = Response.ConnectedPositions.Find(DeviceString) != INDEX_NONE;
 #else
@@ -468,7 +467,7 @@ bool BhapticsLibrary::Lib_IsDevicePlaying(EPosition Pos)
 	{
 		return false;
 	}
-	bhaptics::PositionType device = PositionEnumToPositionType(Pos);
+	bhaptics::PositionType device = PositionEnumToDeviceType(Pos);
 	Value = IsDevicePlaying(device);
 #endif
 	return Value;
@@ -487,10 +486,10 @@ TArray<FHapticFeedback> BhapticsLibrary::Lib_GetResponseStatus()
 	}
 	//std::string Positions [] = {"ForearmL","ForearmR","Head", "VestFront", "VestBack", "HandL", "HandR", "FootL", "FootR"};
 	TArray<bhaptics::PositionType> Positions =
-		{ bhaptics::PositionType::ForearmL,bhaptics::PositionType::ForearmR,bhaptics::PositionType::Head, bhaptics::PositionType::VestFront,bhaptics::PositionType::VestBack,
-		bhaptics::PositionType::HandL, bhaptics::PositionType::HandR, bhaptics::PositionType::FootL, bhaptics::PositionType::FootR };
+	{ bhaptics::PositionType::ForearmL,bhaptics::PositionType::ForearmR,bhaptics::PositionType::Head, bhaptics::PositionType::VestFront,bhaptics::PositionType::VestBack,
+	bhaptics::PositionType::HandL, bhaptics::PositionType::HandR, bhaptics::PositionType::FootL, bhaptics::PositionType::FootR };
 	TArray<EPosition> PositionEnum =
-		{ EPosition::ForearmL,EPosition::ForearmR,EPosition::Head, EPosition::VestFront,EPosition::VestBack,EPosition::HandL, EPosition::HandR, EPosition::FootL, EPosition::FootR };
+	{ EPosition::ForearmL,EPosition::ForearmR,EPosition::Head, EPosition::VestFront,EPosition::VestBack,EPosition::HandL, EPosition::HandR, EPosition::FootL, EPosition::FootR };
 
 	for (int i = 0; i < Positions.Num(); i++)
 	{
@@ -514,7 +513,7 @@ TArray<FHapticFeedback> BhapticsLibrary::Lib_GetResponseStatus()
 }
 
 #if !PLATFORM_ANDROID
-static bhaptics::PositionType PositionEnumToPositionType(EPosition Position)
+static bhaptics::PositionType PositionEnumToDeviceType(EPosition Position)
 {
 	bhaptics::PositionType Device = bhaptics::PositionType::All;
 
@@ -552,6 +551,52 @@ static bhaptics::PositionType PositionEnumToPositionType(EPosition Position)
 		break;
 	case EPosition::VestBack:
 		Device = bhaptics::PositionType::Vest;
+		break;
+	default:
+		//return false;
+		break;
+	}
+	return Device;
+}
+
+static bhaptics::PositionType PositionEnumToPositionType(EPosition Position)
+{
+	bhaptics::PositionType Device = bhaptics::PositionType::All;
+
+	switch (Position)
+	{
+	case EPosition::Left:
+		Device = bhaptics::PositionType::Left;
+		break;
+	case EPosition::Right:
+		Device = bhaptics::PositionType::Right;
+		break;
+	case EPosition::Head:
+		Device = bhaptics::PositionType::Head;
+		break;
+	case EPosition::HandL:
+		Device = bhaptics::PositionType::HandL;
+		break;
+	case EPosition::HandR:
+		Device = bhaptics::PositionType::HandR;
+		break;
+	case EPosition::FootL:
+		Device = bhaptics::PositionType::FootL;
+		break;
+	case EPosition::FootR:
+		Device = bhaptics::PositionType::FootR;
+		break;
+	case EPosition::ForearmL:
+		Device = bhaptics::PositionType::ForearmL;
+		break;
+	case EPosition::ForearmR:
+		Device = bhaptics::PositionType::ForearmR;
+		break;
+	case EPosition::VestFront:
+		Device = bhaptics::PositionType::VestFront;
+		break;
+	case EPosition::VestBack:
+		Device = bhaptics::PositionType::VestBack;
 		break;
 	default:
 		//return false;
@@ -599,6 +644,52 @@ FString PositionEnumToString(EPosition Position)
 		break;
 	case EPosition::VestBack:
 		PositionString = "VestBack";
+		break;
+	default:
+		break;
+	}
+
+	return PositionString;
+}
+
+FString PositionEnumToDeviceString(EPosition Position)
+{
+	FString PositionString = "All";
+
+	switch (Position)
+	{
+	case EPosition::Left:
+		PositionString = "Left";
+		break;
+	case EPosition::Right:
+		PositionString = "Right";
+		break;
+	case EPosition::Head:
+		PositionString = "Head";
+		break;
+	case EPosition::HandL:
+		PositionString = "HandL";
+		break;
+	case EPosition::HandR:
+		PositionString = "HandR";
+		break;
+	case EPosition::FootL:
+		PositionString = "FootL";
+		break;
+	case EPosition::FootR:
+		PositionString = "FootR";
+		break;
+	case EPosition::ForearmL:
+		PositionString = "ForearmL";
+		break;
+	case EPosition::ForearmR:
+		PositionString = "ForearmR";
+		break;
+	case EPosition::VestFront:
+		PositionString = "Vest";
+		break;
+	case EPosition::VestBack:
+		PositionString = "Vest";
 		break;
 	default:
 		break;
