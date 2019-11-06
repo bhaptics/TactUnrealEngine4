@@ -58,6 +58,9 @@ class UAndroidHapticLibrary : public UBlueprintFunctionLibrary
 	//BP
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Pair", Keywords = "Haptics"), Category = "Haptics")
 	static void AndroidThunkCpp_Pair(FString DeviceAddress);
+
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "PairPosition", Keywords = "Haptics"), Category = "Haptics")
+	static void AndroidThunkCpp_PairFromPosition(FString DeviceAddress, FString DevicePosition);
 	//BP
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Unpair", Keywords = "Haptics"), Category = "Haptics")
 	static void AndroidThunkCpp_Unpair(FString DeviceAddress);

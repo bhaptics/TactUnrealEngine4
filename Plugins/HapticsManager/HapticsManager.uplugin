@@ -1,7 +1,7 @@
 {
 	"FileVersion": 3,
 	"Version": 7,
-	"VersionName": "1.5.0",
+	"VersionName": "1.4.6",
 	"FriendlyName": "HapticsManager",
 	"Description": "bHaptics Haptic Library",
 	"Category": "Haptic",
