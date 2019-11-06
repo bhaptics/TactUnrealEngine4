@@ -1,9 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
+#include "CoreTypes.h"
+#include "CoreMinimal.h"
 #include "UObject/Object.h"
 #include "UObject/ObjectMacros.h"
-#include "Engine.h"
 #include "HapticStructures.h"
 #include "FeedbackFile.generated.h"
 
