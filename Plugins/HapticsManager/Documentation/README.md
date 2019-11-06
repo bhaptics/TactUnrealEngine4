@@ -1,6 +1,6 @@
 # bHaptics haptic devices Unreal Engine C++ plugin
 This project helps to utilize haptic devices in Unreal Engine 4
-Current version is 1.4.5
+Current version is 1.4.6
 
 ## Prerequisite
 * bHaptics Player has to be installed (Windows)
@@ -8,7 +8,8 @@ Current version is 1.4.5
    bHaptics webpage: [http://www.bhaptics.com](http://bhaptics.com/app.html)
 
 ## Changes
-* Added Android support.
+* Minor bug fixes to android UI.
+* Sends application name to bHaptics Player for telemetry (Windows only)
 
 ## How to integrate the plugin into existing projects
 * If you have installed from the UE4 Marketplace, you can skip this section and go to the ['How to use the plugin'](#how-to-use-the-plugin) section.
