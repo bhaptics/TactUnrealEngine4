@@ -8,8 +8,7 @@ Current version is 1.4.6
    bHaptics webpage: [http://www.bhaptics.com](http://bhaptics.com/app.html)
 
 ## Changes
-* Minor bug fixes to android UI.
-* Sends application name to bHaptics Player for telemetry (Windows only)
+* Added Android support.
 
 ## How to integrate the plugin into existing projects
 * If you have installed from the UE4 Marketplace, you can skip this section and go to the ['How to use the plugin'](#how-to-use-the-plugin) section.

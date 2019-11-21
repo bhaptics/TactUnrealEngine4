@@ -24,8 +24,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = true), Category = "Android|Haptic")
 		bool IsDarkMode = false;
 	
-	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Initialise", Keywords = "Haptics"), Category = "Haptics")
-		void Initialise(FDevice LinkedDevice);
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "SetDeviceData", Keywords = "Haptics"), Category = "Haptics")
+		void SetDeviceData(FDevice LinkedDevice);
 
 	//BP
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Pair", Keywords = "Haptics"), Category = "Haptics")

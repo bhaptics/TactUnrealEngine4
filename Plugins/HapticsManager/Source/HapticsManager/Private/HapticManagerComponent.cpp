@@ -2,7 +2,7 @@
 
 #include "HapticManagerComponent.h"
 #include "HapticStructures.h"
-
+#include "Components/PrimitiveComponent.h"
 #include "BhapticsLibrary.h"
 
 FCriticalSection UHapticManagerComponent::m_Mutex;

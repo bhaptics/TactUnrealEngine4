@@ -3,15 +3,15 @@
 	"Version": 7,
 	"VersionName": "1.4.6",
 	"FriendlyName": "HapticsManager",
-	"Description": "bHaptics Haptic Library",
+	"Description": "bHaptics haptic library",
 	"Category": "Haptic",
 	"CreatedBy": "bHaptics Inc.",
 	"CreatedByURL": "http://bhaptics.com",
-	"DocsURL": "https://github.com/bhaptics/TactUnrealEngine4/tree/master/Plugins",
+	"DocsURL": "https://github.com/bhaptics/TactUnrealEngine4/tree/master/Plugins/HapticsManager/Documentation",
 	"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/content/f2d84866699e419fbb97cddc7d6530b9",
-	"SupportURL": "http://bhaptics.com",
+	"SupportURL": "https://github.com/bhaptics/TactUnrealEngine4/issues/new",
+	"EngineVersion": "4.22.0",
 	"CanContainContent": true,
-	"IsBetaVersion": false,
 	"Installed": true,
 	"Modules": [
 		{
@@ -27,7 +27,12 @@
 		{
 			"Name": "FeedbackFileEditor",
 			"Type": "Editor",
-			"LoadingPhase": "Default"
+			"LoadingPhase": "Default",
+			"WhitelistPlatforms": [
+				"Win64",
+				"Win32",
+				"Android"
+			]
 		}
 	]
 }

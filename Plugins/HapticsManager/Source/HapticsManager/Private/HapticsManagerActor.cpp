@@ -2,6 +2,8 @@
 
 #include "HapticsManagerActor.h"
 #include "HapticStructures.h"
+#include "Components/StaticMeshComponent.h"
+#include "Materials/MaterialInstanceDynamic.h"
 #include "BhapticsLibrary.h"
 
 FCriticalSection AHapticsManagerActor::m_Mutex;
