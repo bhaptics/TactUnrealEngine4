@@ -36,15 +36,15 @@ class UAndroidHapticLibrary : public UBlueprintFunctionLibrary
 	
 	static FDeviceArrayDelegate UpdateDeviceListDelegate;
 
-	//Scan for bHaptics Ddevice
+	//Scan for bHaptics devices
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "StartHapticDeviceScan", Keywords = "Haptics"), Category = "Haptics")
 	static void AndroidThunkCpp_StartScanning();
 
-	//BP
+	//Stop scanning for devices
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "StopHapticDeviceScan", Keywords = "Haptics"), Category = "Haptics")
 	static void AndroidThunkCpp_StopScanning();
 
-	//BP
+	//Check if its currently scanning
 	UFUNCTION(BlueprintPure, meta = (DisplayName = "IsHapticDeviceScanning", Keywords = "Haptics"), Category = "Haptics")
 	static bool AndroidThunkCpp_IsScanning();
 

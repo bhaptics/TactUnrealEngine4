@@ -21,27 +21,28 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Android|Haptic")
 		bool DidUpdateDevice = false;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = true), Category = "Android|Haptic")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = false), Category = "Android|Haptic")
 		bool IsDarkMode = false;
 	
-	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Initialise", Keywords = "Haptics"), Category = "Haptics")
-		void Initialise(FDevice LinkedDevice);
+	//Set the data of the Haptic Device to use
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "SetDeviceData", Keywords = "Haptics"), Category = "Haptics")
+		void SetDeviceData(FDevice LinkedDevice);
 
-	//BP
+	//Pair with the Haptic Device
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Pair", Keywords = "Haptics"), Category = "Haptics")
 		void Pair();
-	//BP
+	//Unpair with the Haptic Device
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Unpair", Keywords = "Haptics"), Category = "Haptics")
 		void Unpair();
 
-	//BP
+	//Ping the Haptic Device
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Ping", Keywords = "Haptics"), Category = "Haptics")
 		void Ping();
 
-	//BP
+	//Set the Position for the Device (ie. Left/Right)
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "ChangePosition", Keywords = "Haptics"), Category = "Haptics")
 		void ChangePosition(FString Position);
-	//BP
+	//Toggle the Position of the Device
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "TogglePosition", Keywords = "Haptics"), Category = "Haptics")
 		void TogglePosition();
 

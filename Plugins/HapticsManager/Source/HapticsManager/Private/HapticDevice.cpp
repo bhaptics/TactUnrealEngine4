@@ -2,7 +2,7 @@
 #include "HapticDevice.h"
 #include "AndroidHapticLibrary.h"
 
-void UHapticDevice::Initialise(FDevice LinkedDevice)
+void UHapticDevice::SetDeviceData(FDevice LinkedDevice)
 {
 	DeviceData = LinkedDevice;
 	IsInitialised = true;
