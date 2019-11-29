@@ -34,7 +34,7 @@ PublicDependencyModuleNames.AddRange(
 * The Haptic Manager has 3 different ways of submitting feedback: using preset haptic files, specifying which motors or 'dots' to play, or specifying a point on the device to play the feedback.
 
 ### Presets
-* Presets can be constructed through using the bHaptics designer at https://designer.bhaptics.com
+* Presets can be constructed through using the bHaptics designer at https://designer2.bhaptics.com
 * After signing in, you can create a new project and design a feedback effect for use in the game.
 * In order to use the feedback effect in Unreal, export the feedback file from the Designer, and simply drag and drop the file into your Unreal project, or you can import the files using the import function in the Content Browser.
 * The files will be automatically converted into a UAsset, and you can view the feedback effect's identifying Key, the device it will be played on, and the duration of the effect

@@ -36,16 +36,16 @@ class UAndroidHapticLibrary : public UBlueprintFunctionLibrary
 	
 	static FDeviceArrayDelegate UpdateDeviceListDelegate;
 
-	//BP
-	UFUNCTION(BlueprintCallable, meta = (DisplayName = "StartScan", Keywords = "Haptics"), Category = "Haptics")
+	//Scan for bHaptics devices
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "StartHapticDeviceScan", Keywords = "Haptics"), Category = "Haptics")
 	static void AndroidThunkCpp_StartScanning();
 
-	//BP
-	UFUNCTION(BlueprintCallable, meta = (DisplayName = "StopScan", Keywords = "Haptics"), Category = "Haptics")
+	//Stop scanning for devices
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "StopHapticDeviceScan", Keywords = "Haptics"), Category = "Haptics")
 	static void AndroidThunkCpp_StopScanning();
 
-	//BP
-	UFUNCTION(BlueprintPure, meta = (DisplayName = "IsScanning", Keywords = "Haptics"), Category = "Haptics")
+	//Check if its currently scanning
+	UFUNCTION(BlueprintPure, meta = (DisplayName = "IsHapticDeviceScanning", Keywords = "Haptics"), Category = "Haptics")
 	static bool AndroidThunkCpp_IsScanning();
 
 	//Library
@@ -55,35 +55,38 @@ class UAndroidHapticLibrary : public UBlueprintFunctionLibrary
 	static void SubmitRequestToPlayer(FSubmitRequest Request);
 	static void SubmitRequestToPlayer(FRegisterRequest Request);
 
-	//BP
-	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Pair", Keywords = "Haptics"), Category = "Haptics")
+	//Pair with Haptic Device
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "PairHapticDevice", Keywords = "Haptics"), Category = "Haptics")
 	static void AndroidThunkCpp_Pair(FString DeviceAddress);
 
-	UFUNCTION(BlueprintCallable, meta = (DisplayName = "PairPosition", Keywords = "Haptics"), Category = "Haptics")
+	//Pair with Haptic Device and set Position
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "PairHapticDevicePosition", Keywords = "Haptics"), Category = "Haptics")
 	static void AndroidThunkCpp_PairFromPosition(FString DeviceAddress, FString DevicePosition);
-	//BP
-	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Unpair", Keywords = "Haptics"), Category = "Haptics")
+
+	//Unpair Haptic Device
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "UnpairHapticDevice", Keywords = "Haptics"), Category = "Haptics")
 	static void AndroidThunkCpp_Unpair(FString DeviceAddress);
-	//BP
+	
+	//Unpair all Haptic Devices
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "UnpairAll", Keywords = "Haptics"), Category = "Haptics")
 	static void AndroidThunkCpp_UnpairAll();
 	
-	//BP
-	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Ping", Keywords = "Haptics"), Category = "Haptics")
+	//Ping Haptic Device
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "PingHapticDevice", Keywords = "Haptics"), Category = "Haptics")
 	static void AndroidThunkCpp_Ping(FString DeviceAddress);
-	//BP
+	
+	//Ping all Haptic Devices
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "PingAll", Keywords = "Haptics"), Category = "Haptics")
 	static void AndroidThunkCpp_PingAll();
 
-	//BP
-	UFUNCTION(BlueprintCallable, meta = (DisplayName = "ChangePosition", Keywords = "Haptics"), Category = "Haptics")
+	//Set the Position of Device
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "ChangeDevicePosition", Keywords = "Haptics"), Category = "Haptics")
 	static void AndroidThunkCpp_ChangePosition(FString DeviceAddress, FString Position);
-	//BP
-	UFUNCTION(BlueprintCallable, meta = (DisplayName = "TogglePosition", Keywords = "Haptics"), Category = "Haptics")
+	
+	//Toggle the Position of Device
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "ToggleDevicePosition", Keywords = "Haptics"), Category = "Haptics")
 	static void AndroidThunkCpp_TogglePosition(FString DeviceAddress);
-
-
-
+	   
 private:
 	static TArray<FDevice> FoundDevices;
 	static FPlayerResponse CurrentResponse;
