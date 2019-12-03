@@ -266,6 +266,28 @@ void UAndroidHapticLibrary::AndroidThunkCpp_TogglePosition(FString DeviceAddress
 #endif // PLATFORM_ANDROID
 }
 
+void UAndroidHapticLibrary::AndroidThunkCpp_TurnOnVisualization()
+{
+#if PLATFORM_ANDROID
+	if (JNIEnv* Env = FAndroidApplication::GetJavaEnv())
+	{
+		static jmethodID TurnOnVisualizationMethod = FJavaWrapper::FindMethod(Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_TurnOnHapticVisualization", "()V", false);
+		FJavaWrapper::CallVoidMethod(Env, FJavaWrapper::GameActivityThis, TurnOnVisualizationMethod);
+	}
+#endif
+}
+
+void UAndroidHapticLibrary::AndroidThunkCpp_TurnOffVisualization()
+{
+#if PLATFORM_ANDROID
+	if (JNIEnv* Env = FAndroidApplication::GetJavaEnv())
+	{
+		static jmethodID TurnOffVisualizationMethod = FJavaWrapper::FindMethod(Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_TurnOffHapticVisualization", "()V", false);
+		FJavaWrapper::CallVoidMethod(Env, FJavaWrapper::GameActivityThis, TurnOffVisualizationMethod);
+	}
+#endif
+}
+
 EPosition UAndroidHapticLibrary::StringToPosition(FString PositionString)
 {
 	EPosition ReturnValue = EPosition::Default;

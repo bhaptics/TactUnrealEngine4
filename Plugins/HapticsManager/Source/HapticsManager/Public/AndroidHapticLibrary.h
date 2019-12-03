@@ -86,6 +86,10 @@ class UAndroidHapticLibrary : public UBlueprintFunctionLibrary
 	//Toggle the Position of Device
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "ToggleDevicePosition", Keywords = "Haptics"), Category = "Haptics")
 	static void AndroidThunkCpp_TogglePosition(FString DeviceAddress);
+
+	//UFUNCTION(BlueprintCallable, meta = (DisplayName = "SetVisualisation", Keywords = "Haptics"), Category = "Haptics")
+	static void AndroidThunkCpp_TurnOnVisualization();
+	static void AndroidThunkCpp_TurnOffVisualization();
 	   
 private:
 	static TArray<FDevice> FoundDevices;

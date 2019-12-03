@@ -4,6 +4,7 @@
 #include "HapticStructures.h"
 #include "Components/StaticMeshComponent.h"
 #include "Materials/MaterialInstanceDynamic.h"
+#include "AndroidHapticLibrary.h"
 #include "BhapticsLibrary.h"
 
 FCriticalSection AHapticsManagerActor::m_Mutex;
@@ -15,6 +16,12 @@ AHapticsManagerActor::AHapticsManagerActor()
 	PrimaryActorTick.bCanEverTick = true;
 	FGuid Gui = FGuid::NewGuid();
 	Id = Gui.ToString();
+}
+
+void AHapticsManagerActor::BeginDestroy()
+{
+	Super::BeginDestroy();
+	//UAndroidHapticLibrary::AndroidThunkCpp_TurnOffVisualization();
 }
 
 void AHapticsManagerActor::OnConstruction(const FTransform & Transform)
@@ -38,7 +45,8 @@ void AHapticsManagerActor::BeginPlay()
 	InitialiseDots(TactGloveRight);
 	InitialiseDots(TactShoeLeft);
 	InitialiseDots(TactShoeRight);
-	
+
+	UAndroidHapticLibrary::AndroidThunkCpp_TurnOnVisualization();
 }
 
 // Called every frame

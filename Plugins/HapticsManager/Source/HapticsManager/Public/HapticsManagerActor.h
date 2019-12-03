@@ -25,6 +25,8 @@ public:
 
 	virtual void OnConstruction(const FTransform & Transform) override;
 
+	virtual void BeginDestroy() override;
+
 	// Called every frame
 	virtual void Tick(float DeltaSeconds) override;
 
