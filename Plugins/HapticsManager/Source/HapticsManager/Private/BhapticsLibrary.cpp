@@ -6,6 +6,8 @@
 #include "Core/Public/Misc/ConfigCacheIni.h"
 #include "Core/Public/Misc/Paths.h"
 #include "Core/Public/Misc/FileHelper.h"
+#include "Serialization/JsonReader.h"
+#include "Serialization/JsonSerializer.h"
 
 #if PLATFORM_ANDROID
 #include "AndroidHapticLibrary.h"

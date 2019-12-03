@@ -50,6 +50,8 @@ class UAndroidHapticLibrary : public UBlueprintFunctionLibrary
 
 	//Library
 	static void AndroidThunkCpp_Submit(FString PlayerSubmission);
+	static void AndroidThunkCpp_Register(FString PlayerSubmission);
+
 
 	static void SubmitFrame(const FString & Key, FHapticFrame Frame);
 	static void SubmitRequestToPlayer(FSubmitRequest Request);

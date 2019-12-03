@@ -10,6 +10,7 @@ public class FeedbackFileEditor : ModuleRules
     public FeedbackFileEditor(ReadOnlyTargetRules Target) : base (Target)
 	{
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
+        PrivatePCHHeaderFile = "Private/FeedbackFileEditor.h";
 
         PrivateIncludePaths.AddRange(
 			new string[] {

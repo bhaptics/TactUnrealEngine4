@@ -189,11 +189,15 @@
       public void AndroidThunkJava_Submit(String str) {
         bhapticsManager.submit(str);
       }
+      
+      public void AndroidThunkJava_Register(String str) {
+        bhapticsManager.register(str);
+      }
 
       // Device Settings
       public void AndroidThunkJava_Pair(String address) {
         bhapticsManager.pair(address);
-      }
+      }     
       
       // Pair Device with positoin
       public void AndroidThunkJava_PairFromPosition(String address, String position) {

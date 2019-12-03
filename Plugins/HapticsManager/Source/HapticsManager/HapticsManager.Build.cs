@@ -9,6 +9,7 @@ public class HapticsManager : ModuleRules
     public HapticsManager(ReadOnlyTargetRules Target) : base (Target)
 	{
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
+        PrivatePCHHeaderFile = "Public/HapticsManager.h";
 
         PublicIncludePaths.AddRange(
 			new string[] {
@@ -78,7 +79,7 @@ public class HapticsManager : ModuleRules
         else if (Target.Platform == UnrealTargetPlatform.Android)
         {
             string PluginPath = Utils.MakePathRelativeTo(ModuleDirectory, Target.RelativeEnginePath);
-            AdditionalPropertiesForReceipt.Add(new ReceiptProperty("AndroidPlugin", Path.Combine(PluginPath, "HapticsManager_APL.xml")));
+            AdditionalPropertiesForReceipt.Add("AndroidPlugin", Path.Combine(PluginPath, "HapticsManager_APL.xml"));
         }
 
     }
