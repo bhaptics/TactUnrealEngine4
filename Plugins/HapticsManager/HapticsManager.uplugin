@@ -10,7 +10,7 @@
 	"DocsURL": "https://github.com/bhaptics/TactUnrealEngine4/tree/master/Plugins/HapticsManager/Documentation",
 	"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/content/f2d84866699e419fbb97cddc7d6530b9",
 	"SupportURL": "https://github.com/bhaptics/TactUnrealEngine4/issues/new",
-	"EngineVersion": "4.22.0",
+  "EngineVersion": "4.21.0",
 	"CanContainContent": true,
 	"Installed": true,
 	"Modules": [
