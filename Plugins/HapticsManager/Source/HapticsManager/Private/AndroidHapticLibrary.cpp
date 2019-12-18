@@ -266,6 +266,28 @@ void UAndroidHapticLibrary::AndroidThunkCpp_TogglePosition(FString DeviceAddress
 #endif // PLATFORM_ANDROID
 }
 
+void UAndroidHapticLibrary::AndroidThunkCpp_TurnOnVisualization()
+{
+#if PLATFORM_ANDROID
+	if (JNIEnv* Env = FAndroidApplication::GetJavaEnv())
+	{
+		static jmethodID TurnOnVisualizationMethod = FJavaWrapper::FindMethod(Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_TurnOnHapticVisualization", "()V", false);
+		FJavaWrapper::CallVoidMethod(Env, FJavaWrapper::GameActivityThis, TurnOnVisualizationMethod);
+	}
+#endif
+}
+
+void UAndroidHapticLibrary::AndroidThunkCpp_TurnOffVisualization()
+{
+#if PLATFORM_ANDROID
+	if (JNIEnv* Env = FAndroidApplication::GetJavaEnv())
+	{
+		static jmethodID TurnOffVisualizationMethod = FJavaWrapper::FindMethod(Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_TurnOffHapticVisualization", "()V", false);
+		FJavaWrapper::CallVoidMethod(Env, FJavaWrapper::GameActivityThis, TurnOffVisualizationMethod);
+	}
+#endif
+}
+
 EPosition UAndroidHapticLibrary::StringToPosition(FString PositionString)
 {
 	EPosition ReturnValue = EPosition::Default;
@@ -361,7 +383,7 @@ void UAndroidHapticLibrary::SubmitRequestToPlayer(FRegisterRequest Request)
 	TSharedRef< TJsonWriter<TCHAR, TCondensedJsonPrintPolicy<TCHAR>> > Writer = TJsonWriterFactory<TCHAR, TCondensedJsonPrintPolicy<TCHAR>>::Create(&RequestString);
 	if (FJsonSerializer::Serialize(RequestObject.ToSharedRef(), Writer))
 	{
-		AndroidThunkCpp_Submit(RequestString);
+		AndroidThunkCpp_Register(RequestString);
 	}
 }
 
@@ -371,6 +393,19 @@ void UAndroidHapticLibrary::AndroidThunkCpp_Submit(FString PlayerSubmission)
 	if (JNIEnv* Env = FAndroidApplication::GetJavaEnv())
 	{
 		static jmethodID SubmitMethod = FJavaWrapper::FindMethod(Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_Submit", "(Ljava/lang/String;)V", false);
+		jstring PlayerSubmissionJava = Env->NewStringUTF(TCHAR_TO_UTF8(*PlayerSubmission));
+		FJavaWrapper::CallVoidMethod(Env, FJavaWrapper::GameActivityThis, SubmitMethod, PlayerSubmissionJava);
+		Env->DeleteLocalRef(PlayerSubmissionJava);
+	}
+#endif // PLATFORM_ANDROID
+}
+
+void UAndroidHapticLibrary::AndroidThunkCpp_Register(FString PlayerSubmission)
+{
+#if PLATFORM_ANDROID
+	if (JNIEnv* Env = FAndroidApplication::GetJavaEnv())
+	{
+		static jmethodID SubmitMethod = FJavaWrapper::FindMethod(Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_Register", "(Ljava/lang/String;)V", false);
 		jstring PlayerSubmissionJava = Env->NewStringUTF(TCHAR_TO_UTF8(*PlayerSubmission));
 		FJavaWrapper::CallVoidMethod(Env, FJavaWrapper::GameActivityThis, SubmitMethod, PlayerSubmissionJava);
 		Env->DeleteLocalRef(PlayerSubmissionJava);

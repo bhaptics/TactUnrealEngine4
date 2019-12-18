@@ -50,6 +50,8 @@ class UAndroidHapticLibrary : public UBlueprintFunctionLibrary
 
 	//Library
 	static void AndroidThunkCpp_Submit(FString PlayerSubmission);
+	static void AndroidThunkCpp_Register(FString PlayerSubmission);
+
 
 	static void SubmitFrame(const FString & Key, FHapticFrame Frame);
 	static void SubmitRequestToPlayer(FSubmitRequest Request);
@@ -86,6 +88,10 @@ class UAndroidHapticLibrary : public UBlueprintFunctionLibrary
 	//Toggle the Position of Device
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "ToggleDevicePosition", Keywords = "Haptics"), Category = "Haptics")
 	static void AndroidThunkCpp_TogglePosition(FString DeviceAddress);
+
+	//UFUNCTION(BlueprintCallable, meta = (DisplayName = "SetVisualisation", Keywords = "Haptics"), Category = "Haptics")
+	static void AndroidThunkCpp_TurnOnVisualization();
+	static void AndroidThunkCpp_TurnOffVisualization();
 	   
 private:
 	static TArray<FDevice> FoundDevices;
