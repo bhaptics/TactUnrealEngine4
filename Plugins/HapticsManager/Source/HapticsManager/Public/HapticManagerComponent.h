@@ -166,12 +166,6 @@ public:
 			AdvancedDisplay = "3"),
 		Category = "bHaptics")
 		static FRotationOption CustomProjectToVest(FVector Location, UPrimitiveComponent* HitComponent, float HalfHeight = 50, FVector UpVector = FVector::ZeroVector, FVector ForwardVector = FVector::ZeroVector);
-
-	// Set to check if the Player should launch when starting the level.
-	// If true, bHaptics Player will launch when the game is run, if its installed.
-	// If false, the user must launch the Player themselves.
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PlayerMusicSkill)
-	bool ComponentLaunch = true;
 	
 private:
 	static FCriticalSection m_Mutex;
