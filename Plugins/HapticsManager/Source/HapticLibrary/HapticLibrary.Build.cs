@@ -12,7 +12,7 @@ public class HapticLibrary : ModuleRules
         if (Target.Platform == UnrealTargetPlatform.Win64)
         {
             // Add the import library
-            PublicLibraryPaths.Add(Path.Combine(ModuleDirectory, "win64"));
+            PublicLibraryPaths.Add(Path.Combine(ModuleDirectory, "../../DLLs/win64"));
             PublicAdditionalLibraries.Add("haptic_library.lib");
             
             // Delay-load the DLL, so we can load it from the right place first
@@ -21,15 +21,11 @@ public class HapticLibrary : ModuleRules
         else if (Target.Platform == UnrealTargetPlatform.Win32)
         {
             // Add the import library
-            PublicLibraryPaths.Add(Path.Combine(ModuleDirectory, "win32"));
+            PublicLibraryPaths.Add(Path.Combine(ModuleDirectory, "../../DLLs/win32"));
             PublicAdditionalLibraries.Add("haptic_library.lib");
 
             // Delay-load the DLL, so we can load it from the right place first
             PublicDelayLoadDLLs.Add("haptic_library.dll");
         }
-        //else if (Target.Platform == UnrealTargetPlatform.Mac)
-        //{
-        //    PublicDelayLoadDLLs.Add(Path.Combine(ModuleDirectory, "Mac", "Release", "HapticLibrary.dylib"));
-        //}
     }
 }
