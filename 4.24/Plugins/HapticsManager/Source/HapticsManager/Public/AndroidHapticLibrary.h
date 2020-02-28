@@ -19,7 +19,7 @@ DECLARE_DELEGATE_OneParam(FDeviceArrayDelegate, TArray<FDevice>);
 DECLARE_DELEGATE_OneParam(FDeviceStatusDelegate, FDeviceStatus);
 
 UCLASS()
-class UAndroidHapticLibrary : public UBlueprintFunctionLibrary
+class HAPTICSMANAGER_API UAndroidHapticLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_UCLASS_BODY()
 

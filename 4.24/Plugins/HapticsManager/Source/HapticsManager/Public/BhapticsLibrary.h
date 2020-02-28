@@ -28,7 +28,7 @@ public:
 	static void Lib_Submit(FString Key, EPosition Pos, TArray<FPathPoint> Points, int DurationMillis);
 
 	static bool Lib_IsFeedbackRegistered(FString key);
-
+	
 	static bool Lib_IsPlaying();
 
 	static bool Lib_IsPlaying(FString Key);
