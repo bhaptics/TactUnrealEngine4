@@ -227,8 +227,8 @@ struct FRegisterRequest {
 
 	GENERATED_BODY()
 
-		UPROPERTY()
-		FString Key;
+	UPROPERTY()
+	FString Key;
 
 	//UPROPERTY()
 	TSharedPtr<FJsonObject> Project;
@@ -245,8 +245,8 @@ struct FHapticFrame {
 
 	GENERATED_BODY()
 
-		UPROPERTY()
-		int DurationMillis;
+	UPROPERTY()
+	int DurationMillis;
 
 	UPROPERTY()
 		FString Position;

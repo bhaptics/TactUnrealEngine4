@@ -43,7 +43,7 @@ JNI_METHOD void Java_com_epicgames_ue4_GameActivity_nativeOnChangeScanState(JNIE
 	const char *nativeStateString = jenv->GetStringUTFChars(scanningState, 0);
 	FString StateString = FString(nativeStateString);
 	jenv->ReleaseStringUTFChars(scanningState, nativeStateString);
-	UE_LOG(LogTemp, Log, TEXT("The current state is %s"), *StateString);
+	UE_LOG(LogTemp, Log, TEXT("The current scanning state is %s"), *StateString);
 }
 
 JNI_METHOD void Java_com_epicgames_ue4_GameActivity_nativeOnChangeResponse(JNIEnv* jenv, jobject thiz, jstring changeResponse)

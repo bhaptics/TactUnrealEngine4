@@ -85,3 +85,6 @@ Plugins/*/Binaries/*
 
 #zip files
 *.zip
+
+
+enc_temp_folder/

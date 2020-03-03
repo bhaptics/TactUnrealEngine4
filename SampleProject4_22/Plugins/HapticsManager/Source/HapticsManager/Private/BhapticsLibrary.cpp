@@ -79,7 +79,6 @@ bool BhapticsLibrary::InitialiseConnection()
 		FString ExeLocation;
 		FFileHelper::LoadFileToString(ExeLocation, *ConfigPath);
 		if (FPaths::FileExists(ExeLocation)) {
-			//if (!BhapticsUtilities::IsExternalPlayerRunning(ExeLocation))
 			FString ExeName = FPaths::GetBaseFilename(*ExeLocation);
 
 			if (!FPlatformProcess::IsApplicationRunning(*ExeName) && bLaunch)
@@ -94,7 +93,6 @@ bool BhapticsLibrary::InitialiseConnection()
 	}
 	else
 	{
-		//FString ExePath(BhapticsUtilities::GetExecutablePath());
 		char Path[100];
 		int Size = 0;
 		bool Result = TryGetExePath(Path, Size);
@@ -142,8 +140,8 @@ bool BhapticsLibrary::InitialiseConnection()
 		);
 	}
 
-	std::string StandardName(TCHAR_TO_UTF8(*ProjectName));
-	Initialise(StandardName.c_str(), StandardName.c_str());
+	const std::string standardName(TCHAR_TO_UTF8(*ProjectName));
+	Initialise(standardName.c_str(), standardName.c_str());
 	Success = true;
 #endif // !PLATFORM_ANDROID
 	return true;
@@ -207,8 +205,8 @@ void BhapticsLibrary::Lib_SubmitRegistered(FString Key)
 	{
 		return;
 	}
-	std::string StandardKey(TCHAR_TO_UTF8(*Key));
-	SubmitRegistered(StandardKey.c_str());
+	const std::string stdKey(TCHAR_TO_UTF8(*Key));
+	SubmitRegistered(stdKey.c_str());
 #endif // PLATFORM_ANDROID
 
 }
@@ -493,21 +491,21 @@ TArray<FHapticFeedback> BhapticsLibrary::Lib_GetResponseStatus()
 	TArray<EPosition> PositionEnum =
 	{ EPosition::ForearmL,EPosition::ForearmR,EPosition::Head, EPosition::VestFront,EPosition::VestBack,EPosition::HandL, EPosition::HandR, EPosition::FootL, EPosition::FootR };
 
-	for (int i = 0; i < Positions.Num(); i++)
+	for (int posIndex = 0; posIndex < Positions.Num(); posIndex++)
 	{
 		status stat;
-		bool res = TryGetResponseForPosition(Positions[i], stat);
+		bool res = TryGetResponseForPosition(Positions[posIndex], stat);
 		TArray<uint8> val;
 		val.Init(0, 20);
 		if (res)
 		{
-			for (int j = 0; j < val.Num(); j++)
+			for (int motorIndex = 0; motorIndex < val.Num(); motorIndex++)
 			{
-				val[j] = stat.values[j];
+				val[motorIndex] = stat.values[motorIndex];
 			}
 		}
 
-		FHapticFeedback Feedback = FHapticFeedback(PositionEnum[i], val, EFeedbackMode::DOT_MODE);
+		FHapticFeedback Feedback = FHapticFeedback(PositionEnum[posIndex], val, EFeedbackMode::DOT_MODE);
 		ChangedFeedback.Add(Feedback);
 	}
 #endif
@@ -515,6 +513,8 @@ TArray<FHapticFeedback> BhapticsLibrary::Lib_GetResponseStatus()
 }
 
 #if !PLATFORM_ANDROID
+
+
 static bhaptics::PositionType PositionEnumToDeviceType(EPosition Position)
 {
 	bhaptics::PositionType Device = bhaptics::PositionType::All;

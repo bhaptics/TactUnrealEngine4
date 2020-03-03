@@ -33,14 +33,14 @@
 
   <prebuildCopies>
     <log text="Copying example java method directory to staging before build"/>
-    <copyFile src="$S(PluginDir)/Android/bhaptics_ble_1.05.aar"
-            dst="$S(BuildDir)/gradle/bhaptics_ble_1.05.aar" />
-    <copyFile src="$S(PluginDir)/Android/bhaptics_commons_1.05.aar"
-            dst="$S(BuildDir)/gradle/bhaptics_commons_1.05.aar" />
-    <copyFile src="$S(PluginDir)/Android/bhaptics_core_1.05.aar"
-            dst="$S(BuildDir)/gradle/bhaptics_core_1.05.aar" />
-    <copyFile src="$S(PluginDir)/Android/bhaptics_manager_1.05.aar"
-            dst="$S(BuildDir)/gradle/bhaptics_manager_1.05.aar" />
+    <copyFile src="$S(PluginDir)/Android/bhaptics_ble_1.08.aar"
+            dst="$S(BuildDir)/gradle/bhaptics_ble_1.08.aar" />
+    <copyFile src="$S(PluginDir)/Android/bhaptics_commons_1.08.aar"
+            dst="$S(BuildDir)/gradle/bhaptics_commons_1.08.aar" />
+    <copyFile src="$S(PluginDir)/Android/bhaptics_core_1.08.aar"
+            dst="$S(BuildDir)/gradle/bhaptics_core_1.08.aar" />
+    <copyFile src="$S(PluginDir)/Android/bhaptics_manager_1.08.aar"
+            dst="$S(BuildDir)/gradle/bhaptics_manager_1.08.aar" />
   </prebuildCopies>
 
   <AARImports>
@@ -49,10 +49,10 @@
   <buildGradleAdditions>
     <insert>
       dependencies {
-        implementation files('../bhaptics_ble_1.05.aar')
-        implementation files('../bhaptics_core_1.05.aar')
-        implementation files('../bhaptics_commons_1.05.aar')
-        implementation files('../bhaptics_manager_1.05.aar')
+      implementation files('../bhaptics_ble_1.08.aar')
+      implementation files('../bhaptics_core_1.08.aar')
+      implementation files('../bhaptics_commons_1.08.aar')
+      implementation files('../bhaptics_manager_1.08.aar')
       }
     </insert>
   </buildGradleAdditions>
@@ -256,7 +256,7 @@
 		<insert>
       <![CDATA[
         player = new com.bhaptics.bhapticsmanger.HapticPlayerImpl();
-        bhapticsManager = new com.bhaptics.bhapticsmanger.BhapticsManagerImpl(this, player);
+        bhapticsManager = new com.bhaptics.bhapticsmanger.BhapticsManagerImpl(this, player, new PairedDeviceManagerImpl(this));
         bhapticsManager.addBhapticsManageCallback(new com.bhaptics.bhapticsmanger.BhapticsManagerCallback() {
           @Override
           public void onDeviceUpdate(List<com.bhaptics.commons.model.BhapticsDevice> deviceList) {
