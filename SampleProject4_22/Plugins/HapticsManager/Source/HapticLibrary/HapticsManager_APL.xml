@@ -7,11 +7,6 @@
 	</init>
 
   <androidManifestUpdates>
-    <addElements tag="application">
-	    <activity android:name="com.bhaptics.player.AndroidPlayerActivity"
-            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
-            android:label="@string/app_name" />
-    </addElements>
     <addPermission android:name="android.permission.BLUETOOTH" />
     <addPermission android:name="android.permission.BLUETOOTH_ADMIN" />
     <addPermission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -32,7 +27,7 @@
   </proguardAdditions>
 
   <prebuildCopies>
-    <log text="Copying example java method directory to staging before build"/>
+    <log text="Copying bhaptics aar files"/>
     <copyFile src="$S(PluginDir)/Android/bhaptics_ble_1.08.aar"
             dst="$S(BuildDir)/gradle/bhaptics_ble_1.08.aar" />
     <copyFile src="$S(PluginDir)/Android/bhaptics_commons_1.08.aar"
@@ -256,7 +251,7 @@
 		<insert>
       <![CDATA[
         player = new com.bhaptics.bhapticsmanger.HapticPlayerImpl();
-        bhapticsManager = new com.bhaptics.bhapticsmanger.BhapticsManagerImpl(this, player, new PairedDeviceManagerImpl(this));
+        bhapticsManager = new com.bhaptics.bhapticsmanger.BhapticsManagerImpl(this, player, new com.bhaptics.ble.PairedDeviceManagerImpl(this));
         bhapticsManager.addBhapticsManageCallback(new com.bhaptics.bhapticsmanger.BhapticsManagerCallback() {
           @Override
           public void onDeviceUpdate(List<com.bhaptics.commons.model.BhapticsDevice> deviceList) {

@@ -15,7 +15,6 @@
 #include "HapticLibrary/HapticLibrary.h"
 #endif // PLATFORM_ANDROID
 
-#include "HapticsManager.h"
 
 bool BhapticsLibrary::IsInitialised = false;
 bool BhapticsLibrary::IsLoaded = false;
@@ -93,7 +92,7 @@ bool BhapticsLibrary::InitialiseConnection()
 	}
 	else
 	{
-		char Path[100];
+		char Path[1000];
 		int Size = 0;
 		bool Result = TryGetExePath(Path, Size);
 		FString ExePath(Path);

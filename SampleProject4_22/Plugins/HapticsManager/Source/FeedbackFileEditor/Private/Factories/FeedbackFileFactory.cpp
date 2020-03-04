@@ -60,7 +60,7 @@ UObject* UFeedbackFileFactory::FactoryCreateFile(UClass* InClass, UObject* InPar
 
 	bOutOperationCanceled = false;
 
-	if (Device.StartsWith("Vest"))
+	if (Device.StartsWith("Vest") || Device.StartsWith("Tactot"))
 	{
 		UTactotFeedbackFile* TactotFile = nullptr;
 		TactotFile = NewObject<UTactotFeedbackFile>(InParent, UTactotFeedbackFile::StaticClass(), InName, Flags);
