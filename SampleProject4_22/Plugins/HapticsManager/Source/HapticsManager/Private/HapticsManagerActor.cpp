@@ -7,34 +7,24 @@
 #include "AndroidHapticLibrary.h"
 #include "BhapticsLibrary.h"
 
-FCriticalSection AHapticsManagerActor::m_Mutex;
 
 // Sets default values
 AHapticsManagerActor::AHapticsManagerActor()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	FGuid Gui = FGuid::NewGuid();
-	Id = Gui.ToString();
 }
 
 void AHapticsManagerActor::BeginDestroy()
 {
 	Super::BeginDestroy();
-	//UAndroidHapticLibrary::AndroidThunkCpp_TurnOffVisualization();
-}
-
-void AHapticsManagerActor::OnConstruction(const FTransform & Transform)
-{
-	Super::OnConstruction(Transform);
-
+	UAndroidHapticLibrary::AndroidThunkCpp_TurnOffVisualization();
 }
 
 // Called when the game starts or when spawned
 void AHapticsManagerActor::BeginPlay()
 {
 	Super::BeginPlay();
-	ChangedFeedbacks = {};
 
 	InitialiseDots(Tactal);
 	InitialiseDots(TactosyLeft);
@@ -61,8 +51,7 @@ void AHapticsManagerActor::Tick(float DeltaTime)
 
 	IsTicking = true;
 
-	UpdateFeedback();
-	TArray<FHapticFeedback> Visualisation = ChangedFeedbacks;
+	TArray<FHapticFeedback> Visualisation = BhapticsLibrary::Lib_GetResponseStatus();
 
 	for (int i = 0; i < Visualisation.Num(); i++)
 	{
@@ -103,15 +92,7 @@ void AHapticsManagerActor::Tick(float DeltaTime)
 		}
 	}
 
-	ChangedFeedbacks.Empty();
-
 	IsTicking = false;
-}
-
-void AHapticsManagerActor::UpdateFeedback()
-{
-	//std::map<std::string, std::vector<int>> DeviceMotors = bhaptics::HapticPlayer::instance()->getResponseStatus();//fix
-	ChangedFeedbacks = BhapticsLibrary::Lib_GetResponseStatus();
 }
 
 void AHapticsManagerActor::InitialiseDots(TArray<USceneComponent*> TactSuitItem, float Scale)

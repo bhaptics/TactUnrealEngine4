@@ -1,43 +1,16 @@
 //Copyright bHaptics Inc. 2017-2019
 
-#include "HapticManagerComponent.h"
+
+#include "BhapticsRequestLibrary.h"
+
+
 #include "HapticStructures.h"
 #include "Components/PrimitiveComponent.h"
 #include "BhapticsLibrary.h"
 
-FCriticalSection UHapticManagerComponent::m_Mutex;
-
-// Sets default values for this component's properties
-UHapticManagerComponent::UHapticManagerComponent()
+void UBhapticsRequestLibrary::SubmitFeedback(UFeedbackFile* Feedback)
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
-	FGuid Gui = FGuid::NewGuid();
-	Id = Gui.ToString();
-
-}
-
-// Called every frame
-void UHapticManagerComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-}
-
-void UHapticManagerComponent::BeginPlay()
-{
-	Super::BeginPlay();
-
-	m_Mutex.Lock();
-	IsInitialised = BhapticsLibrary::InitialiseConnection();
-	m_Mutex.Unlock();
-	//IsInitialised = true;
-}
-
-
-void UHapticManagerComponent::SubmitFeedback(UFeedbackFile* Feedback)
-{
-	if (!IsInitialised || Feedback == NULL)
+	if (Feedback == NULL)
 	{
 		return;
 	}
@@ -51,9 +24,9 @@ void UHapticManagerComponent::SubmitFeedback(UFeedbackFile* Feedback)
 	BhapticsLibrary::Lib_SubmitRegistered(FeedbackKey);
 }
 
-void UHapticManagerComponent::SubmitFeedbackWithIntensityDuration(UFeedbackFile* Feedback, const FString &AltKey, FRotationOption RotationOption, FScaleOption ScaleOption,bool UseAltKey)
+void UBhapticsRequestLibrary::SubmitFeedbackWithIntensityDuration(UFeedbackFile* Feedback, const FString& AltKey, FRotationOption RotationOption, FScaleOption ScaleOption, bool UseAltKey)
 {
-	if (!IsInitialised || Feedback == NULL)
+	if (Feedback == NULL)
 	{
 		return;
 	}
@@ -63,7 +36,7 @@ void UHapticManagerComponent::SubmitFeedbackWithIntensityDuration(UFeedbackFile*
 
 	if (!UseAltKey)
 	{
-		 UniqueKey = Feedback->Key + FString::FromInt(FMath::Rand());
+		UniqueKey = Feedback->Key + FString::FromInt(FMath::Rand());
 	}
 
 	if (!BhapticsLibrary::Lib_IsFeedbackRegistered(FeedbackKey))
@@ -74,18 +47,18 @@ void UHapticManagerComponent::SubmitFeedbackWithIntensityDuration(UFeedbackFile*
 	BhapticsLibrary::Lib_SubmitRegistered(FeedbackKey, UniqueKey, ScaleOption, RotationOption);
 }
 
-void UHapticManagerComponent::SubmitFeedbackWithTransform(UFeedbackFile* Feedback, const FString &AltKey, FRotationOption RotationOption, bool UseAltKey)
+void UBhapticsRequestLibrary::SubmitFeedbackWithTransform(UFeedbackFile* Feedback, const FString& AltKey, FRotationOption RotationOption, bool UseAltKey)
 {
-	if (!IsInitialised || Feedback == NULL)
+	if (Feedback == NULL)
 	{
 		return;
 	}
-	SubmitFeedbackWithIntensityDuration(Feedback, AltKey, RotationOption, FScaleOption(1, 1),UseAltKey);
+	SubmitFeedbackWithIntensityDuration(Feedback, AltKey, RotationOption, FScaleOption(1, 1), UseAltKey);
 }
 
-void UHapticManagerComponent::RegisterFeedbackFile(const FString &Key, UFeedbackFile* Feedback)
+void UBhapticsRequestLibrary::RegisterFeedbackFile(const FString& Key, UFeedbackFile* Feedback)
 {
-	if (!IsInitialised || Feedback == NULL)
+	if (Feedback == NULL)
 	{
 		return;
 	}
@@ -95,57 +68,34 @@ void UHapticManagerComponent::RegisterFeedbackFile(const FString &Key, UFeedback
 	}
 }
 
-void UHapticManagerComponent::SubmitBytes(const FString &Key, EPosition PositionEnum, const TArray<uint8>& InputBytes, int32 DurationInMilliSecs)
+void UBhapticsRequestLibrary::SubmitBytes(const FString& Key, EPosition PositionEnum, const TArray<uint8>& InputBytes, int32 DurationInMilliSecs)
 {
-	if (!IsInitialised)
-	{
-		return;
-	}
-
 	BhapticsLibrary::Lib_Submit(Key, PositionEnum, InputBytes, DurationInMilliSecs);
 }
 
-void UHapticManagerComponent::SubmitDots(const FString &Key, EPosition PositionEnum, const TArray<FDotPoint> DotPoints, int32 DurationInMilliSecs)
+void UBhapticsRequestLibrary::SubmitDots(const FString& Key, EPosition PositionEnum, const TArray<FDotPoint> DotPoints, int32 DurationInMilliSecs)
 {
-	if (!IsInitialised)
-	{
-		return;
-	}
 	BhapticsLibrary::Lib_Submit(Key, PositionEnum, DotPoints, DurationInMilliSecs);
 }
 
-void UHapticManagerComponent::SubmitPath(const FString &Key, EPosition PositionEnum, const TArray<FPathPoint>PathPoints, int32 DurationInMilliSecs)
+void UBhapticsRequestLibrary::SubmitPath(const FString& Key, EPosition PositionEnum, const TArray<FPathPoint>PathPoints, int32 DurationInMilliSecs)
 {
-	if (!IsInitialised)
-	{
-		return;
-	}
 	BhapticsLibrary::Lib_Submit(Key, PositionEnum, PathPoints, DurationInMilliSecs);
 }
 
-bool UHapticManagerComponent::IsAnythingPlaying()
+bool UBhapticsRequestLibrary::IsAnythingPlaying()
 {
-	if (!IsInitialised)
-	{
-		return false;
-	}
 	bool Value = false;
 	Value = BhapticsLibrary::Lib_IsPlaying();
 	return Value;
 }
 
-bool UHapticManagerComponent::IsRegisteredPlaying(const FString &Key)
+bool UBhapticsRequestLibrary::IsRegisteredPlaying(const FString& Key)
 {
-	if (!IsInitialised)
-	{
-		return false;
-	}
-	bool Value = false;
-	Value = BhapticsLibrary::Lib_IsPlaying(Key);
-	return Value;
+	return  BhapticsLibrary::Lib_IsPlaying(Key);
 }
 
-bool UHapticManagerComponent::IsRegisteredFilePlaying(UFeedbackFile* Feedback)
+bool UBhapticsRequestLibrary::IsRegisteredFilePlaying(UFeedbackFile* Feedback)
 {
 	bool Value = false;
 	if (Feedback == NULL)
@@ -158,30 +108,18 @@ bool UHapticManagerComponent::IsRegisteredFilePlaying(UFeedbackFile* Feedback)
 	return Value;
 }
 
-void UHapticManagerComponent::TurnOffAllFeedback()
+void UBhapticsRequestLibrary::TurnOffAllFeedback()
 {
-	if (!IsInitialised)
-	{
-		return;
-	}
 	BhapticsLibrary::Lib_TurnOff();
 }
 
-void UHapticManagerComponent::TurnOffRegisteredFeedback(const FString &Key)
+void UBhapticsRequestLibrary::TurnOffRegisteredFeedback(const FString& Key)
 {
-	if (!IsInitialised)
-	{
-		return;
-	}
 	BhapticsLibrary::Lib_TurnOff(Key);
 }
 
-void UHapticManagerComponent::TurnOffRegisteredFeedbackFile(UFeedbackFile* Feedback)
+void UBhapticsRequestLibrary::TurnOffRegisteredFeedbackFile(UFeedbackFile* Feedback)
 {
-	if (!IsInitialised)
-	{
-		return;
-	}
 	if (Feedback == NULL)
 	{
 		return;
@@ -191,34 +129,22 @@ void UHapticManagerComponent::TurnOffRegisteredFeedbackFile(UFeedbackFile* Feedb
 	BhapticsLibrary::Lib_TurnOff(FeedbackKey);
 }
 
-void UHapticManagerComponent::EnableHapticFeedback()
+void UBhapticsRequestLibrary::EnableHapticFeedback()
 {
-	if (!IsInitialised)
-	{
-		return;
-	}
 	BhapticsLibrary::Lib_EnableFeedback();
 }
 
-void UHapticManagerComponent::DisableHapticFeedback()
+void UBhapticsRequestLibrary::DisableHapticFeedback()
 {
-	if (!IsInitialised)
-	{
-		return;
-	}
 	BhapticsLibrary::Lib_DisableFeedback();
 }
 
-void UHapticManagerComponent::ToggleHapticFeedback()
+void UBhapticsRequestLibrary::ToggleHapticFeedback()
 {
-	if (!IsInitialised)
-	{
-		return;
-	}
 	BhapticsLibrary::Lib_ToggleFeedback();
 }
 
-FRotationOption UHapticManagerComponent::ProjectToVest(FVector Location, UPrimitiveComponent * HitComponent, float HalfHeight)
+FRotationOption UBhapticsRequestLibrary::ProjectToVest(FVector Location, UPrimitiveComponent* HitComponent, float HalfHeight)
 {
 	if (HitComponent == nullptr)
 	{
@@ -255,7 +181,7 @@ FRotationOption UHapticManagerComponent::ProjectToVest(FVector Location, UPrimit
 	return FRotationOption(Angle, Y_Offset);
 }
 
-FRotationOption UHapticManagerComponent::CustomProjectToVest(FVector Location, UPrimitiveComponent * HitComponent, float HalfHeight, FVector UpVector, FVector ForwardVector)
+FRotationOption UBhapticsRequestLibrary::CustomProjectToVest(FVector Location, UPrimitiveComponent* HitComponent, float HalfHeight, FVector UpVector, FVector ForwardVector)
 {
 	if (HitComponent == nullptr)
 	{
@@ -309,13 +235,7 @@ FRotationOption UHapticManagerComponent::CustomProjectToVest(FVector Location, U
 	return FRotationOption(Angle, Y_Offset);
 }
 
-bool UHapticManagerComponent::IsDeviceConnected(EPosition device)
+bool UBhapticsRequestLibrary::IsDeviceConnected(EPosition device)
 {
-	if (!IsInitialised)
-	{
-		return false;
-	}
-	bool Value = false;
-	Value = BhapticsLibrary::Lib_IsDevicePlaying(device);
-	return Value;
+	return BhapticsLibrary::Lib_IsDevicePlaying(device);
 }

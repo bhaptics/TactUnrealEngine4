@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "HapticStructures.h"
 #include "GameFramework/Actor.h"
-#include "FeedbackFile.h"
 #include "HapticsManagerActor.generated.h"
 
 
@@ -15,15 +14,10 @@ class HAPTICSMANAGER_API AHapticsManagerActor : public AActor
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this actor's properties
 	AHapticsManagerActor();
-
-	TArray<FHapticFeedback> ChangedFeedbacks;
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
-	virtual void OnConstruction(const FTransform & Transform) override;
 
 	virtual void BeginDestroy() override;
 
@@ -57,11 +51,8 @@ public:
 			USceneComponent* GloveLeft, USceneComponent* GloveRight, USceneComponent* ShoeLeft, USceneComponent* ShoeRight);
 
 private:
-	static FCriticalSection m_Mutex;
 	bool IsTicking = false;
-	void UpdateFeedback();
 	void VisualiseFeedback(FHapticFeedback Feedback, TArray<USceneComponent*> TactoSuitItem, float DeviceScale = 1.0f);
 	void InitialiseDots(TArray<USceneComponent*> TactoSuitItem, float Scale = 1.0f);
-	FString Id;
 
 };

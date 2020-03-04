@@ -45,9 +45,10 @@ void BhapticsLibrary::SetLibraryLoaded()
 	IsLoaded = true;
 }
 
-bool BhapticsLibrary::InitialiseConnection()
+bool BhapticsLibrary::Initialize()
 {
 #if PLATFORM_ANDROID
+	UAndroidHapticLibrary::AndroidThunkCpp_StartScanning();
 #else
 	if (!IsLoaded)
 	{
@@ -142,7 +143,7 @@ bool BhapticsLibrary::InitialiseConnection()
 	const std::string standardName(TCHAR_TO_UTF8(*ProjectName));
 	Initialise(standardName.c_str(), standardName.c_str());
 	Success = true;
-#endif // !PLATFORM_ANDROID
+#endif 
 	return true;
 }
 
@@ -483,7 +484,6 @@ TArray<FHapticFeedback> BhapticsLibrary::Lib_GetResponseStatus()
 	{
 		return ChangedFeedback;
 	}
-	//std::string Positions [] = {"ForearmL","ForearmR","Head", "VestFront", "VestBack", "HandL", "HandR", "FootL", "FootR"};
 	TArray<bhaptics::PositionType> Positions =
 	{ bhaptics::PositionType::ForearmL,bhaptics::PositionType::ForearmR,bhaptics::PositionType::Head, bhaptics::PositionType::VestFront,bhaptics::PositionType::VestBack,
 	bhaptics::PositionType::HandL, bhaptics::PositionType::HandR, bhaptics::PositionType::FootL, bhaptics::PositionType::FootR };

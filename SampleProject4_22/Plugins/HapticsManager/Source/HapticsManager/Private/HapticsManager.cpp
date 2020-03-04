@@ -32,6 +32,8 @@ void FHapticsManagerModule::StartupModule()
 	{
 		UE_LOG(LogTemp, Log, TEXT("Cannot find haptics_library.dll"));
 	}
+
+	BhapticsLibrary::Initialize();
 }
 
 void FHapticsManagerModule::ShutdownModule()
