@@ -54,4 +54,5 @@ private:
 	static bool IsInitialised;
 	static FProcHandle Handle;
 	static bool Success;
+	static void InitializeCheck();
 };

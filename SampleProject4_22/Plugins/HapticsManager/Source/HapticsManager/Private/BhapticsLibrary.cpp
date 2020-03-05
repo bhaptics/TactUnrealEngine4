@@ -170,6 +170,8 @@ void BhapticsLibrary::Free()
 }
 void BhapticsLibrary::Lib_RegisterFeedback(FString Key, FString ProjectJson)
 {
+	InitializeCheck();
+	
 #if PLATFORM_ANDROID
 	TSharedPtr<FJsonObject> JsonObject;
 	TSharedRef<TJsonReader<>> JsonReader = TJsonReaderFactory<>::Create(ProjectJson);
@@ -195,6 +197,8 @@ void BhapticsLibrary::Lib_RegisterFeedback(FString Key, FString ProjectJson)
 
 void BhapticsLibrary::Lib_SubmitRegistered(FString Key)
 {
+	InitializeCheck();
+	
 #if PLATFORM_ANDROID
 	FSubmitRequest Request = FSubmitRequest();
 	Request.Key = Key;
@@ -213,6 +217,9 @@ void BhapticsLibrary::Lib_SubmitRegistered(FString Key)
 
 void BhapticsLibrary::Lib_SubmitRegistered(FString Key, FString AltKey, FScaleOption ScaleOpt, FRotationOption RotOption)
 {
+
+	InitializeCheck();
+	
 #if PLATFORM_ANDROID
 	FSubmitRequest Request = FSubmitRequest();
 	Request.Key = Key;
@@ -241,6 +248,8 @@ void BhapticsLibrary::Lib_SubmitRegistered(FString Key, FString AltKey, FScaleOp
 
 void BhapticsLibrary::Lib_Submit(FString Key, EPosition Pos, TArray<uint8> MotorBytes, int DurationMillis)
 {
+	InitializeCheck();
+	
 #if PLATFORM_ANDROID
 	TArray<FDotPoint> Points = TArray<FDotPoint>();
 	for (int i = 0; i < MotorBytes.Num(); i++)
@@ -279,6 +288,9 @@ void BhapticsLibrary::Lib_Submit(FString Key, EPosition Pos, TArray<uint8> Motor
 
 void BhapticsLibrary::Lib_Submit(FString Key, EPosition Pos, TArray<FDotPoint> Points, int DurationMillis)
 {
+
+	InitializeCheck();
+	
 #if PLATFORM_ANDROID
 	FHapticFrame SubmissionFrame = FHapticFrame();
 	SubmissionFrame.DotPoints = Points;
@@ -307,6 +319,7 @@ void BhapticsLibrary::Lib_Submit(FString Key, EPosition Pos, TArray<FDotPoint> P
 
 void BhapticsLibrary::Lib_Submit(FString Key, EPosition Pos, TArray<FPathPoint> Points, int DurationMillis)
 {
+	InitializeCheck();
 #if PLATFORM_ANDROID
 	FHapticFrame SubmissionFrame = FHapticFrame();
 	SubmissionFrame.DotPoints = TArray<FDotPoint>();
@@ -338,6 +351,7 @@ void BhapticsLibrary::Lib_Submit(FString Key, EPosition Pos, TArray<FPathPoint> 
 
 bool BhapticsLibrary::Lib_IsFeedbackRegistered(FString Key)
 {
+	InitializeCheck();
 	bool Value = false;
 #if PLATFORM_ANDROID
 	FPlayerResponse Response = UAndroidHapticLibrary::GetCurrentResponse();
@@ -355,6 +369,8 @@ bool BhapticsLibrary::Lib_IsFeedbackRegistered(FString Key)
 
 bool BhapticsLibrary::Lib_IsPlaying()
 {
+	InitializeCheck();
+	
 	bool Value = false;
 #if PLATFORM_ANDROID
 	FPlayerResponse Response = UAndroidHapticLibrary::GetCurrentResponse();
@@ -371,6 +387,8 @@ bool BhapticsLibrary::Lib_IsPlaying()
 
 bool BhapticsLibrary::Lib_IsPlaying(FString Key)
 {
+	InitializeCheck();
+	
 	bool Value = false;
 #if PLATFORM_ANDROID
 	FPlayerResponse Response = UAndroidHapticLibrary::GetCurrentResponse();
@@ -388,6 +406,7 @@ bool BhapticsLibrary::Lib_IsPlaying(FString Key)
 
 void BhapticsLibrary::Lib_TurnOff()
 {
+	InitializeCheck();
 #if PLATFORM_ANDROID
 	FSubmitRequest Request = FSubmitRequest();
 	Request.Key = "";
@@ -404,6 +423,7 @@ void BhapticsLibrary::Lib_TurnOff()
 
 void BhapticsLibrary::Lib_TurnOff(FString Key)
 {
+	InitializeCheck();
 #if PLATFORM_ANDROID
 	FSubmitRequest Request = FSubmitRequest();
 	Request.Key = Key;
@@ -421,6 +441,7 @@ void BhapticsLibrary::Lib_TurnOff(FString Key)
 
 void BhapticsLibrary::Lib_EnableFeedback()
 {
+	InitializeCheck();
 #if PLATFORM_ANDROID
 #else
 	if (!IsLoaded)
@@ -433,6 +454,7 @@ void BhapticsLibrary::Lib_EnableFeedback()
 
 void BhapticsLibrary::Lib_DisableFeedback()
 {
+	InitializeCheck();
 #if PLATFORM_ANDROID
 #else
 	if (!IsLoaded)
@@ -445,6 +467,7 @@ void BhapticsLibrary::Lib_DisableFeedback()
 
 void BhapticsLibrary::Lib_ToggleFeedback()
 {
+	InitializeCheck();
 #if PLATFORM_ANDROID
 #else
 	if (!IsLoaded)
@@ -457,6 +480,7 @@ void BhapticsLibrary::Lib_ToggleFeedback()
 
 bool BhapticsLibrary::Lib_IsDevicePlaying(EPosition Pos)
 {
+	InitializeCheck();
 	bool Value = false;
 #if PLATFORM_ANDROID
 	FString DeviceString = PositionEnumToDeviceString(Pos);
@@ -475,6 +499,7 @@ bool BhapticsLibrary::Lib_IsDevicePlaying(EPosition Pos)
 
 TArray<FHapticFeedback> BhapticsLibrary::Lib_GetResponseStatus()
 {
+	InitializeCheck();
 	TArray<FHapticFeedback> ChangedFeedback;
 #if PLATFORM_ANDROID
 	FPlayerResponse Response = UAndroidHapticLibrary::GetCurrentResponse();
@@ -509,6 +534,14 @@ TArray<FHapticFeedback> BhapticsLibrary::Lib_GetResponseStatus()
 	}
 #endif
 	return ChangedFeedback;
+}
+
+void BhapticsLibrary::InitializeCheck()
+{
+	if (!IsInitialised)
+	{
+		Initialize();
+	}
 }
 
 #if !PLATFORM_ANDROID
