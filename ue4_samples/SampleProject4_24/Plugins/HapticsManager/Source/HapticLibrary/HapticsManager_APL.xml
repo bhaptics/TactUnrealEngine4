@@ -162,6 +162,9 @@
 
       //Bluetooth Functionality
       public void AndroidThunkJava_Scan() {
+        if (!com.bhaptics.commons.PermissionUtils.hasBluetoothPermission(this)) {
+          return;
+        }
         Log.warn("StartScan");
         bhapticsManager.scan();
       }
