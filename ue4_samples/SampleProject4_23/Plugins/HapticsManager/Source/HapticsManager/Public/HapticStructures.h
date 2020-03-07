@@ -11,6 +11,7 @@ UENUM(BlueprintType)
 enum class EPosition : uint8
 {
 	VestFront = 201, VestBack = 202,
+	Vest = 3,
 	Head = 4,
 	ForearmL = 10, ForearmR = 11,
 	HandL = 6, HandR = 7,

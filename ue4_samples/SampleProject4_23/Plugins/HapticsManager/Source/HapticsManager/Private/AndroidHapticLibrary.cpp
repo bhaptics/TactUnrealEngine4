@@ -315,6 +315,10 @@ EPosition UAndroidHapticLibrary::StringToPosition(FString PositionString)
 	{
 		ReturnValue = EPosition::VestBack;
 	}
+	else if (PositionString == "Vest")
+	{
+		ReturnValue = EPosition::Vest;
+	}
 	else if (PositionString == "Head")
 	{
 		ReturnValue = EPosition::Head;

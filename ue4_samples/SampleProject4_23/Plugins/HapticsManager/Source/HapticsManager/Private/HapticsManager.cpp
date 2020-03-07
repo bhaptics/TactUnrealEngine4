@@ -4,7 +4,6 @@
 #include "BhapticsLibrary.h"
 #include "Misc/Paths.h"
 #include "Interfaces/IPluginManager.h"
-#include "MessageDialog.h"
 
 #define LOCTEXT_NAMESPACE "FHapticsManagerModule"
 void FHapticsManagerModule::StartupModule()

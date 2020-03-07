@@ -165,6 +165,7 @@
         if (!com.bhaptics.commons.PermissionUtils.hasBluetoothPermission(this)) {
           return;
         }
+      
         Log.warn("StartScan");
         bhapticsManager.scan();
       }
