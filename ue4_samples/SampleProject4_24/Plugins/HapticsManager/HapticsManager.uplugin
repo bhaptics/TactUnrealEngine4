@@ -1,7 +1,7 @@
 {
 	"FileVersion": 3,
-	"Version": 7,
-	"VersionName": "1.4.9",
+	"Version": 8,
+	"VersionName": "1.5.0",
 	"FriendlyName": "HapticsManager",
 	"Description": "bHaptics haptic library",
 	"Category": "Haptic",
@@ -12,7 +12,6 @@
 	"SupportURL": "https://github.com/bhaptics/TactUnrealEngine4/issues/new",
 	"EngineVersion": "4.22.0",
 	"CanContainContent": true,
-	"IsBetaVersion": false,
 	"Installed": true,
 	"Modules": [
 		{

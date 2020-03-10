@@ -146,10 +146,16 @@ public:
 	//Compute's the horizontal angle and vertical offset and returns a RotationOption for use with a haptic feedback file.
 	//Assumes the origin of the component is in the center, and that the ForwardVector is the front of the vest.
 	UFUNCTION(BlueprintPure,
-		meta = (DisplayName = "Project To Vest",
+		meta = (DisplayName = "Project To Vest With Player Collision Object",
 			Keywords = "bHaptics"),
 		Category = "bHaptics")
-		static FRotationOption ProjectToVest(FVector Location, UPrimitiveComponent* HitComponent, float HalfHeight = 50);
+		static FRotationOption ProjectToVest(FVector ContactLocation, UPrimitiveComponent* PlayerComponent, float HalfHeight = 50);
+	
+	UFUNCTION(BlueprintPure,
+		meta = (DisplayName = "Project To Vest With Player Location/Position",
+			Keywords = "bHaptics"),
+		Category = "bHaptics")
+		static FRotationOption ProjectToVestLocation(FVector ContactLocation, FVector PlayerLocation, FRotator PlayerRotation);
 
 	//Helper function to compute rotation for a given collision.
 	//Performs the same function as Project To Vest, but allows the Forward and Up vectors to be changed.
@@ -158,6 +164,5 @@ public:
 			Keywords = "bHaptics",
 			AdvancedDisplay = "3"),
 		Category = "bHaptics")
-		static FRotationOption CustomProjectToVest(FVector Location, UPrimitiveComponent* HitComponent, float HalfHeight = 50, FVector UpVector = FVector::ZeroVector, FVector ForwardVector = FVector::ZeroVector);
-
+		static FRotationOption CustomProjectToVest(FVector ContactLocation, UPrimitiveComponent* PlayerComponent, float HalfHeight = 50, FVector UpVector = FVector::ZeroVector, FVector ForwardVector = FVector::ZeroVector);
 };

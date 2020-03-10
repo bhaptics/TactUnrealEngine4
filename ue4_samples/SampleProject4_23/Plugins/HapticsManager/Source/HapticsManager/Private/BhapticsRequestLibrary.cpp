@@ -181,6 +181,33 @@ FRotationOption UBhapticsRequestLibrary::ProjectToVest(FVector Location, UPrimit
 	return FRotationOption(Angle, Y_Offset);
 }
 
+FRotationOption UBhapticsRequestLibrary::ProjectToVestLocation(FVector ContactLocation, FVector PlayerLocation,
+	FRotator PlayerRotation)
+{
+	FRotator InverseRotation = PlayerRotation.GetInverse();
+	FVector HitPoint = InverseRotation.RotateVector(ContactLocation - PlayerLocation);
+	FVector UpVector = FVector::UpVector;//InverseRotation.RotateVector(HitComponent->GetUpVector());
+	FVector ForwardVector = FVector::ForwardVector;//InverseRotation.RotateVector(HitComponent->GetForwardVector());
+	float DotProduct, Angle, A, B;
+	FVector Result;
+
+	UpVector.Normalize();
+	ForwardVector.Normalize();
+
+	DotProduct = FVector::DotProduct(HitPoint, UpVector);
+
+	Result = HitPoint - (DotProduct * UpVector);
+	Result.Normalize();
+
+	A = Result.X * ForwardVector.Y - ForwardVector.X * Result.Y;
+	B = ForwardVector.X * Result.X + Result.Y * ForwardVector.Y;
+
+	Angle = FMath::RadiansToDegrees(FMath::Atan2(A, B));
+
+	return FRotationOption(Angle, 0);
+}
+
+
 FRotationOption UBhapticsRequestLibrary::CustomProjectToVest(FVector Location, UPrimitiveComponent* HitComponent, float HalfHeight, FVector UpVector, FVector ForwardVector)
 {
 	if (HitComponent == nullptr)
@@ -234,6 +261,8 @@ FRotationOption UBhapticsRequestLibrary::CustomProjectToVest(FVector Location, U
 
 	return FRotationOption(Angle, Y_Offset);
 }
+
+
 
 bool UBhapticsRequestLibrary::IsDeviceConnected(EPosition device)
 {
