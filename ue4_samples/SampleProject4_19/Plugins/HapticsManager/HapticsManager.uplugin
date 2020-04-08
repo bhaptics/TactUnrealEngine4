@@ -1,0 +1,39 @@
+{
+	"FileVersion": 3,
+	"Version": 8,
+	"VersionName": "1.5.0",
+	"FriendlyName": "HapticsManager",
+	"Description": "bHaptics haptic library",
+	"Category": "Haptic",
+	"CreatedBy": "bHaptics Inc.",
+	"CreatedByURL": "http://bhaptics.com",
+	"DocsURL": "https://github.com/bhaptics/TactUnrealEngine4/tree/master/Plugins/HapticsManager/Documentation",
+	"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/content/f2d84866699e419fbb97cddc7d6530b9",
+	"SupportURL": "https://github.com/bhaptics/TactUnrealEngine4/issues/new",
+	"EngineVersion": "4.19.0",
+	"CanContainContent": true,
+	"IsBetaVersion": false,
+	"Installed": true,
+	"Modules": [
+		{
+			"Name": "HapticsManager",
+			"Type": "Runtime",
+			"LoadingPhase": "Default",
+			"WhitelistPlatforms": [
+				"Win64",
+				"Win32",
+				"Android"
+			]
+		},
+		{
+			"Name": "FeedbackFileEditor",
+			"Type": "Editor",
+			"LoadingPhase": "Default",
+			"WhitelistPlatforms": [
+				"Win64",
+				"Win32",
+				"Android"
+			]
+		}
+	]
+}
