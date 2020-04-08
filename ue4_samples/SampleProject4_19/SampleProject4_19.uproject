@@ -1,0 +1,20 @@
+{
+	"FileVersion": 3,
+	"EngineAssociation": "4.19",
+	"Category": "",
+	"Description": "",
+	"Modules": [
+		{
+			"Name": "SampleProject4_19",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "HapticsManager",
+			"Enabled": true,
+			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/content/f2d84866699e419fbb97cddc7d6530b9"
+		}
+	]
+}
