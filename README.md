@@ -2,7 +2,7 @@
 This project helps to utilize haptic devices in Unreal Engine 4 Current version is 1.5.1
 
 ### Latest Release
-https://github.com/bhaptics/TactUnrealEngine4/tree/v1.5.1
+https://github.com/bhaptics/TactUnrealEngine4/releases/latest
 
 ### Project Structures
 * plugin/ 
