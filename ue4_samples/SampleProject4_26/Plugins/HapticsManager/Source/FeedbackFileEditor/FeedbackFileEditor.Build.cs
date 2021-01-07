@@ -42,7 +42,8 @@ public class FeedbackFileEditor : ModuleRules
                 "Projects",
                 "InputCore",
                 "HapticsManager",
-                "EditorStyle"
+                "EditorStyle",
+                // "FeedbackFileEditor",
                 //"Sockets",
 				// ... add private dependencies that you statically link with here ...	
 			}
