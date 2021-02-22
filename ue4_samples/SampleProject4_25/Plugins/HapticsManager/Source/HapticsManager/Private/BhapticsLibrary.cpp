@@ -354,8 +354,7 @@ bool BhapticsLibrary::Lib_IsFeedbackRegistered(FString Key)
 	InitializeCheck();
 	bool Value = false;
 #if PLATFORM_ANDROID
-	FPlayerResponse Response = UAndroidHapticLibrary::GetCurrentResponse();
-	Value = Response.RegisteredKeys.Find(Key) != INDEX_NONE;
+	Value = UAndroidHapticLibrary::IsFeedbackRegistered(Key);
 #else
 	if (!IsLoaded)
 	{

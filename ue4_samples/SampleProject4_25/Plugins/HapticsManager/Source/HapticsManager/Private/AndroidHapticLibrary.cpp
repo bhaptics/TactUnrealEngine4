@@ -38,20 +38,14 @@ JNI_METHOD void Java_com_epicgames_ue4_GameActivity_nativeOnDeviceFound(JNIEnv* 
 	}
 }
 
-JNI_METHOD void Java_com_epicgames_ue4_GameActivity_nativeOnChangeScanState(JNIEnv* jenv, jobject thiz, jstring scanningState)
+JNI_METHOD void Java_com_epicgames_ue4_GameActivity_nativeOnChangeScanState(JNIEnv* jenv, jobject thiz)
 {
-	const char *nativeStateString = jenv->GetStringUTFChars(scanningState, 0);
-	FString StateString = FString(nativeStateString);
-	jenv->ReleaseStringUTFChars(scanningState, nativeStateString);
-	UE_LOG(LogTemp, Log, TEXT("The current scanning state is %s"), *StateString);
+	UE_LOG(LogTemp, Log, TEXT("The current scanning state"));
 }
 
-JNI_METHOD void Java_com_epicgames_ue4_GameActivity_nativeOnChangeResponse(JNIEnv* jenv, jobject thiz, jstring changeResponse)
+JNI_METHOD void Java_com_epicgames_ue4_GameActivity_nativeOnChangeResponse(JNIEnv* jenv, jobject thiz)
 {
-	const char *nativeChangeResponse = jenv->GetStringUTFChars(changeResponse, 0);
-	FString Response = FString(nativeChangeResponse);
-	jenv->ReleaseStringUTFChars(changeResponse, nativeChangeResponse);
-	UAndroidHapticLibrary::ParsePlayerResponse(Response);
+	// TODO
 }
 
 #endif //  PLATFORM_ANDROID
@@ -266,27 +260,6 @@ void UAndroidHapticLibrary::AndroidThunkCpp_TogglePosition(FString DeviceAddress
 #endif // PLATFORM_ANDROID
 }
 
-void UAndroidHapticLibrary::AndroidThunkCpp_TurnOnVisualization()
-{
-#if PLATFORM_ANDROID
-	if (JNIEnv* Env = FAndroidApplication::GetJavaEnv())
-	{
-		static jmethodID TurnOnVisualizationMethod = FJavaWrapper::FindMethod(Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_TurnOnHapticVisualization", "()V", false);
-		FJavaWrapper::CallVoidMethod(Env, FJavaWrapper::GameActivityThis, TurnOnVisualizationMethod);
-	}
-#endif
-}
-
-void UAndroidHapticLibrary::AndroidThunkCpp_TurnOffVisualization()
-{
-#if PLATFORM_ANDROID
-	if (JNIEnv* Env = FAndroidApplication::GetJavaEnv())
-	{
-		static jmethodID TurnOffVisualizationMethod = FJavaWrapper::FindMethod(Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_TurnOffHapticVisualization", "()V", false);
-		FJavaWrapper::CallVoidMethod(Env, FJavaWrapper::GameActivityThis, TurnOffVisualizationMethod);
-	}
-#endif
-}
 
 EPosition UAndroidHapticLibrary::StringToPosition(FString PositionString)
 {
@@ -385,6 +358,53 @@ void UAndroidHapticLibrary::SubmitRequestToPlayer(FRegisterRequest Request)
 	{
 		AndroidThunkCpp_Register(RequestString);
 	}
+}
+
+bool UAndroidHapticLibrary::IsFeedbackRegistered(FString key)
+{
+#if PLATFORM_ANDROID
+	if (JNIEnv* Env = FAndroidApplication::GetJavaEnv())
+	{
+		static jmethodID isRegisterMethodId = FJavaWrapper::FindMethod(Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_IsRegistered", "(Ljava/lang/String;)Z", false);
+		jstring keyStrJava = Env->NewStringUTF(TCHAR_TO_UTF8(*key));
+		bool res = FJavaWrapper::CallBooleanMethod(Env, FJavaWrapper::GameActivityThis, isRegisterMethodId, keyStrJava);
+		Env->DeleteLocalRef(keyStrJava);
+
+		return res;
+	}
+#endif // PLATFORM_ANDROID
+
+	return false;
+}
+
+void UAndroidHapticLibrary::RegisterProject(FString key, FString fileStr)
+{
+#if PLATFORM_ANDROID
+	if (JNIEnv* Env = FAndroidApplication::GetJavaEnv())
+	{
+		static jmethodID registerMethodId = FJavaWrapper::FindMethod(Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_Register", "(Ljava/lang/String;Ljava/lang/String;)V", false);
+		jstring keyStrJava = Env->NewStringUTF(TCHAR_TO_UTF8(*key));
+		jstring fileStrJava = Env->NewStringUTF(TCHAR_TO_UTF8(*fileStr));
+		FJavaWrapper::CallVoidMethod(Env, FJavaWrapper::GameActivityThis, registerMethodId, keyStrJava, fileStrJava);
+		Env->DeleteLocalRef(keyStrJava);
+		Env->DeleteLocalRef(fileStrJava);
+	}
+#endif // PLATFORM_ANDROID
+}
+
+void UAndroidHapticLibrary::SubmitRegistered(FString key, FString altKey, float intensity, float duration, float xOffsetAngle, float yOffset)
+{
+#if PLATFORM_ANDROID
+	if (JNIEnv* Env = FAndroidApplication::GetJavaEnv())
+	{
+		static jmethodID SubmitMethod = FJavaWrapper::FindMethod(Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_Submit", "(Ljava/lang/String;Ljava/lang/String;FFFF)V", false);
+		jstring keyJava = Env->NewStringUTF(TCHAR_TO_UTF8(*key));
+		jstring altKeyJava = Env->NewStringUTF(TCHAR_TO_UTF8(*altKey));
+		FJavaWrapper::CallVoidMethod(Env, FJavaWrapper::GameActivityThis, SubmitMethod, keyJava, intensity, duration, xOffsetAngle, yOffset);
+		Env->DeleteLocalRef(keyJava);
+		Env->DeleteLocalRef(altKeyJava);
+	}
+#endif // PLATFORM_ANDROID
 }
 
 void UAndroidHapticLibrary::AndroidThunkCpp_Submit(FString PlayerSubmission)
