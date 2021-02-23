@@ -36,21 +36,26 @@ class UAndroidHapticLibrary : public UBlueprintFunctionLibrary
 	
 	static FDeviceArrayDelegate UpdateDeviceListDelegate;
 
-	//Library
-	static void AndroidThunkCpp_Submit(FString PlayerSubmission);
-	static void AndroidThunkCpp_Register(FString PlayerSubmission);
+	static void SubmitDot(
+		FString Key, FString Pos, TArray<FDotPoint> Points, int DurationMillis);
+	static void SubmitPath(
+		FString Key, FString Pos, TArray<FPathPoint> Points, int DurationMillis);
+	static void TurnOff(
+		FString Key);	
+	static void TurnOffAll();
 
-
-	static void SubmitFrame(const FString & Key, FHapticFrame Frame);
-	static void SubmitRequestToPlayer(FSubmitRequest Request);
-	static void SubmitRequestToPlayer(FRegisterRequest Request);
+	static bool IsDeviceConnceted(EPosition Position);
 
 
 
 	static bool IsFeedbackRegistered(FString key);
+	static bool IsFeedbackPlaying(FString key);
+	static bool IsAnyFeedbackPlaying();
+	static TArray<uint8> GetPositionStatus(FString pos);
 
 	static void RegisterProject(FString key, FString fileStr);
-	static void SubmitRegistered(FString key, FString altKey, float intensity, float duration, float xOffsetAngle, float yOffset);
+	static void SubmitRegistered(
+		FString key, FString altKey, float intensity, float duration, float xOffsetAngle, float yOffset);
 
 	//Scan for bHaptics devices
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "StartHapticDeviceScan", Keywords = "Haptics"), Category = "Haptics")

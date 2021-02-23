@@ -47,6 +47,47 @@ void UBhapticsRequestLibrary::SubmitFeedbackWithIntensityDuration(UFeedbackFile*
 	BhapticsLibrary::Lib_SubmitRegistered(FeedbackKey, UniqueKey, ScaleOption, RotationOption);
 }
 
+void UBhapticsRequestLibrary::SubmitFeedbackWithOptions(UFeedbackFile* Feedback, const FString& Key, FRotationOption RotationOption, FScaleOption ScaleOption)
+{
+	if (Feedback == NULL)
+	{
+		return;
+	}
+
+	FString FeedbackKey = Feedback->Key + Feedback->Id.ToString();
+
+	if (!BhapticsLibrary::Lib_IsFeedbackRegistered(FeedbackKey))
+	{
+		BhapticsLibrary::Lib_RegisterFeedback(FeedbackKey, Feedback->ProjectString);
+	}
+
+	BhapticsLibrary::Lib_SubmitRegistered(FeedbackKey, Key, ScaleOption, RotationOption);
+}
+
+void UBhapticsRequestLibrary::SubmitFeedbackWithScaleOption(UFeedbackFile* Feedback, FScaleOption ScaleOption)
+{
+	if (Feedback == NULL)
+	{
+		return;
+	}
+
+	FString FeedbackKey = Feedback->Key + Feedback->Id.ToString();
+	FString UniqueKey = FeedbackKey + FString::FromInt(FMath::Rand() % 20);
+
+	FRotationOption RotationOption(0, 0);
+
+	if (!BhapticsLibrary::Lib_IsFeedbackRegistered(FeedbackKey))
+	{
+		BhapticsLibrary::Lib_RegisterFeedback(FeedbackKey, Feedback->ProjectString);
+	}
+
+	BhapticsLibrary::Lib_SubmitRegistered(FeedbackKey, UniqueKey, ScaleOption, RotationOption);
+}
+
+void UBhapticsRequestLibrary::LoopFeedbackWithOptions(UFeedbackFile* Feedback, FString Key, FRotationOption RotationOption, FScaleOption ScaleOption)
+{
+}
+
 void UBhapticsRequestLibrary::SubmitFeedbackWithTransform(UFeedbackFile* Feedback, const FString& AltKey, FRotationOption RotationOption, bool UseAltKey)
 {
 	if (Feedback == NULL)
@@ -266,5 +307,5 @@ FRotationOption UBhapticsRequestLibrary::CustomProjectToVest(FVector Location, U
 
 bool UBhapticsRequestLibrary::IsDeviceConnected(EPosition device)
 {
-	return BhapticsLibrary::Lib_IsDevicePlaying(device);
+	return BhapticsLibrary::Lib_IsDeviceConnected(device);
 }

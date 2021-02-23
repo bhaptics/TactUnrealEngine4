@@ -28,14 +28,14 @@
 
   <prebuildCopies>
     <log text="Copying bhaptics aar files"/>
-    <copyFile src="$S(PluginDir)/Android/bhaptics_ble_1.10.aar"
-            dst="$S(BuildDir)/gradle/bhaptics_ble_1.10.aar" />
-    <copyFile src="$S(PluginDir)/Android/bhaptics_commons_1.10.aar"
-            dst="$S(BuildDir)/gradle/bhaptics_commons_1.10.aar" />
-    <copyFile src="$S(PluginDir)/Android/bhaptics_core_1.10.aar"
-            dst="$S(BuildDir)/gradle/bhaptics_core_1.10.aar" />
-    <copyFile src="$S(PluginDir)/Android/bhaptics_manager_1.10.aar"
-            dst="$S(BuildDir)/gradle/bhaptics_manager_1.10.aar" />
+    <copyFile src="$S(PluginDir)/Android/bhaptics_ble.aar"
+            dst="$S(BuildDir)/gradle/bhaptics_ble.aar" />
+    <copyFile src="$S(PluginDir)/Android/bhaptics_commons.aar"
+            dst="$S(BuildDir)/gradle/bhaptics_commons.aar" />
+    <copyFile src="$S(PluginDir)/Android/bhaptics_core.aar"
+            dst="$S(BuildDir)/gradle/bhaptics_core.aar" />
+    <copyFile src="$S(PluginDir)/Android/bhaptics_manager.aar"
+            dst="$S(BuildDir)/gradle/bhaptics_manager.aar" />
   </prebuildCopies>
 
   <AARImports>
@@ -44,10 +44,10 @@
   <buildGradleAdditions>
     <insert>
       dependencies {
-      implementation files('../bhaptics_ble_1.10.aar')
-      implementation files('../bhaptics_core_1.10.aar')
-      implementation files('../bhaptics_commons_1.10.aar')
-      implementation files('../bhaptics_manager_1.10.aar')
+      implementation files('../bhaptics_ble.aar')
+      implementation files('../bhaptics_core.aar')
+      implementation files('../bhaptics_commons.aar')
+      implementation files('../bhaptics_manager.aar')
       }
     </insert>
   </buildGradleAdditions>
@@ -179,6 +179,7 @@
     }
 
     void  AndroidThunkJava_SubmitDot(String key, String position, int[] indexes, int[] intensities, int duration) {
+    android.util.Log.i(TAG, "SubmitDot " + key + " " + position + " "  + indexes[0] + " " + intensities[0]);
         player.submitDot(key, position, indexes, intensities, duration);
     }
     void  AndroidThunkJava_SubmitPath(String key, String position, float[] x, float[] y, int[] intensities, int duration) {

@@ -1,6 +1,7 @@
 // Copyright 1998-2018 Epic Games, Inc. All Rights Reserved.
 
 #include "AndroidHapticLibrary.h"
+#include "BhapticsUtils.h"
 #include "HapticsManager.h"
 #include "JsonObjectConverter.h"
 #include "Json/Public/Serialization/JsonWriter.h"
@@ -312,52 +313,124 @@ EPosition UAndroidHapticLibrary::StringToPosition(FString PositionString)
 	return ReturnValue;
 }
 
-void UAndroidHapticLibrary::SubmitFrame(const FString & Key, FHapticFrame Frame)
+void UAndroidHapticLibrary::SubmitDot(FString Key, FString Pos, TArray<FDotPoint> Points, int DurationMillis)
 {
-	FSubmitRequest Request = FSubmitRequest(Key, "frame", Frame);
-	SubmitRequestToPlayer(Request);
+#if PLATFORM_ANDROID
+	if (JNIEnv* Env = FAndroidApplication::GetJavaEnv())
+	{
+		static jmethodID submitDotMethodId =
+			FJavaWrapper::FindMethod(
+				Env, FJavaWrapper::GameActivityClassID,
+				"AndroidThunkJava_SubmitDot", "(Ljava/lang/String;Ljava/lang/String;[I[II)V", false);
+		jstring keyStrJava = Env->NewStringUTF(TCHAR_TO_UTF8(*Key));
+		jstring posJava = Env->NewStringUTF(TCHAR_TO_UTF8(*Pos));
+
+		jintArray indexesJava = Env->NewIntArray(Points.Num());
+		jintArray intensitiesJava = Env->NewIntArray(Points.Num());
+
+		jint* indexes = new jint[Points.Num()]; 
+		jint* intensities = new jint[Points.Num()];
+		for (int i = 0; i < Points.Num(); ++i) {
+			indexes[i] = Points[i].Index;
+			intensities[i] = Points[i].Intensity;
+		}
+		Env->SetIntArrayRegion(indexesJava, 0, Points.Num(), indexes);
+		Env->SetIntArrayRegion(intensitiesJava, 0, Points.Num(), intensities);
+
+		FJavaWrapper::CallVoidMethod(
+			Env, FJavaWrapper::GameActivityThis, submitDotMethodId, 
+			keyStrJava, posJava, indexesJava, intensitiesJava,  DurationMillis);
+		Env->DeleteLocalRef(keyStrJava);
+		Env->DeleteLocalRef(posJava);
+
+
+		delete[] indexes;
+		delete[] intensities;
+
+	}
+#endif // PLATFORM_ANDROID
 }
 
-void UAndroidHapticLibrary::SubmitRequestToPlayer(FSubmitRequest Request)
+void UAndroidHapticLibrary::SubmitPath(FString Key, FString Pos, TArray<FPathPoint> Points, int DurationMillis)
 {
-
-	TSharedPtr<FJsonObject> SubmitObject = FJsonObjectConverter::UStructToJsonObject(Request);
-	if (SubmitObject.IsValid())
+#if PLATFORM_ANDROID
+	if (JNIEnv* Env = FAndroidApplication::GetJavaEnv())
 	{
-		TSharedPtr<FJsonObject> RequestObject = MakeShareable(new FJsonObject);
-		TArray<TSharedPtr<FJsonValue>> RegisterValues;
-		TArray<TSharedPtr<FJsonValue>> SubmitValues;
-		TSharedRef<FJsonValueObject> JsonValue = MakeShareable(new FJsonValueObject(SubmitObject));
-		SubmitValues.Add(JsonValue);
-		RequestObject->SetArrayField("Register", RegisterValues);
-		RequestObject->SetArrayField("Submit", SubmitValues);
-		FString RequestString;
-		TSharedRef< TJsonWriter<TCHAR, TCondensedJsonPrintPolicy<TCHAR>> > Writer = TJsonWriterFactory<TCHAR, TCondensedJsonPrintPolicy<TCHAR>>::Create(&RequestString);
-		if (FJsonSerializer::Serialize(RequestObject.ToSharedRef(), Writer))
-		{
-			AndroidThunkCpp_Submit(RequestString);
+		static jmethodID submitDotMethodId =
+			FJavaWrapper::FindMethod(
+				Env, FJavaWrapper::GameActivityClassID,
+				"AndroidThunkJava_SubmitPath", "(Ljava/lang/String;Ljava/lang/String;[F[F[II)V", false);
+		jstring keyStrJava = Env->NewStringUTF(TCHAR_TO_UTF8(*Key));
+		jstring posJava = Env->NewStringUTF(TCHAR_TO_UTF8(*Pos));
+
+		jfloatArray xJava = Env->NewFloatArray(Points.Num());
+		jfloatArray yJava = Env->NewFloatArray(Points.Num());
+		jintArray intensitiesJava = Env->NewIntArray(Points.Num());
+		jfloat* x = new jfloat[Points.Num()];
+		jfloat* y = new jfloat[Points.Num()];
+		jint* intensities = new jint[Points.Num()];
+		for (int i = 0; i < Points.Num(); ++i) {
+			x[i] = Points[i].X;
+			y[i] = Points[i].Y;
+			intensities[i] = Points[i].Intensity;
+		}
+
+		Env->SetFloatArrayRegion(xJava, 0, Points.Num(), x);
+		Env->SetFloatArrayRegion(yJava, 0, Points.Num(), y);
+		Env->SetIntArrayRegion(intensitiesJava, 0, Points.Num(), intensities);
+
+
+		FJavaWrapper::CallVoidMethod(
+			Env, FJavaWrapper::GameActivityThis, submitDotMethodId,
+			keyStrJava, posJava, xJava, yJava, intensitiesJava, DurationMillis);
+		Env->DeleteLocalRef(keyStrJava);
+		Env->DeleteLocalRef(posJava);
+
+		delete[] x;
+		delete[] y;
+		delete[] intensities;
+	}
+#endif // PLATFORM_ANDROID
+}
+
+void UAndroidHapticLibrary::TurnOff(FString Key)
+{
+#if PLATFORM_ANDROID
+	if (JNIEnv* Env = FAndroidApplication::GetJavaEnv())
+	{
+		static jmethodID isRegisterMethodId = 
+			FJavaWrapper::FindMethod(
+				Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_TurnOff", "(Ljava/lang/String;)V", false);
+		jstring keyStrJava = Env->NewStringUTF(TCHAR_TO_UTF8(*Key));
+		FJavaWrapper::CallVoidMethod(Env, FJavaWrapper::GameActivityThis, isRegisterMethodId, keyStrJava);
+		Env->DeleteLocalRef(keyStrJava);
+}
+#endif // PLATFORM_ANDROID
+}
+
+void UAndroidHapticLibrary::TurnOffAll()
+{
+#if PLATFORM_ANDROID
+	if (JNIEnv* Env = FAndroidApplication::GetJavaEnv())
+	{
+		static jmethodID isRegisterMethodId = 
+			FJavaWrapper::FindMethod(
+				Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_TurnOffAll", "()V", false);
+		FJavaWrapper::CallVoidMethod(Env, FJavaWrapper::GameActivityThis, isRegisterMethodId);
+	}
+#endif // PLATFORM_ANDROID
+}
+
+bool UAndroidHapticLibrary::IsDeviceConnceted(EPosition Position)
+{
+	for (int i = 0; i < FoundDevices.Num(); i++) {
+		FDevice d = FoundDevices[i];
+		if (d.ConnectionStatus == "Connected" 
+			&& BhapticsUtils::PositionEnumToString(Position) == d.Position) {
+			return true;
 		}
 	}
-
-}
-
-void UAndroidHapticLibrary::SubmitRequestToPlayer(FRegisterRequest Request)
-{
-	TSharedPtr<FJsonObject> RequestObject = MakeShareable(new FJsonObject);
-	TArray<TSharedPtr<FJsonValue>> RegisterValues;
-	TArray<TSharedPtr<FJsonValue>> SubmitValues;
-	TSharedPtr<FJsonObject> RegisterObject = MakeShareable(new FJsonObject);
-	Request.ToJsonObject(*RegisterObject);
-	TSharedRef<FJsonValueObject> JsonValue = MakeShareable(new FJsonValueObject(RegisterObject));
-	RegisterValues.Add(JsonValue);
-	RequestObject->SetArrayField("Register", RegisterValues);
-	RequestObject->SetArrayField("Submit", SubmitValues);
-	FString RequestString;
-	TSharedRef< TJsonWriter<TCHAR, TCondensedJsonPrintPolicy<TCHAR>> > Writer = TJsonWriterFactory<TCHAR, TCondensedJsonPrintPolicy<TCHAR>>::Create(&RequestString);
-	if (FJsonSerializer::Serialize(RequestObject.ToSharedRef(), Writer))
-	{
-		AndroidThunkCpp_Register(RequestString);
-	}
+	return false;
 }
 
 bool UAndroidHapticLibrary::IsFeedbackRegistered(FString key)
@@ -377,12 +450,80 @@ bool UAndroidHapticLibrary::IsFeedbackRegistered(FString key)
 	return false;
 }
 
+bool UAndroidHapticLibrary::IsFeedbackPlaying(FString key)
+{
+#if PLATFORM_ANDROID
+	if (JNIEnv* Env = FAndroidApplication::GetJavaEnv())
+	{
+		static jmethodID isRegisterMethodId = 
+			FJavaWrapper::FindMethod(
+				Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_IsPlaying", "(Ljava/lang/String;)Z", false);
+		jstring keyStrJava = Env->NewStringUTF(TCHAR_TO_UTF8(*key));
+		bool res = FJavaWrapper::CallBooleanMethod(Env, FJavaWrapper::GameActivityThis, isRegisterMethodId, keyStrJava);
+		Env->DeleteLocalRef(keyStrJava);
+
+		return res;
+	}
+#endif // PLATFORM_ANDROID
+
+	return false;
+}
+
+bool UAndroidHapticLibrary::IsAnyFeedbackPlaying()
+{
+#if PLATFORM_ANDROID
+	if (JNIEnv* Env = FAndroidApplication::GetJavaEnv())
+	{
+		static jmethodID isRegisterMethodId =
+			FJavaWrapper::FindMethod(
+				Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_IsAnythingPlaying", "()Z", false);
+		return FJavaWrapper::CallBooleanMethod(Env, FJavaWrapper::GameActivityThis, isRegisterMethodId);
+	}
+#endif // PLATFORM_ANDROID
+	return false;
+}
+
+TArray<uint8> UAndroidHapticLibrary::GetPositionStatus(FString pos)
+{
+	TArray<uint8> IntArray;
+	IntArray.Init(0, 20);
+#if PLATFORM_ANDROID
+	if (JNIEnv* Env = FAndroidApplication::GetJavaEnv())
+	{
+		jstring posJava = Env->NewStringUTF(TCHAR_TO_UTF8(*pos));
+		
+
+		static jmethodID isRegisterMethodId =
+			FJavaWrapper::FindMethod(
+				Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_GetPositionStatus", "(Ljava/lang/String;)[B", false);
+		jbyteArray arrayJava = (jbyteArray) FJavaWrapper::CallObjectMethod(
+			Env, FJavaWrapper::GameActivityThis, isRegisterMethodId, posJava);
+
+		Env->DeleteLocalRef(posJava);
+
+		jbyte* byteArr = Env->GetByteArrayElements(arrayJava, 0);
+		jsize length = Env->GetArrayLength(arrayJava);
+		for (int posIndex = 0; posIndex < length; posIndex++)
+		{
+			IntArray[posIndex] = byteArr[posIndex];
+		}
+
+	}
+#endif // PLATFORM_ANDROID
+
+	return IntArray;
+}
+
 void UAndroidHapticLibrary::RegisterProject(FString key, FString fileStr)
 {
 #if PLATFORM_ANDROID
 	if (JNIEnv* Env = FAndroidApplication::GetJavaEnv())
 	{
-		static jmethodID registerMethodId = FJavaWrapper::FindMethod(Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_Register", "(Ljava/lang/String;Ljava/lang/String;)V", false);
+		static jmethodID registerMethodId = 
+			FJavaWrapper::FindMethod(
+				Env, FJavaWrapper::GameActivityClassID, 
+				"AndroidThunkJava_Register", 
+				"(Ljava/lang/String;Ljava/lang/String;)V", false);
 		jstring keyStrJava = Env->NewStringUTF(TCHAR_TO_UTF8(*key));
 		jstring fileStrJava = Env->NewStringUTF(TCHAR_TO_UTF8(*fileStr));
 		FJavaWrapper::CallVoidMethod(Env, FJavaWrapper::GameActivityThis, registerMethodId, keyStrJava, fileStrJava);
@@ -392,43 +533,27 @@ void UAndroidHapticLibrary::RegisterProject(FString key, FString fileStr)
 #endif // PLATFORM_ANDROID
 }
 
-void UAndroidHapticLibrary::SubmitRegistered(FString key, FString altKey, float intensity, float duration, float xOffsetAngle, float yOffset)
+void UAndroidHapticLibrary::SubmitRegistered(
+	FString key, FString altKey, float intensity, float duration, float xOffsetAngle, float yOffset)
 {
 #if PLATFORM_ANDROID
 	if (JNIEnv* Env = FAndroidApplication::GetJavaEnv())
 	{
-		static jmethodID SubmitMethod = FJavaWrapper::FindMethod(Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_Submit", "(Ljava/lang/String;Ljava/lang/String;FFFF)V", false);
+		FString alt = altKey;
+		if (altKey.IsEmpty()) {
+			alt = key;
+		}
+
+		static jmethodID SubmitMethod = FJavaWrapper::FindMethod(
+			Env, FJavaWrapper::GameActivityClassID, 
+				"AndroidThunkJava_SubmitRegistered", "(Ljava/lang/String;Ljava/lang/String;FFFF)V", false);
 		jstring keyJava = Env->NewStringUTF(TCHAR_TO_UTF8(*key));
-		jstring altKeyJava = Env->NewStringUTF(TCHAR_TO_UTF8(*altKey));
-		FJavaWrapper::CallVoidMethod(Env, FJavaWrapper::GameActivityThis, SubmitMethod, keyJava, intensity, duration, xOffsetAngle, yOffset);
+		jstring altKeyJava = Env->NewStringUTF(TCHAR_TO_UTF8(*alt));
+		FJavaWrapper::CallVoidMethod(
+			Env, FJavaWrapper::GameActivityThis, SubmitMethod, keyJava, altKeyJava,
+			intensity, duration, xOffsetAngle, yOffset);
 		Env->DeleteLocalRef(keyJava);
 		Env->DeleteLocalRef(altKeyJava);
-	}
-#endif // PLATFORM_ANDROID
-}
-
-void UAndroidHapticLibrary::AndroidThunkCpp_Submit(FString PlayerSubmission)
-{
-#if PLATFORM_ANDROID
-	if (JNIEnv* Env = FAndroidApplication::GetJavaEnv())
-	{
-		static jmethodID SubmitMethod = FJavaWrapper::FindMethod(Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_Submit", "(Ljava/lang/String;)V", false);
-		jstring PlayerSubmissionJava = Env->NewStringUTF(TCHAR_TO_UTF8(*PlayerSubmission));
-		FJavaWrapper::CallVoidMethod(Env, FJavaWrapper::GameActivityThis, SubmitMethod, PlayerSubmissionJava);
-		Env->DeleteLocalRef(PlayerSubmissionJava);
-	}
-#endif // PLATFORM_ANDROID
-}
-
-void UAndroidHapticLibrary::AndroidThunkCpp_Register(FString PlayerSubmission)
-{
-#if PLATFORM_ANDROID
-	if (JNIEnv* Env = FAndroidApplication::GetJavaEnv())
-	{
-		static jmethodID SubmitMethod = FJavaWrapper::FindMethod(Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_Register", "(Ljava/lang/String;)V", false);
-		jstring PlayerSubmissionJava = Env->NewStringUTF(TCHAR_TO_UTF8(*PlayerSubmission));
-		FJavaWrapper::CallVoidMethod(Env, FJavaWrapper::GameActivityThis, SubmitMethod, PlayerSubmissionJava);
-		Env->DeleteLocalRef(PlayerSubmissionJava);
 	}
 #endif // PLATFORM_ANDROID
 }

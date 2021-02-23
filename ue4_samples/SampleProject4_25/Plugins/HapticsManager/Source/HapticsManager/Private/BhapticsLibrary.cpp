@@ -1,6 +1,7 @@
 //Copyright bHaptics Inc. 2017-2019
 
 #include "BhapticsLibrary.h"
+#include "BhapticsUtils.h"
 #include "Interfaces/IPluginManager.h"
 
 #include "Core/Public/Misc/ConfigCacheIni.h"
@@ -26,9 +27,6 @@ bool BhapticsLibrary::Success = false;
 static bhaptics::PositionType PositionEnumToDeviceType(EPosition Position);
 static bhaptics::PositionType PositionEnumToPositionType(EPosition Position);
 #endif
-
-static FString PositionEnumToString(EPosition Position);
-static FString PositionEnumToDeviceString(EPosition Position);
 
 BhapticsLibrary::BhapticsLibrary()
 {
@@ -173,17 +171,7 @@ void BhapticsLibrary::Lib_RegisterFeedback(FString Key, FString ProjectJson)
 	InitializeCheck();
 	
 #if PLATFORM_ANDROID
-	TSharedPtr<FJsonObject> JsonObject;
-	TSharedRef<TJsonReader<>> JsonReader = TJsonReaderFactory<>::Create(ProjectJson);
-	if (!FJsonSerializer::Deserialize(JsonReader, JsonObject) || !JsonObject.IsValid())
-	{
-		UE_LOG(LogTemp, Log, TEXT("Deserialisation failed."));
-		return;
-	}
-	FRegisterRequest RegisterRequest = FRegisterRequest();
-	RegisterRequest.Key = Key;
-	RegisterRequest.Project = JsonObject;
-	UAndroidHapticLibrary::SubmitRequestToPlayer(RegisterRequest);
+	UAndroidHapticLibrary::RegisterProject(Key, ProjectJson);
 #else
 	if (!IsLoaded)
 	{
@@ -200,10 +188,7 @@ void BhapticsLibrary::Lib_SubmitRegistered(FString Key)
 	InitializeCheck();
 	
 #if PLATFORM_ANDROID
-	FSubmitRequest Request = FSubmitRequest();
-	Request.Key = Key;
-	Request.Type = "key";
-	UAndroidHapticLibrary::SubmitRequestToPlayer(Request);
+	UAndroidHapticLibrary::SubmitRegistered(Key, Key, 1, 1, 0, 0);
 #else
 	if (!IsLoaded)
 	{
@@ -221,13 +206,8 @@ void BhapticsLibrary::Lib_SubmitRegistered(FString Key, FString AltKey, FScaleOp
 	InitializeCheck();
 	
 #if PLATFORM_ANDROID
-	FSubmitRequest Request = FSubmitRequest();
-	Request.Key = Key;
-	Request.Type = "key";
-	Request.Parameters.Add("rotationOption", RotOption.ToString());
-	Request.Parameters.Add("scaleOption", ScaleOpt.ToString());
-	Request.Parameters.Add("altKey", AltKey);
-	UAndroidHapticLibrary::SubmitRequestToPlayer(Request);
+	UAndroidHapticLibrary::SubmitRegistered(
+		Key, AltKey, ScaleOpt.Intensity, ScaleOpt.Duration, RotOption.OffsetAngleX, RotOption.OffsetY);
 #else
 	if (!IsLoaded)
 	{
@@ -292,12 +272,7 @@ void BhapticsLibrary::Lib_Submit(FString Key, EPosition Pos, TArray<FDotPoint> P
 	InitializeCheck();
 	
 #if PLATFORM_ANDROID
-	FHapticFrame SubmissionFrame = FHapticFrame();
-	SubmissionFrame.DotPoints = Points;
-	SubmissionFrame.Position = PositionEnumToString(Pos);
-	SubmissionFrame.PathPoints = TArray<FPathPoint>();
-	SubmissionFrame.DurationMillis = DurationMillis;
-	UAndroidHapticLibrary::SubmitFrame(Key, SubmissionFrame);
+	UAndroidHapticLibrary::SubmitDot(Key, BhapticsUtils::PositionEnumToString(Pos), Points, DurationMillis);
 #else
 	if (!IsLoaded)
 	{
@@ -321,12 +296,7 @@ void BhapticsLibrary::Lib_Submit(FString Key, EPosition Pos, TArray<FPathPoint> 
 {
 	InitializeCheck();
 #if PLATFORM_ANDROID
-	FHapticFrame SubmissionFrame = FHapticFrame();
-	SubmissionFrame.DotPoints = TArray<FDotPoint>();
-	SubmissionFrame.Position = PositionEnumToString(Pos);
-	SubmissionFrame.PathPoints = Points;
-	SubmissionFrame.DurationMillis = DurationMillis;
-	UAndroidHapticLibrary::SubmitFrame(Key, SubmissionFrame);
+	UAndroidHapticLibrary::SubmitPath(Key, BhapticsUtils::PositionEnumToString(Pos), Points, DurationMillis);
 #else
 	if (!IsLoaded)
 	{
@@ -372,8 +342,7 @@ bool BhapticsLibrary::Lib_IsPlaying()
 	
 	bool Value = false;
 #if PLATFORM_ANDROID
-	FPlayerResponse Response = UAndroidHapticLibrary::GetCurrentResponse();
-	Value = Response.ActiveKeys.Num() > 0;
+	return UAndroidHapticLibrary::IsAnyFeedbackPlaying();
 #else
 	if (!IsLoaded)
 	{
@@ -390,8 +359,7 @@ bool BhapticsLibrary::Lib_IsPlaying(FString Key)
 	
 	bool Value = false;
 #if PLATFORM_ANDROID
-	FPlayerResponse Response = UAndroidHapticLibrary::GetCurrentResponse();
-	Value = Response.ActiveKeys.Find(Key) != INDEX_NONE;
+	return UAndroidHapticLibrary::IsFeedbackPlaying(Key);
 #else
 	if (!IsLoaded)
 	{
@@ -407,10 +375,7 @@ void BhapticsLibrary::Lib_TurnOff()
 {
 	InitializeCheck();
 #if PLATFORM_ANDROID
-	FSubmitRequest Request = FSubmitRequest();
-	Request.Key = "";
-	Request.Type = "turnOffAll";
-	UAndroidHapticLibrary::SubmitRequestToPlayer(Request);
+	UAndroidHapticLibrary::TurnOffAll();
 #else
 	if (!IsLoaded)
 	{
@@ -424,10 +389,7 @@ void BhapticsLibrary::Lib_TurnOff(FString Key)
 {
 	InitializeCheck();
 #if PLATFORM_ANDROID
-	FSubmitRequest Request = FSubmitRequest();
-	Request.Key = Key;
-	Request.Type = "turnOff";
-	UAndroidHapticLibrary::SubmitRequestToPlayer(Request);
+	UAndroidHapticLibrary::TurnOff(Key);
 #else
 	if (!IsLoaded)
 	{
@@ -477,14 +439,12 @@ void BhapticsLibrary::Lib_ToggleFeedback()
 #endif
 }
 
-bool BhapticsLibrary::Lib_IsDevicePlaying(EPosition Pos)
+bool BhapticsLibrary::Lib_IsDeviceConnected(EPosition Pos)
 {
 	InitializeCheck();
 	bool Value = false;
 #if PLATFORM_ANDROID
-	FString DeviceString = PositionEnumToDeviceString(Pos);
-	FPlayerResponse Response = UAndroidHapticLibrary::GetCurrentResponse();
-	Value = Response.ConnectedPositions.Find(DeviceString) != INDEX_NONE;
+	return UAndroidHapticLibrary::IsDeviceConnceted(Pos);
 #else
 	if (!IsLoaded)
 	{
@@ -503,6 +463,18 @@ TArray<FHapticFeedback> BhapticsLibrary::Lib_GetResponseStatus()
 #if PLATFORM_ANDROID
 	FPlayerResponse Response = UAndroidHapticLibrary::GetCurrentResponse();
 	ChangedFeedback = Response.Status;
+	TArray<EPosition> PositionEnum =
+	{ EPosition::ForearmL,EPosition::ForearmR,EPosition::Head, EPosition::VestFront,EPosition::VestBack,EPosition::HandL, EPosition::HandR, EPosition::FootL, EPosition::FootR };
+
+	for (int posIndex = 0; posIndex < PositionEnum.Num(); posIndex++)
+	{
+		EPosition pos = PositionEnum[posIndex];
+		FString posStr = BhapticsUtils::PositionEnumToString(pos);
+		TArray<uint8> val = UAndroidHapticLibrary::GetPositionStatus(posStr);
+
+		FHapticFeedback Feedback = FHapticFeedback(pos, val, EFeedbackMode::DOT_MODE);
+		ChangedFeedback.Add(Feedback);
+	}
 #else
 	if (!IsLoaded)
 	{
@@ -638,95 +610,3 @@ static bhaptics::PositionType PositionEnumToPositionType(EPosition Position)
 	return Device;
 }
 #endif // !PLATFORM_ANDROID
-
-FString PositionEnumToString(EPosition Position)
-{
-	FString PositionString = "All";
-
-	switch (Position)
-	{
-	case EPosition::Left:
-		PositionString = "Left";
-		break;
-	case EPosition::Right:
-		PositionString = "Right";
-		break;
-	case EPosition::Head:
-		PositionString = "Head";
-		break;
-	case EPosition::HandL:
-		PositionString = "HandL";
-		break;
-	case EPosition::HandR:
-		PositionString = "HandR";
-		break;
-	case EPosition::FootL:
-		PositionString = "FootL";
-		break;
-	case EPosition::FootR:
-		PositionString = "FootR";
-		break;
-	case EPosition::ForearmL:
-		PositionString = "ForearmL";
-		break;
-	case EPosition::ForearmR:
-		PositionString = "ForearmR";
-		break;
-	case EPosition::VestFront:
-		PositionString = "VestFront";
-		break;
-	case EPosition::VestBack:
-		PositionString = "VestBack";
-		break;
-	default:
-		break;
-	}
-
-	return PositionString;
-}
-
-FString PositionEnumToDeviceString(EPosition Position)
-{
-	FString PositionString = "All";
-
-	switch (Position)
-	{
-	case EPosition::Left:
-		PositionString = "Left";
-		break;
-	case EPosition::Right:
-		PositionString = "Right";
-		break;
-	case EPosition::Head:
-		PositionString = "Head";
-		break;
-	case EPosition::HandL:
-		PositionString = "HandL";
-		break;
-	case EPosition::HandR:
-		PositionString = "HandR";
-		break;
-	case EPosition::FootL:
-		PositionString = "FootL";
-		break;
-	case EPosition::FootR:
-		PositionString = "FootR";
-		break;
-	case EPosition::ForearmL:
-		PositionString = "ForearmL";
-		break;
-	case EPosition::ForearmR:
-		PositionString = "ForearmR";
-		break;
-	case EPosition::VestFront:
-		PositionString = "Vest";
-		break;
-	case EPosition::VestBack:
-		PositionString = "Vest";
-		break;
-	default:
-		break;
-	}
-
-	return PositionString;
-}
