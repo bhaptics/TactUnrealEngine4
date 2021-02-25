@@ -37,13 +37,13 @@ public class FeedbackFileEditor : ModuleRules
 				"Engine",
 				"Slate",
 				"SlateCore",
+                "FeedbackFileEditor",
                 "Json",
                 "JsonUtilities",
                 "Projects",
                 "InputCore",
                 "HapticsManager",
-                "EditorStyle",
-                // "FeedbackFileEditor",
+                "EditorStyle"
                 //"Sockets",
 				// ... add private dependencies that you statically link with here ...	
 			}

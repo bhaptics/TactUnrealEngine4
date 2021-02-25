@@ -43,11 +43,12 @@ public:
 
 	static void Lib_ToggleFeedback();
 
-	static bool Lib_IsDevicePlaying(EPosition Pos);
+	static bool Lib_IsDeviceConnected(EPosition Pos);
 	
 	static void SetLibraryLoaded();
 
 	static TArray<FHapticFeedback> Lib_GetResponseStatus();
+	static TArray<uint8> Lib_GetResponseStatus(EPosition Pos);
 
 private:
 	static bool IsLoaded;

@@ -36,26 +36,38 @@ class UAndroidHapticLibrary : public UBlueprintFunctionLibrary
 	
 	static FDeviceArrayDelegate UpdateDeviceListDelegate;
 
+	static void SubmitDot(
+		FString Key, FString Pos, TArray<FDotPoint> Points, int DurationMillis);
+	static void SubmitPath(
+		FString Key, FString Pos, TArray<FPathPoint> Points, int DurationMillis);
+	static void TurnOff(
+		FString Key);	
+	static void TurnOffAll();
+
+	static bool IsDeviceConnceted(EPosition Position);
+
+
+
+	static bool IsFeedbackRegistered(FString key);
+	static bool IsFeedbackPlaying(FString key);
+	static bool IsAnyFeedbackPlaying();
+	static TArray<uint8> GetPositionStatus(FString pos);
+
+	static void RegisterProject(FString key, FString fileStr);
+	static void SubmitRegistered(
+		FString key, FString altKey, float intensity, float duration, float xOffsetAngle, float yOffset);
+
 	//Scan for bHaptics devices
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "StartHapticDeviceScan", Keywords = "Haptics"), Category = "Haptics")
-	static void AndroidThunkCpp_StartScanning();
+		static void AndroidThunkCpp_StartScanning();
 
 	//Stop scanning for devices
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "StopHapticDeviceScan", Keywords = "Haptics"), Category = "Haptics")
-	static void AndroidThunkCpp_StopScanning();
+		static void AndroidThunkCpp_StopScanning();
 
 	//Check if its currently scanning
 	UFUNCTION(BlueprintPure, meta = (DisplayName = "IsHapticDeviceScanning", Keywords = "Haptics"), Category = "Haptics")
-	static bool AndroidThunkCpp_IsScanning();
-
-	//Library
-	static void AndroidThunkCpp_Submit(FString PlayerSubmission);
-	static void AndroidThunkCpp_Register(FString PlayerSubmission);
-
-
-	static void SubmitFrame(const FString & Key, FHapticFrame Frame);
-	static void SubmitRequestToPlayer(FSubmitRequest Request);
-	static void SubmitRequestToPlayer(FRegisterRequest Request);
+		static bool AndroidThunkCpp_IsScanning();
 
 	//Pair with Haptic Device
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "PairHapticDevice", Keywords = "Haptics"), Category = "Haptics")
@@ -88,10 +100,6 @@ class UAndroidHapticLibrary : public UBlueprintFunctionLibrary
 	//Toggle the Position of Device
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "ToggleDevicePosition", Keywords = "Haptics"), Category = "Haptics")
 	static void AndroidThunkCpp_TogglePosition(FString DeviceAddress);
-
-	//UFUNCTION(BlueprintCallable, meta = (DisplayName = "SetVisualisation", Keywords = "Haptics"), Category = "Haptics")
-	static void AndroidThunkCpp_TurnOnVisualization();
-	static void AndroidThunkCpp_TurnOffVisualization();
 	   
 private:
 	static TArray<FDevice> FoundDevices;

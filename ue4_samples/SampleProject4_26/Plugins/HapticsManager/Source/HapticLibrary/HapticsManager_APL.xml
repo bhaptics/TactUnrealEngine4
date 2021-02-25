@@ -28,14 +28,14 @@
 
   <prebuildCopies>
     <log text="Copying bhaptics aar files"/>
-    <copyFile src="$S(PluginDir)/Android/bhaptics_ble_1.08.aar"
-            dst="$S(BuildDir)/gradle/bhaptics_ble_1.08.aar" />
-    <copyFile src="$S(PluginDir)/Android/bhaptics_commons_1.08.aar"
-            dst="$S(BuildDir)/gradle/bhaptics_commons_1.08.aar" />
-    <copyFile src="$S(PluginDir)/Android/bhaptics_core_1.08.aar"
-            dst="$S(BuildDir)/gradle/bhaptics_core_1.08.aar" />
-    <copyFile src="$S(PluginDir)/Android/bhaptics_manager_1.08.aar"
-            dst="$S(BuildDir)/gradle/bhaptics_manager_1.08.aar" />
+    <copyFile src="$S(PluginDir)/Android/bhaptics_ble.aar"
+            dst="$S(BuildDir)/gradle/bhaptics_ble.aar" />
+    <copyFile src="$S(PluginDir)/Android/bhaptics_commons.aar"
+            dst="$S(BuildDir)/gradle/bhaptics_commons.aar" />
+    <copyFile src="$S(PluginDir)/Android/bhaptics_core.aar"
+            dst="$S(BuildDir)/gradle/bhaptics_core.aar" />
+    <copyFile src="$S(PluginDir)/Android/bhaptics_manager.aar"
+            dst="$S(BuildDir)/gradle/bhaptics_manager.aar" />
   </prebuildCopies>
 
   <AARImports>
@@ -44,10 +44,10 @@
   <buildGradleAdditions>
     <insert>
       dependencies {
-      implementation files('../bhaptics_ble_1.08.aar')
-      implementation files('../bhaptics_core_1.08.aar')
-      implementation files('../bhaptics_commons_1.08.aar')
-      implementation files('../bhaptics_manager_1.08.aar')
+      implementation files('../bhaptics_ble.aar')
+      implementation files('../bhaptics_core.aar')
+      implementation files('../bhaptics_commons.aar')
+      implementation files('../bhaptics_manager.aar')
       }
     </insert>
   </buildGradleAdditions>
@@ -55,6 +55,11 @@
   <!-- optional additions to the GameActivity imports in GameActivity.java -->
 	<gameActivityImportAdditions>
 	  <insert>
+      import com.bhaptics.bhapticsmanger.BhapticsManager;
+      import com.bhaptics.bhapticsmanger.HapticPlayer;
+      import com.bhaptics.commons.model.BhapticsDevice;
+      import com.bhaptics.commons.model.PositionType;
+
       import org.json.JSONArray;
       import org.json.JSONException;
       import org.json.JSONObject;
@@ -67,22 +72,20 @@
 	<gameActivityClassAdditions>
 		<insert>
       <![CDATA[
-      private com.bhaptics.bhapticsmanger.BhapticsManager bhapticsManager;
-      private com.bhaptics.bhapticsmanger.HapticPlayer player;
-      private String LatestDeviceStatus = "";
-      private String LatestScanStatus = "";
-      private String LatestPlayerResponse = "";
-      private static final String TAG = "HAPTIC_WRAPPER";
-      
-      public native void nativeOnDeviceFound(String deviceListString);
-      public native void nativeOnChangeScanState(String scanningState);
-      public native void nativeOnChangeResponse(String changeResponse);
-      
-      //Helper Functions
-      private static String DeviceToJsonString(List<com.bhaptics.commons.model.BhapticsDevice> devices) {
+          private BhapticsManager bhapticsManager;
+    private HapticPlayer player;
+    private String LatestDeviceStatus = "";
+    private static final String TAG = "HAPTIC_WRAPPER";
+
+    public native void nativeOnDeviceFound(String deviceListString);
+    public native void nativeOnChangeScanState();
+    public native void nativeOnChangeResponse();
+
+    //Helper Functions
+    private static String DeviceToJsonString(List<BhapticsDevice> devices) {
         JSONArray jsonArray = new JSONArray();
 
-        for (com.bhaptics.commons.model.BhapticsDevice device : devices) {
+        for (BhapticsDevice device : devices) {
             JSONObject obj = DeviceToJsonObject(device);
 
             if (obj == null) {
@@ -93,9 +96,9 @@
         }
 
         return jsonArray.toString();
-      }
+    }
 
-      private static JSONObject DeviceToJsonObject(com.bhaptics.commons.model.BhapticsDevice device) {
+    private static JSONObject DeviceToJsonObject(BhapticsDevice device) {
         try {
             JSONObject obj = new JSONObject();
             obj.put("DeviceName", device.getDeviceName());
@@ -109,136 +112,109 @@
             android.util.Log.d(TAG, "toJsonObject: " + e.getMessage());
         }
         return null;
-      }
+    }
 
-      private static String ResponseToJsonString(com.bhaptics.bhapticsmanger.PlayerResponse response) {
-        try {
-            JSONObject resultJson = new JSONObject();
-            resultJson.put("ConnectedDeviceCount", response.getConnectedDeviceCount());
-            
-            JSONArray connectedPositions  = new JSONArray();
-            resultJson.put("ConnectedPositions", connectedPositions);
-            for (com.bhaptics.commons.model.PositionType pos : response.getConnectedPositions()) {
-                connectedPositions.put(pos.toString());
-            }
-
-            JSONArray registeredKey  = new JSONArray();
-            resultJson.put("RegisteredKeys", registeredKey);
-            for (String key : response.getRegisteredKeys()) {
-                registeredKey.put(key);
-            }
-            JSONArray activeKeys  = new JSONArray();
-            resultJson.put("ActiveKeys", activeKeys);
-            for (String key : response.getActiveKeys()) {
-                activeKeys.put(key);
-            }
-
-            JSONObject status =  new JSONObject();
-            resultJson.put("Status", status);
-            for (String position : response.getStatus().keySet()) {
-                if (com.bhaptics.commons.model.PositionType.Vest.toString().equals(position)) {
-                    // status wants to get VestFront and VestBack
-                    continue;
-                }
-                JSONArray motorValues = new JSONArray();
-                byte[] values = response.getStatus().get(position);
-
-                for (int i = 0; i < values.length; i++) {
-                    motorValues.put(values[i]);
-                }
-
-                status.put(position, motorValues);
-            }
-
-            return resultJson.toString();
-        } catch (JSONException e) {
-            android.util.Log.e(TAG, "feedbackResponse: " + e.getMessage(), e);
-        } catch (Exception e) {
-            android.util.Log.e(TAG, "unknown: " + e.getMessage(), e);
-        }
-
-        return "";
-      }
-
-      //Bluetooth Functionality
-      public void AndroidThunkJava_Scan() {
+    //Bluetooth Functionality
+    public void AndroidThunkJava_Scan() {
         if (!com.bhaptics.commons.PermissionUtils.hasBluetoothPermission(this)) {
-          return;
+            return;
         }
-      
-        Log.warn("StartScan");
+
         bhapticsManager.scan();
-      }
-      public void AndroidThunkJava_StopScan() {
+    }
+    public void AndroidThunkJava_StopScan() {
         bhapticsManager.stopScan();
-      }
-      
-      public boolean AndroidThunkJava_IsScanning() {
+    }
+
+    public boolean AndroidThunkJava_IsScanning() {
         return bhapticsManager.isScanning();
-      }
-      
-      //Submit to player
-      public void AndroidThunkJava_Submit(String str) {
-        bhapticsManager.submit(str);
-      }
-      
-      public void AndroidThunkJava_Register(String str) {
-        bhapticsManager.register(str);
-      }
+    }
 
-      // Device Settings
-      public void AndroidThunkJava_Pair(String address) {
+    // Device Settings
+    public void AndroidThunkJava_Pair(String address) {
         bhapticsManager.pair(address);
-      }     
-      
-      // Pair Device with positoin
-      public void AndroidThunkJava_PairFromPosition(String address, String position) {
+    }
+
+    // Pair Device with positoin
+    public void AndroidThunkJava_PairFromPosition(String address, String position) {
         bhapticsManager.pair(address, com.bhaptics.commons.model.PositionType.valueOf(position));
-      }
+    }
 
-      public void AndroidThunkJava_Unpair(String address) {
+    public void AndroidThunkJava_Unpair(String address) {
         bhapticsManager.unpair(address);
-      }
+    }
 
-      public void AndroidThunkJava_UnpairAll() {
+    public void AndroidThunkJava_UnpairAll() {
         bhapticsManager.unpairAll();
-      }
+    }
 
-      public void AndroidThunkJava_ChangePosition(String address, String position){
+    public void AndroidThunkJava_ChangePosition(String address, String position){
         bhapticsManager.changePosition(address, com.bhaptics.commons.model.PositionType.valueOf(position));
-      }
+    }
 
-      public void AndroidThunkJava_TogglePosition(String address) {
+    public void AndroidThunkJava_TogglePosition(String address) {
         bhapticsManager.togglePosition(address);
-      }
+    }
 
-      public void AndroidThunkJava_Ping(String address) {
+    public void AndroidThunkJava_Ping(String address) {
         bhapticsManager.ping(address);
-      }
-      public void AndroidThunkJava_PingAll() {
+    }
+    public void AndroidThunkJava_PingAll() {
         bhapticsManager.pingAll();
-      }
-      
-      public void AndroidThunkJava_TurnOffHapticVisualization(){
-        bhapticsManager.turnOffVisualization();
-      }
-      
-      public void AndroidThunkJava_TurnOnHapticVisualization(){
-        bhapticsManager.turnOnVisualization();
-      }
+    }
 
-      public String AndroidThunkJava_GetDeviceList() {
-          List<com.bhaptics.commons.model.BhapticsDevice> deviceList = bhapticsManager.getDeviceList();
-          return DeviceToJsonString(deviceList);
-      }
+    public String AndroidThunkJava_GetDeviceList() {
+        List<BhapticsDevice> deviceList = bhapticsManager.getDeviceList();
+        return DeviceToJsonString(deviceList);
+    }
 
-      public String AndroidThunkJava_GetLatestScanStatus() {
-          return LatestScanStatus;
-      }
+    public boolean AndroidThunkJava_GetLatestScanStatus() {
+        return bhapticsManager.isScanning();
+    }
 
-      public String AndroidThunkJava_GetLatestPlayerResponse() {
-          return LatestPlayerResponse;
-      }
+    public void AndroidThunkJava_SubmitRegistered(String key, String altKey,
+                                                  float intensity, float duration,
+                                                  float offsetAngleX, float offsetY) {
+        player.submitRegistered(key, altKey, intensity, duration, offsetAngleX, offsetY);
+    }
+
+    void  AndroidThunkJava_SubmitDot(String key, String position, int[] indexes, int[] intensities, int duration) {
+    android.util.Log.i(TAG, "SubmitDot " + key + " " + position + " "  + indexes[0] + " " + intensities[0]);
+        player.submitDot(key, position, indexes, intensities, duration);
+    }
+    void  AndroidThunkJava_SubmitPath(String key, String position, float[] x, float[] y, int[] intensities, int duration) {
+        player.submitPath(key, position, x, y, intensities, duration);
+    }
+
+    public void AndroidThunkJava_Register(String key, String fileStr) {
+        player.registerProject(key, fileStr);
+    }
+    public void AndroidThunkJava_RegisterReflected(String key, String fileStr) {
+        player.registerProjectReflected(key, fileStr);
+    }
+    public void AndroidThunkJava_TurnOff(String key) {
+        player.turnOff(key);
+    }
+
+    public void AndroidThunkJava_TurnOffAll() {
+        player.turnOffAll();
+    }
+
+    public byte[] AndroidThunkJava_GetPositionStatus(String position) {
+        return  player.getPositionStatus(PositionType.valueOf(position));
+    }
+
+    public boolean AndroidThunkJava_IsRegistered(String key) {
+        return player.isRegistered(key);
+    }
+    public boolean AndroidThunkJava_IsPlaying(String key) {
+        return player.isPlaying(key);
+    }
+    public boolean AndroidThunkJava_IsAnythingPlaying() {
+        return player.isAnythingPlaying();
+    }
+
+
     ]]>
     </insert>
 	</gameActivityClassAdditions>
@@ -254,35 +230,34 @@
 	<gameActivityOnCreateAdditions>
 		<insert>
       <![CDATA[
+        
         player = new com.bhaptics.bhapticsmanger.HapticPlayerImpl();
         bhapticsManager = new com.bhaptics.bhapticsmanger.BhapticsManagerImpl(this, player, new com.bhaptics.ble.PairedDeviceManagerImpl(this));
         bhapticsManager.addBhapticsManageCallback(new com.bhaptics.bhapticsmanger.BhapticsManagerCallback() {
-          @Override
-          public void onDeviceUpdate(List<com.bhaptics.commons.model.BhapticsDevice> deviceList) {
-              LatestDeviceStatus = DeviceToJsonString(deviceList);
-              nativeOnDeviceFound(LatestDeviceStatus);
-          }
+            @Override
+            public void onDeviceUpdate(List<com.bhaptics.commons.model.BhapticsDevice> deviceList) {
+                LatestDeviceStatus = DeviceToJsonString(deviceList);
+                nativeOnDeviceFound(LatestDeviceStatus);
+            }
 
-          @Override
-          public void onScanStatusChange(boolean scanning) {
-              LatestScanStatus = scanning +"";
-              nativeOnChangeScanState(LatestScanStatus);
-          }
+            @Override
+            public void onScanStatusChange(boolean scanning) {
+                nativeOnChangeScanState();
+            }
 
-          @Override
-          public void onChangeResponse(com.bhaptics.bhapticsmanger.PlayerResponse response) {
-              LatestPlayerResponse = ResponseToJsonString(response);
-              nativeOnChangeResponse(LatestPlayerResponse);
-          }
-          
-          @Override
-          public void onConnect(String address) {
-              android.util.Log.i("MAIN_ACTIVITY", "onConnect: " + address );
-          }
-          @Override
-          public void onDisconnect(String address) {
-              android.util.Log.i("MAIN ACTIVITY", "onDisconnect: " + address );
-          }
+            @Override
+            public void onChangeResponse() {
+                nativeOnChangeResponse();
+            }
+
+            @Override
+            public void onConnect(String address) {
+                android.util.Log.i("MAIN_ACTIVITY", "onConnect: " + address );
+            }
+            @Override
+            public void onDisconnect(String address) {
+                android.util.Log.i("MAIN ACTIVITY", "onDisconnect: " + address );
+            }
         });
       ]]>
     </insert>

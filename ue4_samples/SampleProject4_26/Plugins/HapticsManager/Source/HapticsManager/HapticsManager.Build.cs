@@ -43,15 +43,15 @@ public class HapticsManager : ModuleRules
 		PrivateDependencyModuleNames.AddRange(
 			new string[]
 			{
-                "CoreUObject",
-                "Engine",
-                "Slate",
-                "SlateCore",
+				"CoreUObject",
+				"Engine",
+				"Slate",
+				"SlateCore",
                 "Json",
                 "JsonUtilities",
                 "Projects",
                 "InputCore",
-                "DeveloperSettings",
+				"DeveloperSettings",
                 "HapticLibrary"
 				// ... add private dependencies that you statically link with here ...	
 			}
@@ -59,10 +59,11 @@ public class HapticsManager : ModuleRules
 
         
         DynamicallyLoadedModuleNames.AddRange(
-            new string[]
-            {
-                // ... add any modules that your module loads dynamically here ...
-            });
+			new string[]
+			{
+				// ... add any modules that your module loads dynamically here ...
+			}
+			);
 
     }
 
