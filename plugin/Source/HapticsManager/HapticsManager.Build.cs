@@ -51,6 +51,7 @@ public class HapticsManager : ModuleRules
                 "JsonUtilities",
                 "Projects",
                 "InputCore",
+				"DeveloperSettings",
                 "HapticLibrary"
 				// ... add private dependencies that you statically link with here ...	
 			}
