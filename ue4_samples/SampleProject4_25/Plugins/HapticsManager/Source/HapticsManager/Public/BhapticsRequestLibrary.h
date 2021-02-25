@@ -169,6 +169,13 @@ public:
 		Category = "bHaptics")
 		static void ToggleHapticFeedback();
 
+	//Toggle haptic feedback on/off
+	UFUNCTION(BlueprintCallable,
+		meta = (DisplayName = "Get Status",
+			Keywords = "bHaptics"),
+		Category = "bHaptics")
+		static TArray<uint8> GetResponseStatus(EPosition Pos);
+
 	//Helper function to compute rotation for a given collision.
 	//Compute's the horizontal angle and vertical offset and returns a RotationOption for use with a haptic feedback file.
 	//Assumes the origin of the component is in the center, and that the ForwardVector is the front of the vest.

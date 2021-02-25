@@ -507,6 +507,40 @@ TArray<FHapticFeedback> BhapticsLibrary::Lib_GetResponseStatus()
 	return ChangedFeedback;
 }
 
+TArray<uint8> BhapticsLibrary::Lib_GetResponseStatus(EPosition Pos)
+{
+	InitializeCheck();
+#if PLATFORM_ANDROID
+
+	FString posStr = BhapticsUtils::PositionEnumToString(Pos);
+	TArray<uint8> val = UAndroidHapticLibrary::GetPositionStatus(posStr);
+	return val;
+#else
+	TArray<uint8> val;
+	val.Init(0, 20);
+	if (!IsLoaded)
+	{
+		return val;
+	}
+	status stat;
+	bool res = TryGetResponseForPosition(PositionEnumToPositionType(Pos), stat);
+	if (res)
+	{
+		for (int motorIndex = 0; motorIndex < val.Num(); motorIndex++)
+		{
+			val[motorIndex] = stat.values[motorIndex];
+		}
+
+		return val;
+	}
+	else {
+		UE_LOG(LogTemp, Log, TEXT("Failed to get status"));
+
+		return val;
+	}
+#endif
+}
+
 void BhapticsLibrary::InitializeCheck()
 {
 	if (!IsInitialised)

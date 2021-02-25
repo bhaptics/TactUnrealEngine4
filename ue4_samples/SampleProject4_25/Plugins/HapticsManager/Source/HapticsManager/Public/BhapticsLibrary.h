@@ -48,6 +48,7 @@ public:
 	static void SetLibraryLoaded();
 
 	static TArray<FHapticFeedback> Lib_GetResponseStatus();
+	static TArray<uint8> Lib_GetResponseStatus(EPosition Pos);
 
 private:
 	static bool IsLoaded;

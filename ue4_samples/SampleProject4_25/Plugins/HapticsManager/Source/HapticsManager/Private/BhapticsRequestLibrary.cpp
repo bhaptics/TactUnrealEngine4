@@ -185,6 +185,11 @@ void UBhapticsRequestLibrary::ToggleHapticFeedback()
 	BhapticsLibrary::Lib_ToggleFeedback();
 }
 
+TArray<uint8> UBhapticsRequestLibrary::GetResponseStatus(EPosition Pos)
+{
+	return BhapticsLibrary::Lib_GetResponseStatus(Pos);
+}
+
 FRotationOption UBhapticsRequestLibrary::ProjectToVest(FVector Location, UPrimitiveComponent* HitComponent, float HalfHeight)
 {
 	if (HitComponent == nullptr)
@@ -217,8 +222,15 @@ FRotationOption UBhapticsRequestLibrary::ProjectToVest(FVector Location, UPrimit
 
 	Angle = FMath::RadiansToDegrees(FMath::Atan2(A, B));
 
-	Y_Offset = FMath::Clamp(DotProduct / (HalfHeight * 2), -0.5f, 0.5f);
-
+	if (HalfHeight < 0.01) 
+	{
+		Y_Offset = 0;
+	}
+	else 
+	{
+		Y_Offset = FMath::Clamp(DotProduct / (HalfHeight * 2), -0.5f, 0.5f);
+	}
+	
 	return FRotationOption(Angle, Y_Offset);
 }
 
