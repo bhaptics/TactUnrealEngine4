@@ -18,7 +18,6 @@ AHapticsManagerActor::AHapticsManagerActor()
 void AHapticsManagerActor::BeginDestroy()
 {
 	Super::BeginDestroy();
-	UAndroidHapticLibrary::AndroidThunkCpp_TurnOffVisualization();
 }
 
 // Called when the game starts or when spawned
@@ -35,8 +34,6 @@ void AHapticsManagerActor::BeginPlay()
 	InitialiseDots(TactGloveRight);
 	InitialiseDots(TactShoeLeft);
 	InitialiseDots(TactShoeRight);
-
-	UAndroidHapticLibrary::AndroidThunkCpp_TurnOnVisualization();
 }
 
 // Called every frame

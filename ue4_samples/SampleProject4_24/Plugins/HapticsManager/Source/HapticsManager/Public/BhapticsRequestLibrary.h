@@ -23,24 +23,53 @@ public:
 		Category = "bHaptics")
 		static void SubmitFeedback(UFeedbackFile* Feedback);
 
-	//Submit a haptic feedback file and transform it by a given RotationOption.
-	//This call will only rotate vest feedback files, with other devices being kept the same.
-	//Provide an AltKey to uniquely identify this feedback.
+	// Deprecated
 	UFUNCTION(BlueprintCallable,
 		meta = (DisplayName = "Submit Feedback with Transform",
 			Keywords = "bHaptics",
+			DeprecatedFunction,
+			DeprecationMessage = "Now managed through  `Submit Feedback wih Options`..",
 			AdvancedDisplay = "AltKey"),
 		Category = "bHaptics")
 		static void SubmitFeedbackWithTransform(UFeedbackFile* Feedback, const FString& AltKey, FRotationOption Option, bool UseAltKey = false);
 
-	//Submit a haptic feedback file, and scale the intensity and duration by a given ScaleOption.
-	//Provide an AltKey to uniquely identify this feedback.
+	// Deprecated
 	UFUNCTION(BlueprintCallable,
 		meta = (DisplayName = "Submit Feedback with Scaled Intensity and Duration",
 			Keywords = "bHaptics",
+			DeprecatedFunction,
+			DeprecationMessage = "Now managed through `Submit Feedback wih Options`.",
 			AdvancedDisplay = "AltKey"),
 		Category = "bHaptics")
 		static void SubmitFeedbackWithIntensityDuration(UFeedbackFile* Feedback, const FString& AltKey, FRotationOption RotationOption, FScaleOption ScaleOption, bool UseAltKey = false);
+
+	UFUNCTION(BlueprintCallable,
+		meta = (DisplayName = "Submit Feedback with Options",
+			Keywords = "bHaptics"),
+		Category = "bHaptics")
+		static void SubmitFeedbackWithOptions(
+			UFeedbackFile* Feedback, 
+			const FString& Key, 
+			FRotationOption RotationOption, 
+			FScaleOption ScaleOption);
+
+	UFUNCTION(BlueprintCallable,
+		meta = (DisplayName = "Submit Feedback with Scale Option",
+			Keywords = "bHaptics"),
+		Category = "bHaptics")
+		static void SubmitFeedbackWithScaleOption(
+			UFeedbackFile* Feedback, 
+			FScaleOption ScaleOption);
+
+	UFUNCTION(BlueprintCallable,
+		meta = (DisplayName = "Loop Feedback with Options",
+			Keywords = "bHaptics"),
+		Category = "bHaptics")
+		static void LoopFeedbackWithOptions(
+			UFeedbackFile* Feedback,
+			FString Key,
+			FRotationOption RotationOption,
+			FScaleOption ScaleOption);
 
 	//Register a given haptic feedback file under the specified key.
 	UFUNCTION(BlueprintCallable,
@@ -108,9 +137,7 @@ public:
 	//Turn off the specified haptic feedback pattern if it is playing;
 	UFUNCTION(BlueprintCallable,
 		meta = (DisplayName = "Turn Off Feedback",
-			Keywords = "bHaptics",
-			DeprecatedFunction,
-			DeprecationMessage = "Now managed through the FeedbackFile."),
+			Keywords = "bHaptics"),
 		Category = "bHaptics")
 		static void TurnOffRegisteredFeedback(const FString& Key);
 
@@ -141,6 +168,13 @@ public:
 			Keywords = "bHaptics"),
 		Category = "bHaptics")
 		static void ToggleHapticFeedback();
+
+	//Toggle haptic feedback on/off
+	UFUNCTION(BlueprintCallable,
+		meta = (DisplayName = "Get Status",
+			Keywords = "bHaptics"),
+		Category = "bHaptics")
+		static TArray<uint8> GetResponseStatus(EPosition Pos);
 
 	//Helper function to compute rotation for a given collision.
 	//Compute's the horizontal angle and vertical offset and returns a RotationOption for use with a haptic feedback file.
