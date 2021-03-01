@@ -8,6 +8,10 @@
 #include "HapticStructures.h"
 #include "FeedbackFile.generated.h"
 
+#if WITH_EDITORONLY_DATA
+class UAssetImportData;
+#endif
+
 UCLASS(BlueprintType, hidecategories = (Object))
 class HAPTICSMANAGER_API UFeedbackFile : public UObject
 {
@@ -28,10 +32,19 @@ public :
 
 	//Device(s) on which the haptic feedback will be played.
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "FeedbackFile")
-		FString Device;
+	FString Device;
 
 	//Duration of the haptic feedback effect (in seconds)
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "FeedbackFile")
-		float Duration;
+	float Duration;
+
+#if WITH_EDITORONLY_DATA
+	UPROPERTY(VisibleAnywhere, Instanced, Category = ImportSettings)
+	class UAssetImportData* AssetImportData;
+	void GetAssetRegistryTags(TArray<FAssetRegistryTag>& OutTags) const;
+#endif
+
+	void PostInitProperties();
+	void PostLoad();
 };
 
