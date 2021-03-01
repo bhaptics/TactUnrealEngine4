@@ -51,6 +51,7 @@ EReimportResult::Type UReimportFeedbackFileFactory::Reimport(UObject* Obj)
 	if (Device != FeedbackFile->Device)
 		return EReimportResult::Failed;
 
+	FeedbackFile->Id = FGuid::NewGuid();
 	FeedbackFile->ProjectString = ProjectString;
 	FeedbackFile->Key = Key;
 	FeedbackFile->Duration = Duration;
