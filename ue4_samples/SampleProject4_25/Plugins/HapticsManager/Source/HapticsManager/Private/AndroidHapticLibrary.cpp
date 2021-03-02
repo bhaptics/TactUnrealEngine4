@@ -533,6 +533,25 @@ void UAndroidHapticLibrary::RegisterProject(FString key, FString fileStr)
 #endif // PLATFORM_ANDROID
 }
 
+void UAndroidHapticLibrary::RegisterProjectReflected(FString key, FString fileStr)
+{
+#if PLATFORM_ANDROID
+	if (JNIEnv* Env = FAndroidApplication::GetJavaEnv())
+	{
+		static jmethodID registerMethodId =
+			FJavaWrapper::FindMethod(
+				Env, FJavaWrapper::GameActivityClassID,
+				"AndroidThunkJava_RegisterReflected",
+				"(Ljava/lang/String;Ljava/lang/String;)V", false);
+		jstring keyStrJava = Env->NewStringUTF(TCHAR_TO_UTF8(*key));
+		jstring fileStrJava = Env->NewStringUTF(TCHAR_TO_UTF8(*fileStr));
+		FJavaWrapper::CallVoidMethod(Env, FJavaWrapper::GameActivityThis, registerMethodId, keyStrJava, fileStrJava);
+		Env->DeleteLocalRef(keyStrJava);
+		Env->DeleteLocalRef(fileStrJava);
+	}
+#endif // PLATFORM_ANDROID
+}
+
 void UAndroidHapticLibrary::SubmitRegistered(
 	FString key, FString altKey, float intensity, float duration, float xOffsetAngle, float yOffset)
 {
