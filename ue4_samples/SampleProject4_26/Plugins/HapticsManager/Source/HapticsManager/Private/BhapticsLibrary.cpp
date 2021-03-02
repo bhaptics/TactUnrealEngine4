@@ -183,6 +183,26 @@ void BhapticsLibrary::Lib_RegisterFeedback(FString Key, FString ProjectJson)
 #endif
 }
 
+void BhapticsLibrary::Lib_RegisterReflectedFeedback(FString Key, FString ProjectJson)
+{
+	InitializeCheck();
+
+#if PLATFORM_ANDROID
+	UAndroidHapticLibrary::RegisterProjectReflected(Key, ProjectJson);
+#else
+	if (!IsLoaded)
+	{
+		return;
+	}
+
+	FString s = "{\"project\":" + ProjectJson + ", \"intervalMillis\": 20, \"size\": 20, \"durationMillis\": 1000}";
+
+	std::string StandardKey(TCHAR_TO_UTF8(*Key));
+	std::string ProjectString =  (TCHAR_TO_UTF8(*s));
+	RegisterFeedbackFromTactFileReflected(StandardKey.c_str(), ProjectString.c_str());
+#endif
+}
+
 void BhapticsLibrary::Lib_SubmitRegistered(FString Key)
 {
 	InitializeCheck();
