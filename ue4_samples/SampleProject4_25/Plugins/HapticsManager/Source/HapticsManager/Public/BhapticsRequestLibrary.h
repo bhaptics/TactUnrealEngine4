@@ -62,13 +62,11 @@ public:
 			FScaleOption ScaleOption);
 
 	UFUNCTION(BlueprintCallable,
-		meta = (DisplayName = "Loop Feedback with Options",
+		meta = (DisplayName = "Submit Feedback Reflected - Works with Arm, Hand and Foot",
 			Keywords = "bHaptics"),
 		Category = "bHaptics")
-		static void LoopFeedbackWithOptions(
+		static void SubmitFeedbackReflected(
 			UFeedbackFile* Feedback,
-			FString Key,
-			FRotationOption RotationOption,
 			FScaleOption ScaleOption);
 
 	//Register a given haptic feedback file under the specified key.

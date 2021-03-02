@@ -54,6 +54,8 @@ class UAndroidHapticLibrary : public UBlueprintFunctionLibrary
 	static TArray<uint8> GetPositionStatus(FString pos);
 
 	static void RegisterProject(FString key, FString fileStr);
+	static void RegisterProjectReflected(FString key, FString fileStr);
+
 	static void SubmitRegistered(
 		FString key, FString altKey, float intensity, float duration, float xOffsetAngle, float yOffset);
 

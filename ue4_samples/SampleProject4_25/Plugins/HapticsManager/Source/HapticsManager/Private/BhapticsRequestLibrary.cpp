@@ -8,6 +8,8 @@
 #include "Components/PrimitiveComponent.h"
 #include "BhapticsLibrary.h"
 
+FString REFLECT_SUFFIX = "REF";
+
 void UBhapticsRequestLibrary::SubmitFeedback(UFeedbackFile* Feedback)
 {
 	if (Feedback == NULL)
@@ -84,8 +86,25 @@ void UBhapticsRequestLibrary::SubmitFeedbackWithScaleOption(UFeedbackFile* Feedb
 	BhapticsLibrary::Lib_SubmitRegistered(FeedbackKey, UniqueKey, ScaleOption, RotationOption);
 }
 
-void UBhapticsRequestLibrary::LoopFeedbackWithOptions(UFeedbackFile* Feedback, FString Key, FRotationOption RotationOption, FScaleOption ScaleOption)
+void UBhapticsRequestLibrary::SubmitFeedbackReflected(UFeedbackFile* Feedback, FScaleOption ScaleOption)
 {
+	if (Feedback == NULL)
+	{
+		return;
+	}
+
+	FString FeedbackKey = Feedback->Key + Feedback->Id.ToString() + REFLECT_SUFFIX;
+	FString UniqueKey = FeedbackKey + FString::FromInt(FMath::Rand() % 20);
+
+	FRotationOption RotationOption(0, 0);
+
+	if (!BhapticsLibrary::Lib_IsFeedbackRegistered(FeedbackKey))
+	{
+		BhapticsLibrary::Lib_RegisterReflectedFeedback(FeedbackKey, Feedback->ProjectString);
+	}
+
+	BhapticsLibrary::Lib_SubmitRegistered(FeedbackKey, UniqueKey, ScaleOption, RotationOption);
+
 }
 
 void UBhapticsRequestLibrary::SubmitFeedbackWithTransform(UFeedbackFile* Feedback, const FString& AltKey, FRotationOption RotationOption, bool UseAltKey)

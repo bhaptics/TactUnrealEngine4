@@ -19,6 +19,7 @@
 #include "Feedback/HandFeedbackFile.h"
 #include "Feedback/FootFeedbackFile.h"
 
+#include "EditorFramework/AssetImportData.h"
 
 UFeedbackFileFactory::UFeedbackFileFactory(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -26,18 +27,74 @@ UFeedbackFileFactory::UFeedbackFileFactory(const FObjectInitializer& ObjectIniti
 	SupportedClass = UFeedbackFile::StaticClass();
 	bCreateNew = false;
 	bEditorImport = true;
+	Formats.Add(TEXT("tact;bHaptics Feedback"));
 }
 
 UObject* UFeedbackFileFactory::FactoryCreateFile(UClass* InClass, UObject* InParent, FName InName, EObjectFlags Flags,
 	const FString& Filename, const TCHAR* Parms, FFeedbackContext* Warn, bool& bOutOperationCanceled)
 {
-	UFeedbackFile* FeedbackFile = nullptr;
+
+	TSharedPtr<FJsonObject> JsonProject = LoadFileToJson(Filename);
+	if (!JsonProject.IsValid())
+		return nullptr;
+
+	FString ProjectString;
+	TSharedRef<TJsonWriter<TCHAR, TCondensedJsonPrintPolicy<TCHAR>>> Writer = TJsonWriterFactory<TCHAR, TCondensedJsonPrintPolicy<TCHAR>>::Create(&ProjectString);
+	FJsonSerializer::Serialize(JsonProject.ToSharedRef(), Writer);
+
+	FString Key = JsonProject->GetStringField("name");
+	FString Device = JsonProject->GetObjectField("layout")->GetStringField("type");
+	float Duration = JsonProject->GetNumberField("mediaFileDuration");
+
+	UFeedbackFile* FeedbackFile = UFeedbackFileFactory::CreateFeebackFile(Device, InParent, InName, Flags);
+
+	FeedbackFile->Id = FGuid::NewGuid();
+	FeedbackFile->ProjectString = ProjectString;
+	FeedbackFile->Key = Key;
+	FeedbackFile->Device = Device;
+	FeedbackFile->Duration = Duration;
+
+	FeedbackFile->AssetImportData->Update(Filename);
+
+	bOutOperationCanceled = false;
+	
+	return FeedbackFile;
+}
+
+
+
+UFeedbackFile* UFeedbackFileFactory::CreateFeebackFile(const FString& Device, UObject* InParent, FName InName, EObjectFlags Flags)
+{
+	if (Device.StartsWith("Vest") || Device.StartsWith("Tactot"))
+	{
+		return NewObject<UTactotFeedbackFile>(InParent, UTactotFeedbackFile::StaticClass(), InName, Flags);
+	}
+	else if (Device.StartsWith("Tactosy"))
+	{
+		return NewObject<UTactosyFeedbackFile>(InParent, UTactosyFeedbackFile::StaticClass(), InName, Flags);
+	}
+	else if (Device.StartsWith("Tactal") || Device.StartsWith("Head"))
+	{
+		return NewObject<UTactalFeedbackFile>(InParent, UTactalFeedbackFile::StaticClass(), InName, Flags);
+	}
+	else if (Device.StartsWith("Hand"))
+	{
+		return NewObject<UHandFeedbackFile>(InParent, UHandFeedbackFile::StaticClass(), InName, Flags);
+	}
+	else if (Device.StartsWith("Foot"))
+	{
+		return NewObject<UFootFeedbackFile>(InParent, UFootFeedbackFile::StaticClass(), InName, Flags);
+	}
+
+	return NewObject<UFeedbackFile>(InParent, UFootFeedbackFile::StaticClass(), InName, Flags);
+}
+
+
+
+
+TSharedPtr<FJsonObject> UFeedbackFileFactory::LoadFileToJson(const FString& Filename)
+{
 	FString TextString;
-	FGuid Id = FGuid::NewGuid();
-	FString ProjectString = "";
-	FString Key = "";
-	FString Device = "Tact";
-	float Duration = 0;
 
 	if (FFileHelper::LoadFileToString(TextString, *Filename))
 	{
@@ -46,82 +103,11 @@ UObject* UFeedbackFileFactory::FactoryCreateFile(UClass* InClass, UObject* InPar
 
 		if (FJsonSerializer::Deserialize(Reader, JsonObject))
 		{
-			FString OutputString;
 			TSharedPtr<FJsonObject> JsonProject = JsonObject->GetObjectField("project");
-			TSharedRef<TJsonWriter<TCHAR, TCondensedJsonPrintPolicy<TCHAR>>> Writer = TJsonWriterFactory<TCHAR, TCondensedJsonPrintPolicy<TCHAR>>::Create(&OutputString);
-			FJsonSerializer::Serialize(JsonProject.ToSharedRef(), Writer);
-
-			ProjectString = OutputString;
-			Key = JsonProject->GetStringField("name");
-			Device = JsonProject->GetObjectField("layout")->GetStringField("type");
-			Duration = JsonProject->GetNumberField("mediaFileDuration");
+			return JsonProject;
 		}
 	}
 
-	bOutOperationCanceled = false;
-
-	if (Device.StartsWith("Vest") || Device.StartsWith("Tactot"))
-	{
-		UTactotFeedbackFile* TactotFile = nullptr;
-		TactotFile = NewObject<UTactotFeedbackFile>(InParent, UTactotFeedbackFile::StaticClass(), InName, Flags);
-		TactotFile->Id = Id;
-		TactotFile->ProjectString = ProjectString;
-		TactotFile->Key = Key;
-		TactotFile->Device = Device;
-		TactotFile->Duration = Duration;
-		return TactotFile;
-	}
-	else if (Device.StartsWith("Tactosy"))
-	{
-		UTactosyFeedbackFile* TactosyFile = nullptr;
-		TactosyFile = NewObject<UTactosyFeedbackFile>(InParent, UTactosyFeedbackFile::StaticClass(), InName, Flags);
-		TactosyFile->Id = Id;
-		TactosyFile->ProjectString = ProjectString;
-		TactosyFile->Key = Key;
-		TactosyFile->Device = Device;
-		TactosyFile->Duration = Duration;
-		return TactosyFile;
-	}
-	else if (Device.StartsWith("Tactal")|| Device.StartsWith("Head"))
-	{
-		UTactalFeedbackFile* TactalFile = nullptr;
-		TactalFile = NewObject<UTactalFeedbackFile>(InParent, UTactalFeedbackFile::StaticClass(), InName, Flags);
-		TactalFile->Id = Id;
-		TactalFile->ProjectString = ProjectString;
-		TactalFile->Key = Key;
-		TactalFile->Device = Device;
-		TactalFile->Duration = Duration;
-		return TactalFile;
-	}
-	else if (Device.StartsWith("Hand"))
-	{
-		UHandFeedbackFile* HandFile = nullptr;
-		HandFile = NewObject<UHandFeedbackFile>(InParent, UHandFeedbackFile::StaticClass(), InName, Flags);
-		HandFile->Id = Id;
-		HandFile->ProjectString = ProjectString;
-		HandFile->Key = Key;
-		HandFile->Device = Device;
-		HandFile->Duration = Duration;
-		return HandFile;
-	}
-	else if (Device.StartsWith("Foot"))
-	{
-		UFootFeedbackFile* FootFile = nullptr;
-		FootFile = NewObject<UFootFeedbackFile>(InParent, UFootFeedbackFile::StaticClass(), InName, Flags);
-		FootFile->Id = Id;
-		FootFile->ProjectString = ProjectString;
-		FootFile->Key = Key;
-		FootFile->Device = Device;
-		FootFile->Duration = Duration;
-		return FootFile;
-	}
-
-	FeedbackFile = NewObject<UFeedbackFile>(InParent, InClass, InName, Flags);
-	FeedbackFile->Id = Id;
-	FeedbackFile->ProjectString = ProjectString;
-	FeedbackFile->Key = Key;
-	FeedbackFile->Device = Device;
-	FeedbackFile->Duration = Duration;
-	
-	return FeedbackFile;
+	return TSharedPtr<FJsonObject>();
 }
+

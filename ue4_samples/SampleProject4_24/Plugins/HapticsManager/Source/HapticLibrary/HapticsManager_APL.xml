@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <root xmlns:android="http://schemas.android.com/apk/res/android">
-	<!-- init section is always evaluated once per architecture -->
-	<trace enable="true"/>
-	<init>
-		<log text="AndroidAPITemplate init"/>		
-	</init>
+  <!-- init section is always evaluated once per architecture -->
+  <trace enable="true"/>
+  <init>
+    <log text="AndroidAPITemplate init"/>
+  </init>
 
   <androidManifestUpdates>
     <addPermission android:name="android.permission.BLUETOOTH" />
@@ -15,7 +15,8 @@
 
   <!-- optional additions to proguard -->
   <proguardAdditions>
-    <insert><![CDATA[
+    <insert>
+      <![CDATA[
       -keepattributes Signature
       -dontskipnonpubliclibraryclassmembers
 
@@ -23,7 +24,11 @@
             public <methods>;
             public <fields>;
      }
-    ]]></insert>
+	 -keep class com.bhaptics.** {
+		*;
+	}
+    ]]>
+    </insert>
   </proguardAdditions>
 
   <prebuildCopies>
@@ -51,10 +56,10 @@
       }
     </insert>
   </buildGradleAdditions>
-  
+
   <!-- optional additions to the GameActivity imports in GameActivity.java -->
-	<gameActivityImportAdditions>
-	  <insert>
+  <gameActivityImportAdditions>
+    <insert>
       import com.bhaptics.bhapticsmanger.BhapticsManager;
       import com.bhaptics.bhapticsmanger.HapticPlayer;
       import com.bhaptics.commons.model.BhapticsDevice;
@@ -65,12 +70,12 @@
       import org.json.JSONObject;
       import java.util.List;
     </insert>
-	</gameActivityImportAdditions>
-	
+  </gameActivityImportAdditions>
 
-	<!-- optional additions to the GameActivity class in GameActivity.java -->
-	<gameActivityClassAdditions>
-		<insert>
+
+  <!-- optional additions to the GameActivity class in GameActivity.java -->
+  <gameActivityClassAdditions>
+    <insert>
       <![CDATA[
           private BhapticsManager bhapticsManager;
     private HapticPlayer player;
@@ -217,18 +222,18 @@
 
     ]]>
     </insert>
-	</gameActivityClassAdditions>
-	
-	<!-- optional additions to GameActivity onCreate metadata reading in GameActivity.java -->
-	<gameActivityReadMetadataAdditions>
-	<insert>
+  </gameActivityClassAdditions>
 
-  </insert>
-	</gameActivityReadMetadataAdditions>
-	
-	<!-- optional additions to GameActivity onCreate in GameActivity.java -->
-	<gameActivityOnCreateAdditions>
-		<insert>
+  <!-- optional additions to GameActivity onCreate metadata reading in GameActivity.java -->
+  <gameActivityReadMetadataAdditions>
+    <insert>
+
+    </insert>
+  </gameActivityReadMetadataAdditions>
+
+  <!-- optional additions to GameActivity onCreate in GameActivity.java -->
+  <gameActivityOnCreateAdditions>
+    <insert>
       <![CDATA[
         
         player = new com.bhaptics.bhapticsmanger.HapticPlayerImpl();
@@ -261,35 +266,35 @@
         });
       ]]>
     </insert>
-	</gameActivityOnCreateAdditions>
+  </gameActivityOnCreateAdditions>
 
-	<!-- optional additions to GameActivity onDestroy in GameActivity.java -->
-	<gameActivityOnDestroyAdditions>
-		<insert>
-		
-		</insert>
-	</gameActivityOnDestroyAdditions>
-	
-	
-	<!-- optional additions to GameActivity onStart in GameActivity.java -->
-	<gameActivityOnStartAdditions>
-		<insert>
+  <!-- optional additions to GameActivity onDestroy in GameActivity.java -->
+  <gameActivityOnDestroyAdditions>
+    <insert>
 
     </insert>
-	</gameActivityOnStartAdditions>
+  </gameActivityOnDestroyAdditions>
 
-	<!-- optional additions to GameActivity onStop in GameActivity.java -->
-	<gameActivityOnStopAdditions>
-		<insert>
-		
-		</insert>
-	</gameActivityOnStopAdditions>
-	
 
-	<!-- optional additions to GameActivity onPause in GameActivity.java	-->
-	<gameActivityOnPauseAdditions>
+  <!-- optional additions to GameActivity onStart in GameActivity.java -->
+  <gameActivityOnStartAdditions>
     <insert>
-    <![CDATA[
+
+    </insert>
+  </gameActivityOnStartAdditions>
+
+  <!-- optional additions to GameActivity onStop in GameActivity.java -->
+  <gameActivityOnStopAdditions>
+    <insert>
+
+    </insert>
+  </gameActivityOnStopAdditions>
+
+
+  <!-- optional additions to GameActivity onPause in GameActivity.java	-->
+  <gameActivityOnPauseAdditions>
+    <insert>
+      <![CDATA[
     ]]>
     </insert>
   </gameActivityOnPauseAdditions>
@@ -302,14 +307,14 @@
   </gameActivityOnResumeAdditions>
 
 
-	<!-- optional additions to GameActivity onActivityResult in GameActivity.java -->
-	<gameActivityOnActivityResultAdditions>
-		<insert>
-		</insert>
-    </gameActivityOnActivityResultAdditions>
-	
+  <!-- optional additions to GameActivity onActivityResult in GameActivity.java -->
+  <gameActivityOnActivityResultAdditions>
+    <insert>
+    </insert>
+  </gameActivityOnActivityResultAdditions>
 
-	<!-- optional libraries to load in GameActivity.java before libUE4.so -->
-	<soLoadLibrary>
-	</soLoadLibrary>
+
+  <!-- optional libraries to load in GameActivity.java before libUE4.so -->
+  <soLoadLibrary>
+  </soLoadLibrary>
 </root>

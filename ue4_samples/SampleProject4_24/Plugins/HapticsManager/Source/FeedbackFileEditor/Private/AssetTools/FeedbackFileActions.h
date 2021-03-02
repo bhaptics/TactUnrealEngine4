@@ -4,16 +4,12 @@
 #include "Developer/AssetTools/Public/AssetTypeActions_Base.h"
 #include "Templates/SharedPointer.h"
 
-class FSlateStyleSet;
 /**
  * 
  */
 class FFeedbackFileActions
 	: public FAssetTypeActions_Base
 {
-public:
-	FFeedbackFileActions(const TSharedRef<FSlateStyleSet>& InStyle);
-
 public:
 
 	virtual bool CanFilter() override;
@@ -24,8 +20,6 @@ public:
 	virtual FColor GetTypeColor() const override;
 	virtual bool HasActions(const TArray<UObject*>& InObjects) const override;
 
-private:
-
-	/** Pointer to the style set to use for toolkits. */
-	TSharedRef<FSlateStyleSet> Style;
+	virtual void GetResolvedSourceFilePaths(const TArray<UObject*>& TypeAssets, TArray<FString>& OutSourceFilePaths) const override;
+	virtual bool IsImportedAsset() const override { return true; }
 };
