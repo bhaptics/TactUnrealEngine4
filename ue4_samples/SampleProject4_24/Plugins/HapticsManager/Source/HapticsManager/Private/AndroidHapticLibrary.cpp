@@ -261,17 +261,93 @@ void UAndroidHapticLibrary::AndroidThunkCpp_TogglePosition(FString DeviceAddress
 #endif // PLATFORM_ANDROID
 }
 
+void UAndroidHapticLibrary::AndroidThunkCpp_StartStreaming(bool autoConnect)
+{
+#if PLATFORM_ANDROID
+	if (JNIEnv* Env = FAndroidApplication::GetJavaEnv())
+	{
+		static jmethodID StartStreamingMethod = FJavaWrapper::FindMethod(Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_StartStream", "(Z)V", false);
+		jboolean jAutoConnect = autoConnect;
+		FJavaWrapper::CallVoidMethod(Env, FJavaWrapper::GameActivityThis, StartStreamingMethod, jAutoConnect);
+	}
+#endif // PLATFORM_ANDROID
+}
+
+void UAndroidHapticLibrary::AndroidThunkCpp_StopStreaming()
+{
+#if PLATFORM_ANDROID
+	if (JNIEnv* Env = FAndroidApplication::GetJavaEnv())
+	{
+		static jmethodID Method = FJavaWrapper::FindMethod(Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_StopStream", "()V", false);
+		FJavaWrapper::CallVoidMethod(Env, FJavaWrapper::GameActivityThis, Method);
+	}
+#endif // PLATFORM_ANDROID
+}
+
+TArray<FHapticStreamingDevice> UAndroidHapticLibrary::AndroidThunkCpp_GetStreamingHosts()
+{
+	TArray<FHapticStreamingDevice> HostArray;
+#if PLATFORM_ANDROID
+
+	if (JNIEnv* Env = FAndroidApplication::GetJavaEnv())
+	{
+		static jmethodID Method = FJavaWrapper::FindMethod(Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_GetStreamHosts", "()Ljava/lang/String;", false);
+		jstring jHostStr = (jstring)FJavaWrapper::CallObjectMethod(Env, FJavaWrapper::GameActivityThis, Method);
+
+		const char* nativeDeviceListString = Env->GetStringUTFChars(jHostStr, 0);
+		FString HostString = FString(nativeDeviceListString);
+		Env->ReleaseStringUTFChars(jHostStr, nativeDeviceListString);
+
+		if (FJsonObjectConverter::JsonArrayStringToUStruct(HostString, &HostArray, 0, 0))
+		{
+			UE_LOG(LogTemp, Log, TEXT("GetStreamingHosts Success %d"), HostArray.Num());
+			return HostArray;
+		}
+		else
+		{
+			UE_LOG(LogTemp, Log, TEXT("GetStreamingHosts parse failed"));
+		}
+	}
+
+#endif
+	return HostArray;
+}
+
+void UAndroidHapticLibrary::AndroidThunkCpp_RefreshStreamingHosts()
+{
+#if PLATFORM_ANDROID
+	if (JNIEnv* Env = FAndroidApplication::GetJavaEnv())
+	{
+		static jmethodID Method = FJavaWrapper::FindMethod(Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_RefreshStreamHosts", "()V", false);
+		FJavaWrapper::CallVoidMethod(Env, FJavaWrapper::GameActivityThis, Method);
+	}
+#endif // PLATFORM_ANDROID
+}
+
+void UAndroidHapticLibrary::AndroidThunkCpp_ConnectStreamingHosts(FString host)
+{
+#if PLATFORM_ANDROID
+	if (JNIEnv* Env = FAndroidApplication::GetJavaEnv())
+	{
+		static jmethodID Method = FJavaWrapper::FindMethod(Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_ConnectStreamHost", "(Ljava/lang/String;)V", false);
+		jstring HostJava = Env->NewStringUTF(TCHAR_TO_UTF8(*host));
+		FJavaWrapper::CallVoidMethod(Env, FJavaWrapper::GameActivityThis, Method, HostJava);
+		Env->DeleteLocalRef(HostJava);
+	}
+#endif // PLATFORM_ANDROID
+}
+
 
 EPosition UAndroidHapticLibrary::StringToPosition(FString PositionString)
 {
 	EPosition ReturnValue = EPosition::Default;
 
 	if (PositionString == "Left") {
-		ReturnValue = EPosition::Left;
+		ReturnValue = EPosition::ForearmL;
 	}
 	else if (PositionString == "Right")
 	{
-		ReturnValue = EPosition::Right;
+		ReturnValue = EPosition::ForearmR;
 	}
 	else if (PositionString == "ForearmL")
 	{
@@ -311,6 +387,65 @@ EPosition UAndroidHapticLibrary::StringToPosition(FString PositionString)
 	}
 	
 	return ReturnValue;
+}
+
+TArray<FHapticStreamingDevice> UAndroidHapticLibrary::Parse(FString JsonString)
+{
+	TSharedPtr<FJsonObject> JsonObject;
+	TSharedRef<TJsonReader<>> JsonReader = TJsonReaderFactory<>::Create(JsonString);
+	if (!FJsonSerializer::Deserialize(JsonReader, JsonObject) || !JsonObject.IsValid())
+	{
+		UE_LOG(LogTemp, Log, TEXT("Deserialisation failed."));
+	}
+	else
+	{
+		FPlayerResponse Response = FPlayerResponse();
+
+		TArray<TSharedPtr<FJsonValue>> RegisteredKeysValueArray = JsonObject->GetArrayField("RegisteredKeys");
+		TArray<TSharedPtr<FJsonValue>> ActiveKeysValueArray = JsonObject->GetArrayField("ActiveKeys");
+		Response.ConnectedDeviceCount = JsonObject->GetIntegerField("ConnectedDeviceCount");
+		TArray<TSharedPtr<FJsonValue>> ConnectedPositionsValueArray = JsonObject->GetArrayField("ConnectedPositions");
+		TMap<FString, TSharedPtr<FJsonValue>> StatusValuesMap = JsonObject->GetObjectField("Status")->Values;
+		int i = 0;
+
+		for (i = 0; i < RegisteredKeysValueArray.Num(); i++)
+		{
+			Response.RegisteredKeys.Add(RegisteredKeysValueArray[i]->AsString());
+		}
+
+		for (i = 0; i < ActiveKeysValueArray.Num(); i++)
+		{
+			Response.ActiveKeys.Add(ActiveKeysValueArray[i]->AsString());
+		}
+
+		for (i = 0; i < ConnectedPositionsValueArray.Num(); i++)
+		{
+			Response.ConnectedPositions.Add(ConnectedPositionsValueArray[i]->AsString());
+		}
+
+		TArray<FHapticFeedback> MotorsToUpdate;
+		for (auto& StatusValue : StatusValuesMap)
+		{
+			FString PositionName = StatusValue.Key;
+			TArray<TSharedPtr<FJsonValue>> MotorValues = StatusValue.Value->AsArray();
+			TArray<uint8> Motors = TArray<uint8>();
+			for (i = 0; i < MotorValues.Num(); i++)
+			{
+				Motors.Add(MotorValues[i]->AsNumber());
+			}
+			MotorsToUpdate.Add(FHapticFeedback(StringToPosition(PositionName), Motors, EFeedbackMode::PATH_MODE));
+
+		}
+		Response.Status = MotorsToUpdate;
+		m_Mutex.Lock();
+		CurrentResponse = Response;
+		m_Mutex.Unlock();
+
+		UpdateDeviceStatusDelegate.ExecuteIfBound(MotorsToUpdate);
+	}
+
+
+	return TArray<FHapticStreamingDevice>();
 }
 
 void UAndroidHapticLibrary::SubmitDot(FString Key, FString Pos, TArray<FDotPoint> Points, int DurationMillis)

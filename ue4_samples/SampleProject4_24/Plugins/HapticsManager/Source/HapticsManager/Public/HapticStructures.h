@@ -221,6 +221,18 @@ struct FDevice {
 		bool IsPaired;
 };
 
+USTRUCT(BlueprintType)
+struct FHapticStreamingDevice {
+
+	GENERATED_BODY()
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Android|Haptic")
+		FString Ip;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Android|Haptic")
+		bool IsConnected;
+};
+
 USTRUCT()
 struct FRegisterRequest {
 

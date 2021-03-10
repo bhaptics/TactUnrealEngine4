@@ -102,6 +102,18 @@ class UAndroidHapticLibrary : public UBlueprintFunctionLibrary
 	//Toggle the Position of Device
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "ToggleDevicePosition", Keywords = "Haptics"), Category = "Haptics")
 	static void AndroidThunkCpp_TogglePosition(FString DeviceAddress);
+
+	//Toggle the Position of Device
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "StartHapticStreaming (Android)", Keywords = "Haptics"), Category = "Haptics")
+	static void AndroidThunkCpp_StartStreaming(bool autoConnect);
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "StopHapticStreaming (Android)", Keywords = "Haptics"), Category = "Haptics")
+	static void AndroidThunkCpp_StopStreaming();
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "GetHapticStreamingHosts (Android)", Keywords = "Haptics"), Category = "Haptics")
+	static TArray<FHapticStreamingDevice> AndroidThunkCpp_GetStreamingHosts();
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "RefreshHapticStreamingHosts (Android)", Keywords = "Haptics"), Category = "Haptics")
+	static void AndroidThunkCpp_RefreshStreamingHosts();
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "ConnectHapticStreamingHosts (Android)", Keywords = "Haptics"), Category = "Haptics")
+	static void AndroidThunkCpp_ConnectStreamingHosts(FString host);
 	   
 private:
 	static TArray<FDevice> FoundDevices;
@@ -109,5 +121,7 @@ private:
 	static FPlayerResponse LastUpdatedResponse;
 	static EPosition StringToPosition(FString PositionString);
 	static FCriticalSection m_Mutex;
+
+	static TArray<FHapticStreamingDevice> Parse(FString JsonString);
 
 };
