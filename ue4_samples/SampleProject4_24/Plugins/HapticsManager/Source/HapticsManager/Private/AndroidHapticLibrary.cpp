@@ -20,7 +20,10 @@ FCriticalSection UAndroidHapticLibrary::m_Mutex;
 jmethodID SubmitRegisteredMethodId;
 jmethodID IsPlayingMethodId;
 jmethodID IsAnyFeedbackPlayingMethodId;
+jmethodID IsRegisterMethodId;
 jmethodID GetPositionStatusMethodId;
+jmethodID RegisterMethodId;
+jmethodID RegisterReflectedMethodId;
 #endif
 
 UAndroidHapticLibrary::UAndroidHapticLibrary(const FObjectInitializer& ObjectInitializer)
@@ -41,10 +44,25 @@ UAndroidHapticLibrary::UAndroidHapticLibrary(const FObjectInitializer& ObjectIni
 			FJavaWrapper::FindMethod(
 				Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_IsAnythingPlaying", "()Z", false);
 
+		IsRegisterMethodId = 
+			FJavaWrapper::FindMethod(Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_IsRegistered", "(Ljava/lang/String;)Z", false);
+
 
 		GetPositionStatusMethodId =
 			FJavaWrapper::FindMethod(
 				Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_GetPositionStatus", "(Ljava/lang/String;)[B", false);
+	
+		RegisterMethodId =
+			FJavaWrapper::FindMethod(
+				Env, FJavaWrapper::GameActivityClassID,
+				"AndroidThunkJava_Register",
+				"(Ljava/lang/String;Ljava/lang/String;)V", false);
+
+		RegisterReflectedMethodId =
+			FJavaWrapper::FindMethod(
+				Env, FJavaWrapper::GameActivityClassID,
+				"AndroidThunkJava_RegisterReflected",
+				"(Ljava/lang/String;Ljava/lang/String;)V", false);
 	}
 #endif
 }
@@ -608,9 +626,8 @@ bool UAndroidHapticLibrary::IsFeedbackRegistered(FString key)
 #if PLATFORM_ANDROID
 	if (JNIEnv* Env = FAndroidApplication::GetJavaEnv())
 	{
-		static jmethodID isRegisterMethodId = FJavaWrapper::FindMethod(Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_IsRegistered", "(Ljava/lang/String;)Z", false);
 		jstring keyStrJava = Env->NewStringUTF(TCHAR_TO_UTF8(*key));
-		bool res = FJavaWrapper::CallBooleanMethod(Env, FJavaWrapper::GameActivityThis, isRegisterMethodId, keyStrJava);
+		bool res = FJavaWrapper::CallBooleanMethod(Env, FJavaWrapper::GameActivityThis, IsRegisterMethodId, keyStrJava);
 		Env->DeleteLocalRef(keyStrJava);
 
 		if (res) {
@@ -683,14 +700,9 @@ void UAndroidHapticLibrary::RegisterProject(FString key, FString fileStr)
 #if PLATFORM_ANDROID
 	if (JNIEnv* Env = FAndroidApplication::GetJavaEnv())
 	{
-		static jmethodID registerMethodId = 
-			FJavaWrapper::FindMethod(
-				Env, FJavaWrapper::GameActivityClassID, 
-				"AndroidThunkJava_Register", 
-				"(Ljava/lang/String;Ljava/lang/String;)V", false);
 		jstring keyStrJava = Env->NewStringUTF(TCHAR_TO_UTF8(*key));
 		jstring fileStrJava = Env->NewStringUTF(TCHAR_TO_UTF8(*fileStr));
-		FJavaWrapper::CallVoidMethod(Env, FJavaWrapper::GameActivityThis, registerMethodId, keyStrJava, fileStrJava);
+		FJavaWrapper::CallVoidMethod(Env, FJavaWrapper::GameActivityThis, RegisterMethodId, keyStrJava, fileStrJava);
 		Env->DeleteLocalRef(keyStrJava);
 		Env->DeleteLocalRef(fileStrJava);
 	}
@@ -702,14 +714,9 @@ void UAndroidHapticLibrary::RegisterProjectReflected(FString key, FString fileSt
 #if PLATFORM_ANDROID
 	if (JNIEnv* Env = FAndroidApplication::GetJavaEnv())
 	{
-		static jmethodID registerMethodId =
-			FJavaWrapper::FindMethod(
-				Env, FJavaWrapper::GameActivityClassID,
-				"AndroidThunkJava_RegisterReflected",
-				"(Ljava/lang/String;Ljava/lang/String;)V", false);
 		jstring keyStrJava = Env->NewStringUTF(TCHAR_TO_UTF8(*key));
 		jstring fileStrJava = Env->NewStringUTF(TCHAR_TO_UTF8(*fileStr));
-		FJavaWrapper::CallVoidMethod(Env, FJavaWrapper::GameActivityThis, registerMethodId, keyStrJava, fileStrJava);
+		FJavaWrapper::CallVoidMethod(Env, FJavaWrapper::GameActivityThis, RegisterReflectedMethodId, keyStrJava, fileStrJava);
 		Env->DeleteLocalRef(keyStrJava);
 		Env->DeleteLocalRef(fileStrJava);
 	}
@@ -727,9 +734,6 @@ void UAndroidHapticLibrary::SubmitRegistered(
 			alt = key;
 		}
 
-		//static jmethodID SubmitMethod = FJavaWrapper::FindMethod(
-		//	Env, FJavaWrapper::GameActivityClassID, 
-		//		"AndroidThunkJava_SubmitRegistered", "(Ljava/lang/String;Ljava/lang/String;FFFF)V", false);
 		jstring keyJava = Env->NewStringUTF(TCHAR_TO_UTF8(*key));
 		jstring altKeyJava = Env->NewStringUTF(TCHAR_TO_UTF8(*alt));
 		FJavaWrapper::CallVoidMethod(
