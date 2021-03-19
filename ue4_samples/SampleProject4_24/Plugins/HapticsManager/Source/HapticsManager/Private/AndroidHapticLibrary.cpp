@@ -16,10 +16,37 @@ FDeviceStatusDelegate UAndroidHapticLibrary::UpdateDeviceStatusDelegate;
 
 FCriticalSection UAndroidHapticLibrary::m_Mutex;
 
+#if PLATFORM_ANDROID
+jmethodID SubmitRegisteredMethodId;
+jmethodID IsPlayingMethodId;
+jmethodID IsAnyFeedbackPlayingMethodId;
+jmethodID GetPositionStatusMethodId;
+#endif
+
 UAndroidHapticLibrary::UAndroidHapticLibrary(const FObjectInitializer& ObjectInitializer)
 : Super(ObjectInitializer)
 {
+#if PLATFORM_ANDROID
+	if (JNIEnv* Env = FAndroidApplication::GetJavaEnv())
+	{
+		SubmitRegisteredMethodId = FJavaWrapper::FindMethod(
+			Env, FJavaWrapper::GameActivityClassID,
+			"AndroidThunkJava_SubmitRegistered", "(Ljava/lang/String;Ljava/lang/String;FFFF)V", false);
 
+		IsPlayingMethodId =
+			FJavaWrapper::FindMethod(
+				Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_IsPlaying", "(Ljava/lang/String;)Z", false);
+
+		IsAnyFeedbackPlayingMethodId =
+			FJavaWrapper::FindMethod(
+				Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_IsAnythingPlaying", "()Z", false);
+
+
+		GetPositionStatusMethodId =
+			FJavaWrapper::FindMethod(
+				Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_GetPositionStatus", "(Ljava/lang/String;)[B", false);
+	}
+#endif
 }
 
 #if  PLATFORM_ANDROID
@@ -568,8 +595,16 @@ bool UAndroidHapticLibrary::IsDeviceConnceted(EPosition Position)
 	return false;
 }
 
+
+TArray<FString> RegisteredKeyCache;
+
 bool UAndroidHapticLibrary::IsFeedbackRegistered(FString key)
 {
+	if (RegisteredKeyCache.Contains(key)) {
+		return true;
+	}
+
+
 #if PLATFORM_ANDROID
 	if (JNIEnv* Env = FAndroidApplication::GetJavaEnv())
 	{
@@ -577,6 +612,10 @@ bool UAndroidHapticLibrary::IsFeedbackRegistered(FString key)
 		jstring keyStrJava = Env->NewStringUTF(TCHAR_TO_UTF8(*key));
 		bool res = FJavaWrapper::CallBooleanMethod(Env, FJavaWrapper::GameActivityThis, isRegisterMethodId, keyStrJava);
 		Env->DeleteLocalRef(keyStrJava);
+
+		if (res) {
+			RegisteredKeyCache.Add(key);
+		}
 
 		return res;
 	}
@@ -590,11 +629,8 @@ bool UAndroidHapticLibrary::IsFeedbackPlaying(FString key)
 #if PLATFORM_ANDROID
 	if (JNIEnv* Env = FAndroidApplication::GetJavaEnv())
 	{
-		static jmethodID isRegisterMethodId = 
-			FJavaWrapper::FindMethod(
-				Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_IsPlaying", "(Ljava/lang/String;)Z", false);
 		jstring keyStrJava = Env->NewStringUTF(TCHAR_TO_UTF8(*key));
-		bool res = FJavaWrapper::CallBooleanMethod(Env, FJavaWrapper::GameActivityThis, isRegisterMethodId, keyStrJava);
+		bool res = FJavaWrapper::CallBooleanMethod(Env, FJavaWrapper::GameActivityThis, IsPlayingMethodId, keyStrJava);
 		Env->DeleteLocalRef(keyStrJava);
 
 		return res;
@@ -609,10 +645,7 @@ bool UAndroidHapticLibrary::IsAnyFeedbackPlaying()
 #if PLATFORM_ANDROID
 	if (JNIEnv* Env = FAndroidApplication::GetJavaEnv())
 	{
-		static jmethodID isRegisterMethodId =
-			FJavaWrapper::FindMethod(
-				Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_IsAnythingPlaying", "()Z", false);
-		return FJavaWrapper::CallBooleanMethod(Env, FJavaWrapper::GameActivityThis, isRegisterMethodId);
+		return FJavaWrapper::CallBooleanMethod(Env, FJavaWrapper::GameActivityThis, IsAnyFeedbackPlayingMethodId);
 	}
 #endif // PLATFORM_ANDROID
 	return false;
@@ -626,13 +659,9 @@ TArray<uint8> UAndroidHapticLibrary::GetPositionStatus(FString pos)
 	if (JNIEnv* Env = FAndroidApplication::GetJavaEnv())
 	{
 		jstring posJava = Env->NewStringUTF(TCHAR_TO_UTF8(*pos));
-		
 
-		static jmethodID isRegisterMethodId =
-			FJavaWrapper::FindMethod(
-				Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_GetPositionStatus", "(Ljava/lang/String;)[B", false);
 		jbyteArray arrayJava = (jbyteArray) FJavaWrapper::CallObjectMethod(
-			Env, FJavaWrapper::GameActivityThis, isRegisterMethodId, posJava);
+			Env, FJavaWrapper::GameActivityThis, GetPositionStatusMethodId, posJava);
 
 		Env->DeleteLocalRef(posJava);
 
@@ -698,13 +727,13 @@ void UAndroidHapticLibrary::SubmitRegistered(
 			alt = key;
 		}
 
-		static jmethodID SubmitMethod = FJavaWrapper::FindMethod(
-			Env, FJavaWrapper::GameActivityClassID, 
-				"AndroidThunkJava_SubmitRegistered", "(Ljava/lang/String;Ljava/lang/String;FFFF)V", false);
+		//static jmethodID SubmitMethod = FJavaWrapper::FindMethod(
+		//	Env, FJavaWrapper::GameActivityClassID, 
+		//		"AndroidThunkJava_SubmitRegistered", "(Ljava/lang/String;Ljava/lang/String;FFFF)V", false);
 		jstring keyJava = Env->NewStringUTF(TCHAR_TO_UTF8(*key));
 		jstring altKeyJava = Env->NewStringUTF(TCHAR_TO_UTF8(*alt));
 		FJavaWrapper::CallVoidMethod(
-			Env, FJavaWrapper::GameActivityThis, SubmitMethod, keyJava, altKeyJava,
+			Env, FJavaWrapper::GameActivityThis, SubmitRegisteredMethodId, keyJava, altKeyJava,
 			intensity, duration, xOffsetAngle, yOffset);
 		Env->DeleteLocalRef(keyJava);
 		Env->DeleteLocalRef(altKeyJava);
