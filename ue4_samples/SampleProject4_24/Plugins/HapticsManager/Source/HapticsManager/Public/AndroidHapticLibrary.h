@@ -46,8 +46,6 @@ class UAndroidHapticLibrary : public UBlueprintFunctionLibrary
 
 	static bool IsDeviceConnceted(EPosition Position);
 
-
-
 	static bool IsFeedbackRegistered(FString key);
 	static bool IsFeedbackPlaying(FString key);
 	static bool IsAnyFeedbackPlaying();
@@ -103,7 +101,7 @@ class UAndroidHapticLibrary : public UBlueprintFunctionLibrary
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "ToggleDevicePosition", Keywords = "Haptics"), Category = "Haptics")
 	static void AndroidThunkCpp_TogglePosition(FString DeviceAddress);
 
-	//Toggle the Position of Device
+	// Streaming Functions
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "StartHapticStreaming (Android)", Keywords = "Haptics"), Category = "Haptics")
 	static void AndroidThunkCpp_StartStreaming(bool autoConnect);
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "StopHapticStreaming (Android)", Keywords = "Haptics"), Category = "Haptics")
@@ -114,13 +112,13 @@ class UAndroidHapticLibrary : public UBlueprintFunctionLibrary
 	static void AndroidThunkCpp_RefreshStreamingHosts();
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "ConnectHapticStreamingHosts (Android)", Keywords = "Haptics"), Category = "Haptics")
 	static void AndroidThunkCpp_ConnectStreamingHosts(FString host);
-	   
 private:
 	static TArray<FDevice> FoundDevices;
 	static FPlayerResponse CurrentResponse;
 	static FPlayerResponse LastUpdatedResponse;
 	static EPosition StringToPosition(FString PositionString);
 	static FCriticalSection m_Mutex;
+
 
 	static TArray<FHapticStreamingDevice> Parse(FString JsonString);
 
