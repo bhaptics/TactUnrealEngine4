@@ -138,8 +138,10 @@ bool BhapticsLibrary::Initialize()
 		);
 	}
 
+	const char* AppName = "UE_GAME";
+
 	const std::string standardName(TCHAR_TO_UTF8(*ProjectName));
-	Initialise(standardName.c_str(), standardName.c_str());
+	Initialise(AppName, AppName);
 	Success = true;
 #endif 
 	return true;
