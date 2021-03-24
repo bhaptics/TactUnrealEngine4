@@ -2,7 +2,7 @@
 
 
 #include "BhapticsRequestLibrary.h"
-
+#include <chrono>
 
 #include "HapticStructures.h"
 #include "Components/PrimitiveComponent.h"
@@ -17,7 +17,7 @@ void UBhapticsRequestLibrary::SubmitFeedback(UFeedbackFile* Feedback)
 		return;
 	}
 
-	FString FeedbackKey = Feedback->Key + Feedback->Id.ToString();
+	FString FeedbackKey = ToFeedbackKey(Feedback);
 
 	if (!BhapticsLibrary::Lib_IsFeedbackRegistered(FeedbackKey))
 	{
@@ -33,7 +33,7 @@ void UBhapticsRequestLibrary::SubmitFeedbackWithIntensityDuration(UFeedbackFile*
 		return;
 	}
 
-	FString FeedbackKey = Feedback->Key + Feedback->Id.ToString();
+	FString FeedbackKey = ToFeedbackKey(Feedback);
 	FString UniqueKey = AltKey;
 
 	if (!UseAltKey)
@@ -56,7 +56,7 @@ void UBhapticsRequestLibrary::SubmitFeedbackWithOptions(UFeedbackFile* Feedback,
 		return;
 	}
 
-	FString FeedbackKey = Feedback->Key + Feedback->Id.ToString();
+	FString FeedbackKey = ToFeedbackKey(Feedback);
 
 	if (!BhapticsLibrary::Lib_IsFeedbackRegistered(FeedbackKey))
 	{
@@ -73,7 +73,7 @@ void UBhapticsRequestLibrary::SubmitFeedbackWithScaleOption(UFeedbackFile* Feedb
 		return;
 	}
 
-	FString FeedbackKey = Feedback->Key + Feedback->Id.ToString();
+	FString FeedbackKey = ToFeedbackKey(Feedback);
 	FString UniqueKey = FeedbackKey + FString::FromInt(FMath::Rand() % 20);
 
 	FRotationOption RotationOption(0, 0);
@@ -93,7 +93,7 @@ void UBhapticsRequestLibrary::SubmitFeedbackReflected(UFeedbackFile* Feedback, F
 		return;
 	}
 
-	FString FeedbackKey = Feedback->Key + Feedback->Id.ToString() + REFLECT_SUFFIX;
+	FString FeedbackKey = ToFeedbackKey(Feedback) + REFLECT_SUFFIX;
 	FString UniqueKey = FeedbackKey + FString::FromInt(FMath::Rand() % 20);
 
 	FRotationOption RotationOption(0, 0);
@@ -332,6 +332,11 @@ FRotationOption UBhapticsRequestLibrary::CustomProjectToVest(FVector Location, U
 	Y_Offset = FMath::Clamp(DotProduct / (HalfHeight * 2), -0.5f, 0.5f);
 
 	return FRotationOption(Angle, Y_Offset);
+}
+
+FString UBhapticsRequestLibrary::ToFeedbackKey(UFeedbackFile* Feedback)
+{
+	return Feedback->Key + FString::FromInt(Feedback->Id.A % 100) + FString::FromInt(Feedback->Id.B % 100);
 }
 
 

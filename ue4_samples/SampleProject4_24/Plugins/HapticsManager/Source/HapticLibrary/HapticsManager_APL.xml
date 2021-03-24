@@ -213,7 +213,7 @@
 
     public void AndroidThunkJava_SubmitRegistered(String key, String altKey,
                                                   float intensity, float duration,
-                                                  float offsetAngleX, float offsetY) {
+                                                  float offsetAngleX, float offsetY) {                                                  
         player.submitRegistered(key, altKey, intensity, duration, offsetAngleX, offsetY);
     }
 

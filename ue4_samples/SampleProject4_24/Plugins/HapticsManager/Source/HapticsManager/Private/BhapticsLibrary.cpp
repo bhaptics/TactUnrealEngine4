@@ -46,7 +46,12 @@ void BhapticsLibrary::SetLibraryLoaded()
 bool BhapticsLibrary::Initialize()
 {
 #if PLATFORM_ANDROID
+	if (IsInitialised) {
+		return false;
+	}
 	UAndroidHapticLibrary::AndroidThunkCpp_StartScanning();
+	IsInitialised = true;
+	return Success;
 #else
 	if (!IsLoaded)
 	{
@@ -572,8 +577,6 @@ void BhapticsLibrary::InitializeCheck()
 }
 
 #if !PLATFORM_ANDROID
-
-
 static bhaptics::PositionType PositionEnumToDeviceType(EPosition Position)
 {
 	bhaptics::PositionType Device = bhaptics::PositionType::All;
