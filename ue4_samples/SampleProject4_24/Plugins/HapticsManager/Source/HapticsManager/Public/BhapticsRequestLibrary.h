@@ -197,4 +197,7 @@ public:
 			AdvancedDisplay = "3"),
 		Category = "bHaptics")
 		static FRotationOption CustomProjectToVest(FVector ContactLocation, UPrimitiveComponent* PlayerComponent, float HalfHeight = 50, FVector UpVector = FVector::ZeroVector, FVector ForwardVector = FVector::ZeroVector);
+
+	private:
+		static FString ToFeedbackKey(UFeedbackFile* Feedback);
 };

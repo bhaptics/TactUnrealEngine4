@@ -17,6 +17,8 @@ FDeviceStatusDelegate UAndroidHapticLibrary::UpdateDeviceStatusDelegate;
 FCriticalSection UAndroidHapticLibrary::m_Mutex;
 
 #if PLATFORM_ANDROID
+jmethodID StartScanMethodId;
+jmethodID IsScanningMethod;
 jmethodID SubmitRegisteredMethodId;
 jmethodID IsPlayingMethodId;
 jmethodID IsAnyFeedbackPlayingMethodId;
@@ -32,6 +34,9 @@ UAndroidHapticLibrary::UAndroidHapticLibrary(const FObjectInitializer& ObjectIni
 #if PLATFORM_ANDROID
 	if (JNIEnv* Env = FAndroidApplication::GetJavaEnv())
 	{
+		StartScanMethodId = FJavaWrapper::FindMethod(Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_Scan", "()V", false);
+		IsScanningMethod = FJavaWrapper::FindMethod(Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_IsScanning", "()Z", false);
+
 		SubmitRegisteredMethodId = FJavaWrapper::FindMethod(
 			Env, FJavaWrapper::GameActivityClassID,
 			"AndroidThunkJava_SubmitRegistered", "(Ljava/lang/String;Ljava/lang/String;FFFF)V", false);
@@ -173,8 +178,7 @@ void UAndroidHapticLibrary::AndroidThunkCpp_StartScanning()
 #if PLATFORM_ANDROID
 	if (JNIEnv* Env = FAndroidApplication::GetJavaEnv())
 	{
-		static jmethodID StartScanMethod = FJavaWrapper::FindMethod(Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_Scan", "()V", false);
-		FJavaWrapper::CallVoidMethod(Env, FJavaWrapper::GameActivityThis, StartScanMethod);
+		FJavaWrapper::CallVoidMethod(Env, FJavaWrapper::GameActivityThis, StartScanMethodId);
 	}
 #endif // PLATFORM_ANDROID
 }
