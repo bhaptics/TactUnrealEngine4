@@ -47,6 +47,8 @@ class UAndroidHapticLibrary : public UBlueprintFunctionLibrary
 	static bool IsDeviceConnceted(EPosition Position);
 
 
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "IsStandAloneMode", Keywords = "Haptics"), Category = "Haptics")
+	static bool IsLegacyMode();
 
 	static bool IsFeedbackRegistered(FString key);
 	static bool IsFeedbackPlaying(FString key);
