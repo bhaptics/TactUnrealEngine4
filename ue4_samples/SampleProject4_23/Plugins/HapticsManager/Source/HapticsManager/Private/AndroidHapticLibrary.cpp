@@ -53,6 +53,7 @@ JNI_METHOD void Java_com_epicgames_ue4_GameActivity_nativeOnChangeResponse(JNIEn
 
 void UAndroidHapticLibrary::UpdateDevices(TArray<FDevice> DeviceList)
 {
+	UE_LOG(LogTemp, Log, TEXT("UpdateDevices %d"), DeviceList.Num());
 	FoundDevices = DeviceList;
 	UpdateDeviceListDelegate.ExecuteIfBound(DeviceList);
 }
@@ -430,6 +431,22 @@ bool UAndroidHapticLibrary::IsDeviceConnceted(EPosition Position)
 			return true;
 		}
 	}
+	return false;
+}
+
+bool UAndroidHapticLibrary::IsLegacyMode()
+{
+#if PLATFORM_ANDROID
+	if (JNIEnv* Env = FAndroidApplication::GetJavaEnv())
+	{
+		static jmethodID isLegacyModeId = FJavaWrapper::FindMethod(Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_Is_legacy", "()Z", false);
+		bool res = FJavaWrapper::CallBooleanMethod(Env, FJavaWrapper::GameActivityThis, isLegacyModeId);
+		Env->DeleteLocalRef(keyStrJava);
+
+		return res;
+	}
+#endif // PLATFORM_ANDROID
+
 	return false;
 }
 
