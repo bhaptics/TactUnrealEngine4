@@ -48,6 +48,8 @@ class UAndroidHapticLibrary : public UBlueprintFunctionLibrary
 
 
 
+	static bool IsLegacyMode();
+
 	static bool IsFeedbackRegistered(FString key);
 	static bool IsFeedbackPlaying(FString key);
 	static bool IsAnyFeedbackPlaying();
