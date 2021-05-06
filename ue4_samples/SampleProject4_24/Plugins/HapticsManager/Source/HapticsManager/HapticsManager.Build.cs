@@ -29,7 +29,7 @@ public class HapticsManager : ModuleRules
             new string[] {
                         "Settings",
                         "Launch",
-            }
+			}
             );
         PublicDependencyModuleNames.AddRange(
 			new string[]
@@ -52,7 +52,7 @@ public class HapticsManager : ModuleRules
                 "Projects",
                 "InputCore",
                 "HapticLibrary"
-				// ... add private dependencies that you statically link with here ...	
+                // ... add private dependencies that you statically link with here ...	
 			}
 			);
 

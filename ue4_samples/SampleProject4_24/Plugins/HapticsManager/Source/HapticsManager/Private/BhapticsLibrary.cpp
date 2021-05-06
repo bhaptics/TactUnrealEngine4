@@ -9,6 +9,7 @@
 #include "Core/Public/Misc/FileHelper.h"
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
+#include <string>
 
 #if PLATFORM_ANDROID
 #include "AndroidHapticLibrary.h"
@@ -28,6 +29,10 @@ static bhaptics::PositionType PositionEnumToDeviceType(EPosition Position);
 static bhaptics::PositionType PositionEnumToPositionType(EPosition Position);
 #endif
 
+FString ProjectName = "AppName";
+std::string projectName;
+
+
 BhapticsLibrary::BhapticsLibrary()
 {
 
@@ -35,7 +40,6 @@ BhapticsLibrary::BhapticsLibrary()
 
 BhapticsLibrary::~BhapticsLibrary()
 {
-
 }
 
 void BhapticsLibrary::SetLibraryLoaded()
@@ -43,15 +47,26 @@ void BhapticsLibrary::SetLibraryLoaded()
 	IsLoaded = true;
 }
 
+
 bool BhapticsLibrary::Initialize()
 {
-#if PLATFORM_ANDROID
-	if (IsInitialised) {
-		return false;
+	if (GConfig) {
+		FString fromString = " ";
+		FString toString = "";
+		const TCHAR* from = *fromString;
+		const TCHAR* to = *toString;
+		GConfig->GetString(
+			TEXT("/Script/EngineSettings.GeneralProjectSettings"),
+			TEXT("ProjectName"),
+			ProjectName,
+			GGameIni
+		);
+		ProjectName = ProjectName.Replace(from, to);
+		projectName = (TCHAR_TO_UTF8(*ProjectName));
+		UE_LOG(LogTemp, Log, TEXT("BhapticsLibrary Constructor: %s."), *ProjectName);
 	}
-	UAndroidHapticLibrary::AndroidThunkCpp_StartScanning();
-	IsInitialised = true;
-	return Success;
+#if PLATFORM_ANDROID
+	IsInitialised = UAndroidHapticLibrary::AndroidThunkCpp_Initialize(ProjectName);
 #else
 	if (!IsLoaded)
 	{
@@ -133,20 +148,7 @@ bool BhapticsLibrary::Initialize()
 		}
 
 	}
-	FString ProjectName;
-	if (GConfig) {
-		GConfig->GetString(
-			TEXT("/Script/EngineSettings.GeneralProjectSettings"),
-			TEXT("ProjectName"),
-			ProjectName,
-			GGameIni
-		);
-	}
-
-	const char* AppName = "UE_GAME";
-
-	const std::string standardName(TCHAR_TO_UTF8(*ProjectName));
-	Initialise(AppName, AppName);
+	Initialise(projectName.c_str(), projectName.c_str());
 	Success = true;
 #endif 
 	return true;
@@ -488,7 +490,7 @@ TArray<FHapticFeedback> BhapticsLibrary::Lib_GetResponseStatus()
 	InitializeCheck();
 	TArray<FHapticFeedback> ChangedFeedback;
 #if PLATFORM_ANDROID
-	FPlayerResponse Response = UAndroidHapticLibrary::GetCurrentResponse();
+	FPlayerResponse Response;
 	ChangedFeedback = Response.Status;
 	TArray<EPosition> PositionEnum =
 	{ EPosition::ForearmL,EPosition::ForearmR,EPosition::Head, EPosition::VestFront,EPosition::VestBack,EPosition::HandL, EPosition::HandR, EPosition::FootL, EPosition::FootR };
@@ -577,6 +579,8 @@ void BhapticsLibrary::InitializeCheck()
 }
 
 #if !PLATFORM_ANDROID
+
+
 static bhaptics::PositionType PositionEnumToDeviceType(EPosition Position)
 {
 	bhaptics::PositionType Device = bhaptics::PositionType::All;
