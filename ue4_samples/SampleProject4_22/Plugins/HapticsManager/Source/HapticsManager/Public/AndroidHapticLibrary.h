@@ -49,6 +49,7 @@ class UAndroidHapticLibrary : public UBlueprintFunctionLibrary
 
 	static void RegisterProject(FString key, FString fileStr);
 	static void RegisterProjectReflected(FString key, FString fileStr);
+	static bool AndroidThunkCpp_Initialize(FString appName);
 
 	static void SubmitRegistered(
 		FString key, FString altKey, float intensity, float duration, float xOffsetAngle, float yOffset);

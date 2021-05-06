@@ -45,9 +45,18 @@ void BhapticsLibrary::SetLibraryLoaded()
 
 bool BhapticsLibrary::Initialize()
 {
+	FString ProjectName = "AppName";
+	if (GConfig) {
+		GConfig->GetString(
+			TEXT("/Script/EngineSettings.GeneralProjectSettings"),
+			TEXT("ProjectName"),
+			ProjectName,
+			GGameIni
+		);
+	}
+
 #if PLATFORM_ANDROID
-	//UAndroidHapticLibrary::AndroidThunkCpp_StartScanning();
-	IsInitialised = true;
+	IsInitialised = UAndroidHapticLibrary::AndroidThunkCpp_Initialize(ProjectName);
 #else
 	if (!IsLoaded)
 	{
@@ -129,18 +138,9 @@ bool BhapticsLibrary::Initialize()
 		}
 
 	}
-	FString ProjectName;
-	if (GConfig) {
-		GConfig->GetString(
-			TEXT("/Script/EngineSettings.GeneralProjectSettings"),
-			TEXT("ProjectName"),
-			ProjectName,
-			GGameIni
-		);
-	}
-
-	const std::string standardName(TCHAR_TO_UTF8(*ProjectName));
-	Initialise(standardName.c_str(), standardName.c_str());
+	UE_LOG(LogTemp, Log, TEXT("Project %s"), *ProjectName);
+	char* result = TCHAR_TO_UTF8(*ProjectName);
+	Initialise(result, result);
 	Success = true;
 #endif 
 	return true;

@@ -7,7 +7,6 @@
 #include "Json/Public/Serialization/JsonWriter.h"
 #include "Json/Public/Policies/CondensedJsonPrintPolicy.h"
 
-TArray<FDevice> UAndroidHapticLibrary::FoundDevices;
 FPlayerResponse UAndroidHapticLibrary::CurrentResponse;
 FPlayerResponse UAndroidHapticLibrary::LastUpdatedResponse;
 
@@ -202,14 +201,7 @@ EPosition UAndroidHapticLibrary::StringToPosition(FString PositionString)
 {
 	EPosition ReturnValue = EPosition::Default;
 
-	if (PositionString == "Left") {
-		ReturnValue = EPosition::Left;
-	}
-	else if (PositionString == "Right")
-	{
-		ReturnValue = EPosition::Right;
-	}
-	else if (PositionString == "ForearmL")
+	if (PositionString == "ForearmL")
 	{
 		ReturnValue = EPosition::ForearmL;
 	}
@@ -359,8 +351,9 @@ void UAndroidHapticLibrary::TurnOffAll()
 
 bool UAndroidHapticLibrary::IsDeviceConnceted(EPosition Position)
 {
-	for (int i = 0; i < FoundDevices.Num(); i++) {
-		FDevice d = FoundDevices[i];
+	auto Devices = UAndroidHapticLibrary::GetCurrentDevices();
+	for (int i = 0; i < Devices.Num(); i++) {
+		FDevice d = Devices[i];
 		if (d.IsConnected
 			&& BhapticsUtils::PositionEnumToString(Position) == d.Position) {
 			return true;
@@ -497,6 +490,23 @@ void UAndroidHapticLibrary::RegisterProjectReflected(FString key, FString fileSt
 		Env->DeleteLocalRef(fileStrJava);
 	}
 #endif // PLATFORM_ANDROID
+}
+
+bool UAndroidHapticLibrary::AndroidThunkCpp_Initialize(FString appName)
+{
+#if PLATFORM_ANDROID
+	if (JNIEnv* Env = FAndroidApplication::GetJavaEnv())
+	{
+		static jmethodID InitializeMethodId = FJavaWrapper::FindMethod(
+			Env, FJavaWrapper::GameActivityClassID,
+			"AndroidThunkJava_Initialize", "(Ljava/lang/String;)V", false);
+		jstring appNameJava = Env->NewStringUTF(TCHAR_TO_UTF8(*appName));
+		FJavaWrapper::CallVoidMethod(
+			Env, FJavaWrapper::GameActivityThis, InitializeMethodId, appNameJava);
+		Env->DeleteLocalRef(appNameJava);
+	}
+#endif // PLATFORM_ANDROID
+	return true;
 }
 
 void UAndroidHapticLibrary::SubmitRegistered(
