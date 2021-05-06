@@ -77,6 +77,7 @@
     <insert>
       <![CDATA[
     private SdkRequestHandler sdkRequestHandler;
+    private String appName = "";
     private static final String TAG = "bhaptics_WRAPPER";
 
     //Helper Functions
@@ -122,6 +123,11 @@
     public boolean AndroidThunkJava_Is_legacy() {
         return sdkRequestHandler.isLegacyMode();
     }
+    
+    public void AndroidThunkJava_Initialize(String appName) {
+        android.util.Log.d(TAG, "AndroidThunkJava_Initialize: " + appName);
+    }
+
 
     public void AndroidThunkJava_Scan() {
         android.util.Log.d(TAG, "AndroidThunkJava_Scan() ");
@@ -289,7 +295,8 @@
   <gameActivityOnCreateAdditions>
     <insert>
       <![CDATA[
-        sdkRequestHandler = new SdkRequestHandler(this, "appName");
+        android.util.Log.d(TAG, "onCreate() : " + appName);
+        sdkRequestHandler = new SdkRequestHandler(this, appName);
       ]]>
     </insert>
   </gameActivityOnCreateAdditions>
