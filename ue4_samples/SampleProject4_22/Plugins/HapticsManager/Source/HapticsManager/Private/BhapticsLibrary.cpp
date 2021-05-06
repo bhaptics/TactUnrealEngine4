@@ -46,7 +46,8 @@ void BhapticsLibrary::SetLibraryLoaded()
 bool BhapticsLibrary::Initialize()
 {
 #if PLATFORM_ANDROID
-	UAndroidHapticLibrary::AndroidThunkCpp_StartScanning();
+	//UAndroidHapticLibrary::AndroidThunkCpp_StartScanning();
+	IsInitialised = true;
 #else
 	if (!IsLoaded)
 	{
@@ -481,7 +482,7 @@ TArray<FHapticFeedback> BhapticsLibrary::Lib_GetResponseStatus()
 	InitializeCheck();
 	TArray<FHapticFeedback> ChangedFeedback;
 #if PLATFORM_ANDROID
-	FPlayerResponse Response = UAndroidHapticLibrary::GetCurrentResponse();
+	FPlayerResponse Response;
 	ChangedFeedback = Response.Status;
 	TArray<EPosition> PositionEnum =
 	{ EPosition::ForearmL,EPosition::ForearmR,EPosition::Head, EPosition::VestFront,EPosition::VestBack,EPosition::HandL, EPosition::HandR, EPosition::FootL, EPosition::FootR };

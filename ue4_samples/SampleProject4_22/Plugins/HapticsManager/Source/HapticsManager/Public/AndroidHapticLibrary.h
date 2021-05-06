@@ -23,18 +23,10 @@ class UAndroidHapticLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_UCLASS_BODY()
 
-	static void UpdateDevices(TArray<FDevice> DeviceList);
-	static void ParsePlayerResponse(FString ResponseString);
+	//static void UpdateDevices(TArray<FDevice> DeviceList);
 
 	UFUNCTION(BlueprintPure, meta = (DisplayName = "GetCurrentDevices", Keywords = "Haptics"), Category = "Haptics")
-		static TArray<FDevice> GetCurrentDevices() { return FoundDevices; };
-
-	//UFUNCTION(BlueprintCallable, meta = (DisplayName = "GetCurrentResponse", Keywords = "Haptics"), Category = "Haptics")
-	static FPlayerResponse GetCurrentResponse();
-
-	static FDeviceStatusDelegate UpdateDeviceStatusDelegate;
-	
-	static FDeviceArrayDelegate UpdateDeviceListDelegate;
+		static TArray<FDevice> GetCurrentDevices();
 
 	static void SubmitDot(
 		FString Key, FString Pos, TArray<FDotPoint> Points, int DurationMillis);
