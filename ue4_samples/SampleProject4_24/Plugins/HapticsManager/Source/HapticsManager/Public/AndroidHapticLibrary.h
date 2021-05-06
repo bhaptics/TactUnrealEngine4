@@ -23,18 +23,10 @@ class UAndroidHapticLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_UCLASS_BODY()
 
-	static void UpdateDevices(TArray<FDevice> DeviceList);
-	static void ParsePlayerResponse(FString ResponseString);
+	//static void UpdateDevices(TArray<FDevice> DeviceList);
 
 	UFUNCTION(BlueprintPure, meta = (DisplayName = "GetCurrentDevices", Keywords = "Haptics"), Category = "Haptics")
-		static TArray<FDevice> GetCurrentDevices() { return FoundDevices; };
-
-	//UFUNCTION(BlueprintCallable, meta = (DisplayName = "GetCurrentResponse", Keywords = "Haptics"), Category = "Haptics")
-	static FPlayerResponse GetCurrentResponse();
-
-	static FDeviceStatusDelegate UpdateDeviceStatusDelegate;
-	
-	static FDeviceArrayDelegate UpdateDeviceListDelegate;
+		static TArray<FDevice> GetCurrentDevices();
 
 	static void SubmitDot(
 		FString Key, FString Pos, TArray<FDotPoint> Points, int DurationMillis);
@@ -46,6 +38,10 @@ class UAndroidHapticLibrary : public UBlueprintFunctionLibrary
 
 	static bool IsDeviceConnceted(EPosition Position);
 
+
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "IsStandAloneMode", Keywords = "Haptics"), Category = "Haptics")
+	static bool IsLegacyMode();
+
 	static bool IsFeedbackRegistered(FString key);
 	static bool IsFeedbackPlaying(FString key);
 	static bool IsAnyFeedbackPlaying();
@@ -53,6 +49,7 @@ class UAndroidHapticLibrary : public UBlueprintFunctionLibrary
 
 	static void RegisterProject(FString key, FString fileStr);
 	static void RegisterProjectReflected(FString key, FString fileStr);
+	static bool AndroidThunkCpp_Initialize(FString appName);
 
 	static void SubmitRegistered(
 		FString key, FString altKey, float intensity, float duration, float xOffsetAngle, float yOffset);
@@ -100,26 +97,12 @@ class UAndroidHapticLibrary : public UBlueprintFunctionLibrary
 	//Toggle the Position of Device
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "ToggleDevicePosition", Keywords = "Haptics"), Category = "Haptics")
 	static void AndroidThunkCpp_TogglePosition(FString DeviceAddress);
-
-	// Streaming Functions
-	UFUNCTION(BlueprintCallable, meta = (DisplayName = "StartHapticStreaming (Android)", Keywords = "Haptics"), Category = "Haptics")
-	static void AndroidThunkCpp_StartStreaming(bool autoConnect);
-	UFUNCTION(BlueprintCallable, meta = (DisplayName = "StopHapticStreaming (Android)", Keywords = "Haptics"), Category = "Haptics")
-	static void AndroidThunkCpp_StopStreaming();
-	UFUNCTION(BlueprintCallable, meta = (DisplayName = "GetHapticStreamingHosts (Android)", Keywords = "Haptics"), Category = "Haptics")
-	static TArray<FHapticStreamingDevice> AndroidThunkCpp_GetStreamingHosts();
-	UFUNCTION(BlueprintCallable, meta = (DisplayName = "RefreshHapticStreamingHosts (Android)", Keywords = "Haptics"), Category = "Haptics")
-	static void AndroidThunkCpp_RefreshStreamingHosts();
-	UFUNCTION(BlueprintCallable, meta = (DisplayName = "ConnectHapticStreamingHosts (Android)", Keywords = "Haptics"), Category = "Haptics")
-	static void AndroidThunkCpp_ConnectStreamingHosts(FString host);
+	   
 private:
 	static TArray<FDevice> FoundDevices;
 	static FPlayerResponse CurrentResponse;
 	static FPlayerResponse LastUpdatedResponse;
 	static EPosition StringToPosition(FString PositionString);
 	static FCriticalSection m_Mutex;
-
-
-	static TArray<FHapticStreamingDevice> Parse(FString JsonString);
 
 };
