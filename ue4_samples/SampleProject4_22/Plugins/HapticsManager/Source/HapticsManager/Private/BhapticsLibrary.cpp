@@ -9,6 +9,7 @@
 #include "Core/Public/Misc/FileHelper.h"
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
+#include <string>
 
 #if PLATFORM_ANDROID
 #include "AndroidHapticLibrary.h"
@@ -28,6 +29,10 @@ static bhaptics::PositionType PositionEnumToDeviceType(EPosition Position);
 static bhaptics::PositionType PositionEnumToPositionType(EPosition Position);
 #endif
 
+FString ProjectName = "AppName";
+std::string projectName;
+
+
 BhapticsLibrary::BhapticsLibrary()
 {
 
@@ -35,7 +40,6 @@ BhapticsLibrary::BhapticsLibrary()
 
 BhapticsLibrary::~BhapticsLibrary()
 {
-
 }
 
 void BhapticsLibrary::SetLibraryLoaded()
@@ -43,18 +47,24 @@ void BhapticsLibrary::SetLibraryLoaded()
 	IsLoaded = true;
 }
 
+
 bool BhapticsLibrary::Initialize()
 {
-	FString ProjectName = "AppName";
 	if (GConfig) {
+		FString fromString = " ";
+		FString toString = "";
+		const TCHAR* from = *fromString;
+		const TCHAR* to = *toString;
 		GConfig->GetString(
 			TEXT("/Script/EngineSettings.GeneralProjectSettings"),
 			TEXT("ProjectName"),
 			ProjectName,
 			GGameIni
 		);
+		ProjectName = ProjectName.Replace(from, to);
+		projectName = (TCHAR_TO_UTF8(*ProjectName));
+		UE_LOG(LogTemp, Log, TEXT("BhapticsLibrary Constructor: %s."), *ProjectName);
 	}
-
 #if PLATFORM_ANDROID
 	IsInitialised = UAndroidHapticLibrary::AndroidThunkCpp_Initialize(ProjectName);
 #else
@@ -138,9 +148,7 @@ bool BhapticsLibrary::Initialize()
 		}
 
 	}
-	UE_LOG(LogTemp, Log, TEXT("Project %s"), *ProjectName);
-	char* result = TCHAR_TO_UTF8(*ProjectName);
-	Initialise(result, result);
+	Initialise(projectName.c_str(), projectName.c_str());
 	Success = true;
 #endif 
 	return true;
