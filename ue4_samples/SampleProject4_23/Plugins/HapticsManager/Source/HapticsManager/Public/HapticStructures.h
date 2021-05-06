@@ -212,7 +212,7 @@ struct FDevice {
 		FString Position;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Android|Haptic")
-		FString ConnectionStatus;
+		bool IsConnected;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Android|Haptic")
 		bool IsPaired;
