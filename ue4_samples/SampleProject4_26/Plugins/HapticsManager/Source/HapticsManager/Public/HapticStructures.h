@@ -15,7 +15,7 @@ enum class EPosition : uint8
 	ForearmL = 10, ForearmR = 11,
 	HandL = 6, HandR = 7,
 	FootL = 8, FootR = 9,
-	Left = 1, Right = 2,
+	Left = 1 UMETA(Hidden), Right = 2 UMETA(Hidden),
 	Default = 0 UMETA(Hidden),
 };
 
@@ -202,8 +202,8 @@ struct FDevice {
 
 	GENERATED_BODY()
 
-		UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Android|Haptic")
-		FString DeviceName;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Android|Haptic")
+	FString DeviceName;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Android|Haptic")
 		FString Address;
@@ -212,10 +212,7 @@ struct FDevice {
 		FString Position;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Android|Haptic")
-		int Battery;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Android|Haptic")
-		FString ConnectionStatus;
+		bool IsConnected;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Android|Haptic")
 		bool IsPaired;
