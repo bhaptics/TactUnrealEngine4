@@ -15,6 +15,8 @@
 #include "AssetTools/HandFileActions.h"
 #include "AssetTools/FootFileActions.h"
 
+#include "Factories/ReimportFeedbackFileFactory.h"
+
 TArray<TSharedRef<IAssetTypeActions>> RegisteredAssetTypeActions;
 
 #define LOCTEXT_NAMESPACE "FFeedbackFileEditorModule"
@@ -31,6 +33,9 @@ void FFeedbackFileEditorModule::StartupModule()
 	//The image we wish to load is located inside the Resources folder inside the Base Directory
 	//so let's set the content dir to the base dir and manually switch to the Resources folder:
 	StyleSet->SetContentRoot(ContentDir);
+
+	//Create reimport handler for Feedback file
+	UReimportFeedbackFileFactory::StaticClass();
 
 	//Create a brush from the icon
 	FSlateImageBrush* ThumbnailBrush = new FSlateImageBrush(StyleSet->RootToContentDir(TEXT("Resources/icon128"), TEXT(".png")), FVector2D(128.f, 128.f));
@@ -73,12 +78,12 @@ void FFeedbackFileEditorModule::StartupModule()
 
 	IAssetTools& AssetTools = FModuleManager::LoadModuleChecked<FAssetToolsModule>("AssetTools").Get();
 	
-	auto Action = MakeShareable(new FFeedbackFileActions(StyleSet.ToSharedRef()));
-	auto ActionVest = MakeShareable(new FTactotFileActions(StyleSet.ToSharedRef()));
-	auto ActionArm = MakeShareable(new FTactosyFileActions(StyleSet.ToSharedRef()));
-	auto ActionHead = MakeShareable(new FTactalFileActions(StyleSet.ToSharedRef()));
-	auto ActionHand = MakeShareable(new FHandFileActions(StyleSet.ToSharedRef()));
-	auto ActionFoot = MakeShareable(new FFootFileActions(StyleSet.ToSharedRef()));
+	auto Action = MakeShareable(new FFeedbackFileActions());
+	auto ActionVest = MakeShareable(new FTactotFileActions());
+	auto ActionArm = MakeShareable(new FTactosyFileActions());
+	auto ActionHead = MakeShareable(new FTactalFileActions());
+	auto ActionHand = MakeShareable(new FHandFileActions());
+	auto ActionFoot = MakeShareable(new FFootFileActions());
 
 	AssetTools.RegisterAssetTypeActions(Action);
 	AssetTools.RegisterAssetTypeActions(ActionVest);

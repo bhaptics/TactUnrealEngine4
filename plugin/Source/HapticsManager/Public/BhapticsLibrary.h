@@ -16,6 +16,7 @@ public:
 	static void Free();
 	
 	static void Lib_RegisterFeedback(FString Key, FString ProjectJson);
+	static void Lib_RegisterReflectedFeedback(FString Key, FString ProjectJson);
 
 	static void Lib_SubmitRegistered(FString Key);
 

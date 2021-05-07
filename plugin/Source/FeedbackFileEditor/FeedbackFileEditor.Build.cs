@@ -33,10 +33,10 @@ public class FeedbackFileEditor : ModuleRules
 		PrivateDependencyModuleNames.AddRange(
 			new string[]
 			{
-				"CoreUObject",
-				"Engine",
-				"Slate",
-				"SlateCore",
+                "CoreUObject",
+                "Engine",
+                "Slate",
+                "SlateCore",
                 "Json",
                 "JsonUtilities",
                 "Projects",
