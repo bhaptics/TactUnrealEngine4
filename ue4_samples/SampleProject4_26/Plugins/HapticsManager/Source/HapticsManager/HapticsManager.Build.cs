@@ -29,31 +29,30 @@ public class HapticsManager : ModuleRules
             new string[] {
                         "Settings",
                         "Launch",
-            }
+			}
             );
         PublicDependencyModuleNames.AddRange(
-			new string[]
-			{
-				"Core",
+            new string[] 
+            {
+                "Core",
 				// ... add other public dependencies that you statically link with here ...
-			}
+            }
 			);
-			
 		
-		PrivateDependencyModuleNames.AddRange(
-			new string[]
-			{
-				"CoreUObject",
-				"Engine",
-				"Slate",
-				"SlateCore",
+        PrivateDependencyModuleNames.AddRange(
+            new string[] 
+            {
+                "CoreUObject", 
+                "Engine", 
+                "Slate", 
+                "SlateCore",
                 "Json",
                 "JsonUtilities",
                 "Projects",
-                "InputCore",
-				"DeveloperSettings",
-                "HapticLibrary"
-				// ... add private dependencies that you statically link with here ...	
+                "InputCore", 
+                "DeveloperSettings",
+				"HapticLibrary"
+                // ... add private dependencies that you statically link with here ...	
 			}
 			);
 
