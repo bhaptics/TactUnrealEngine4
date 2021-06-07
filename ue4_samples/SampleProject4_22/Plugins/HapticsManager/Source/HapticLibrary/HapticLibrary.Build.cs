@@ -28,7 +28,6 @@ public class HapticLibrary : ModuleRules
             PublicDelayLoadDLLs.Add("haptic_library.dll");
 
             RuntimeDependencies.Add(Path.Combine(ModuleDirectory, "DLLs", "win32", "haptic_library.dll"));
-
         } else if (Target.Platform == UnrealTargetPlatform.Android)
         {
             string PluginPath = Utils.MakePathRelativeTo(ModuleDirectory, Target.RelativeEnginePath);
