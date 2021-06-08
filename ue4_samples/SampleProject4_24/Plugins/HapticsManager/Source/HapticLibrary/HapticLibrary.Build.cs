@@ -17,9 +17,7 @@ public class HapticLibrary : ModuleRules
             // Delay-load the DLL, so we can load it from the right place first
             PublicDelayLoadDLLs.Add("haptic_library.dll");
 
-            // Ensure that the DLL is staged along with the executable
-            // RuntimeDependencies.Add("$(PluginDir)/Binaries/ThirdParty/bHapticsLibrary/Win64/ExampleLibrary.dll");
-            RuntimeDependencies.Add(new RuntimeDependency(Path.Combine(ModuleDirectory, "DLLs/win64/haptic_library.dll")));
+            RuntimeDependencies.Add(Path.Combine(ModuleDirectory, "DLLs", "win64", "haptic_library.dll"));
         }
         else if (Target.Platform == UnrealTargetPlatform.Win32)
         {
@@ -29,10 +27,7 @@ public class HapticLibrary : ModuleRules
             // Delay-load the DLL, so we can load it from the right place first
             PublicDelayLoadDLLs.Add("haptic_library.dll");
 
-            // Ensure that the DLL is staged along with the executable
-            // RuntimeDependencies.Add("$(PluginDir)/Binaries/ThirdParty/bHapticsLibrary/Win64/ExampleLibrary.dll");
-            RuntimeDependencies.Add(new RuntimeDependency(Path.Combine(ModuleDirectory, "DLLs/win32/haptic_library.dll")));
-
+            RuntimeDependencies.Add(Path.Combine(ModuleDirectory, "DLLs", "win32", "haptic_library.dll"));
         } else if (Target.Platform == UnrealTargetPlatform.Android)
         {
             string PluginPath = Utils.MakePathRelativeTo(ModuleDirectory, Target.RelativeEnginePath);
