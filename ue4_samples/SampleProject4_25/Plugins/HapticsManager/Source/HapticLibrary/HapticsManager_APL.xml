@@ -6,12 +6,12 @@
     <log text="AndroidAPITemplate init"/>
   </init>
 
-  <androidManifestUpdates>
-    <addPermission android:name="android.permission.BLUETOOTH" />
-    <addPermission android:name="android.permission.BLUETOOTH_ADMIN" />
-    <addPermission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <addPermission android:name="android.permission.ACCESS_FINE_LOCATION" />
-  </androidManifestUpdates>
+  <!-- <androidManifestUpdates> -->
+  <!--   <addPermission android:name="android.permission.BLUETOOTH" /> -->
+  <!--   <addPermission android:name="android.permission.BLUETOOTH_ADMIN" /> -->
+  <!--   <addPermission android:name="android.permission.ACCESS_COARSE_LOCATION" /> -->
+  <!--   <addPermission android:name="android.permission.ACCESS_FINE_LOCATION" /> -->
+  <!-- </androidManifestUpdates> -->
 
   <!-- optional additions to proguard -->
   <proguardAdditions>
