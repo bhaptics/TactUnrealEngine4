@@ -1,4 +1,4 @@
-﻿// Copyright 1998-2016 Epic Games, Inc. All Rights Reserved.
+﻿// Copyright 2015~2021 bHaptics Inc. All Rights Reserved.
 
 using System;
 using System.IO;
@@ -6,24 +6,20 @@ using UnrealBuildTool;
 
 public class HapticsManager : ModuleRules
 {
-    public HapticsManager(ReadOnlyTargetRules Target) : base (Target)
-	{
+    public HapticsManager(ReadOnlyTargetRules Target) : base (Target) 
+    {
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
         PrivatePCHHeaderFile = "Public/HapticsManager.h";
 
         PublicIncludePaths.AddRange(
 			new string[] {
                 //"HapticsManager/Public"
-				// ... add public include paths required here ...
-			}
-			);
-				
-		PrivateIncludePaths.AddRange(
-			new string[] {
+            });
+        
+        PrivateIncludePaths.AddRange(
+            new string[] {
                 //"HapticsManager/Private",
-				// ... add other private include paths required here ...
-			}
-			);
+            });
 
         PrivateIncludePathModuleNames.AddRange(
             new string[] {
@@ -35,10 +31,10 @@ public class HapticsManager : ModuleRules
             new string[] 
             {
                 "Core",
-				// ... add other public dependencies that you statically link with here ...
+
             }
-			);
-		
+            );
+
         PrivateDependencyModuleNames.AddRange(
             new string[] 
             {
@@ -49,21 +45,18 @@ public class HapticsManager : ModuleRules
                 "Json",
                 "JsonUtilities",
                 "Projects",
-                "InputCore", 
+                "InputCore",
                 "DeveloperSettings",
-				"HapticLibrary"
-                // ... add private dependencies that you statically link with here ...	
+                "HapticLibrary"
 			}
 			);
 
-        
         DynamicallyLoadedModuleNames.AddRange(
-			new string[]
-			{
-				// ... add any modules that your module loads dynamically here ...
-			}
-			);
+            new string[]
+            {
 
+            }
+            );
     }
 
 }
