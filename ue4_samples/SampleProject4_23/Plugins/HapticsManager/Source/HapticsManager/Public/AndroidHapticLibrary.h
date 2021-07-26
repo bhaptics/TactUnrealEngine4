@@ -36,12 +36,6 @@ class UAndroidHapticLibrary : public UBlueprintFunctionLibrary
 		FString Key);	
 	static void TurnOffAll();
 
-	static bool IsDeviceConnceted(EPosition Position);
-
-
-	UFUNCTION(BlueprintCallable, meta = (DisplayName = "IsStandAloneMode", Keywords = "Haptics"), Category = "Haptics")
-	static bool IsLegacyMode();
-
 	static bool IsFeedbackRegistered(FString key);
 	static bool IsFeedbackPlaying(FString key);
 	static bool IsAnyFeedbackPlaying();
@@ -51,12 +45,22 @@ class UAndroidHapticLibrary : public UBlueprintFunctionLibrary
 	static void RegisterProjectReflected(FString key, FString fileStr);
 	static bool AndroidThunkCpp_Initialize(FString appName);
 
+
+
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "IsBhapticsDeviceConnceted", Keywords = "Haptics"), Category = "Haptics")
+	static bool IsDeviceConnceted(FString Position);
+
 	static void SubmitRegistered(
 		FString key, FString altKey, float intensity, float duration, float xOffsetAngle, float yOffset);
 
 	//Ping Haptic Device
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "PingHapticDevice", Keywords = "Haptics"), Category = "Haptics")
 	static void AndroidThunkCpp_Ping(FString DeviceAddress);
+	//Ping Haptic Device
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "PingByPosition", Keywords = "Haptics"), Category = "Haptics")
+	static void AndroidThunkJava_PingPosition(FString Position);
+
+	static bool IsDeviceConnceted(EPosition Position);
 	
 	//Ping all Haptic Devices
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "PingAll", Keywords = "Haptics"), Category = "Haptics")
@@ -70,15 +74,10 @@ class UAndroidHapticLibrary : public UBlueprintFunctionLibrary
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "ToggleDevicePosition", Keywords = "Haptics"), Category = "Haptics")
 	static void AndroidThunkCpp_TogglePosition(FString DeviceAddress);
 
-	//Toggle the Position of Device
-	UFUNCTION(BlueprintCallable, meta = (DisplayName = "BhapticsRefreshPairing", Keywords = "Haptics"), Category = "Haptics")
-	static void AndroidThunkJava_RefreshPairing();
 	   
 private:
-	static TArray<FDevice> FoundDevices;
 	static FPlayerResponse CurrentResponse;
 	static FPlayerResponse LastUpdatedResponse;
-	static EPosition StringToPosition(FString PositionString);
-	static FCriticalSection m_Mutex;
+	static TArray<FDevice> DeviceList;
 
 };

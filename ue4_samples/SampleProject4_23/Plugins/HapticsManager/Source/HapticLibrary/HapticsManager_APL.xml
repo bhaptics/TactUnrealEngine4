@@ -119,14 +119,13 @@
         return null;
     }
 
-    //Bluetooth Functionality
-    public boolean AndroidThunkJava_Is_legacy() {
-        return sdkRequestHandler.isLegacyMode();
-    }
-
     public void AndroidThunkJava_Initialize(String appName) {
         android.util.Log.d(TAG, "AndroidThunkJava_Initialize: " + appName);
         this.appName = appName;
+        
+        if (sdkRequestHandler != null) {
+            sdkRequestHandler.updateAppName(appName);
+        }
     }
     
     public void AndroidThunkJava_RefreshPairing() {
@@ -162,6 +161,16 @@
         android.util.Log.d(TAG, "AndroidThunkJava_Ping() " + address);
         sdkRequestHandler.ping(address);
     }
+    
+    public void AndroidThunkJava_PingPosition(String pos) {
+        android.util.Log.d(TAG, "AndroidThunkJava_PingPosition() " + pos);
+        for (SimpleBhapticsDevice simpleBhapticsDevice : sdkRequestHandler.getDeviceList()) {
+            if (simpleBhapticsDevice.getPosition() == SimpleBhapticsDevice.stringToPosition(pos)) {
+                sdkRequestHandler.ping(simpleBhapticsDevice.getAddress());
+            }
+        }
+    }
+    
     public void AndroidThunkJava_PingAll() {
         List<SimpleBhapticsDevice> deviceList = sdkRequestHandler.getDeviceList();
 

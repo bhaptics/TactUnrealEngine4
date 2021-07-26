@@ -23,7 +23,6 @@ public class FeedbackFileEditor : ModuleRules
             {
                 "Core",
                 "UnrealEd"
-
             }
             );
 
@@ -49,6 +48,5 @@ public class FeedbackFileEditor : ModuleRules
             {
             }
             );
-
-	}
+    }
 }
