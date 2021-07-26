@@ -9,12 +9,16 @@
 
 FPlayerResponse UAndroidHapticLibrary::CurrentResponse;
 FPlayerResponse UAndroidHapticLibrary::LastUpdatedResponse;
+TArray< FDevice> UAndroidHapticLibrary::DeviceList;
 
-FCriticalSection UAndroidHapticLibrary::m_Mutex;
 #if PLATFORM_ANDROID
 jmethodID GetCurrentDeviceMethod;
-jmethodID isRegisterMethodId;
+jmethodID TurnOffMethodId;
+jmethodID TurnOffAllMethodId;
 jmethodID GetPositionStatusMethodId;
+jmethodID PingMethodId;
+jmethodID PingAllMethodId;
+jmethodID PingPositionMethodId;
 #endif
 
 UAndroidHapticLibrary::UAndroidHapticLibrary(const FObjectInitializer& ObjectInitializer)
@@ -23,19 +27,45 @@ UAndroidHapticLibrary::UAndroidHapticLibrary(const FObjectInitializer& ObjectIni
 #if PLATFORM_ANDROID
 	if (JNIEnv* Env = FAndroidApplication::GetJavaEnv())
 	{
-		GetCurrentDeviceMethod = FJavaWrapper::FindMethod(Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_getDeviceList", "()Ljava/lang/String;", false);
-		GetPositionStatusMethodId =
-			FJavaWrapper::FindMethod(
-				Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_GetPositionStatus", "(Ljava/lang/String;)[B", false);
+		GetCurrentDeviceMethod = FJavaWrapper::FindMethod(
+			Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_getDeviceList", "()Ljava/lang/String;", false);
+		
+		TurnOffMethodId =FJavaWrapper::FindMethod(
+			Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_TurnOff", "(Ljava/lang/String;)V", false);
 
+		TurnOffAllMethodId =FJavaWrapper::FindMethod(
+			Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_TurnOffAll", "()V", false);
+
+		GetPositionStatusMethodId = FJavaWrapper::FindMethod(
+			Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_GetPositionStatus", "(Ljava/lang/String;)[B", false);
+
+		PingMethodId = FJavaWrapper::FindMethod(
+			Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_Ping", "(Ljava/lang/String;)V", false);
+
+		PingPositionMethodId = FJavaWrapper::FindMethod(
+			Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_PingPosition", "(Ljava/lang/String;)V", false);
+
+		PingAllMethodId = FJavaWrapper::FindMethod(
+			Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_PingAll", "()V", false);
 	}
 #endif
 }
 
-
+int64 last = 0;
 TArray<FDevice> UAndroidHapticLibrary::GetCurrentDevices()
 {
-	TArray<FDevice> DeviceList;
+	FDateTime Time = FDateTime::Now();
+	//Get the timestamp
+	int64 Timestamp = (int64) (Time.GetTicks() / ETimespan::TicksPerMillisecond);
+
+	if (Timestamp - last < 1000) {
+		return DeviceList;
+	}
+
+	last = Timestamp;
+
+
+	TArray<FDevice> UpdateDeviceList;
 #if PLATFORM_ANDROID
 	if (JNIEnv* Env = FAndroidApplication::GetJavaEnv())
 	{
@@ -45,7 +75,7 @@ TArray<FDevice> UAndroidHapticLibrary::GetCurrentDevices()
 
 		Env->ReleaseStringUTFChars(jstr, nativeDeviceListString);
 
-		if (!FJsonObjectConverter::JsonArrayStringToUStruct(DevicesListString, &DeviceList, 0, 0))
+		if (!FJsonObjectConverter::JsonArrayStringToUStruct(DevicesListString, &UpdateDeviceList, 0, 0))
 		{
 			UE_LOG(LogTemp, Log, TEXT("parse failed"));
 		}
@@ -88,15 +118,16 @@ TArray<FDevice> UAndroidHapticLibrary::GetCurrentDevices()
 	d4.Position = "HandR";
 	d4.IsConnected = false;
 	d4.Battery=-1;
-	DeviceList.Add(d);
+	//UpdateDeviceList.Add(d);
 	//DeviceList.Add(d5);
 	//DeviceList.Add(d6);
 	//DeviceList.Add(d7);
-	DeviceList.Add(d2);
-	DeviceList.Add(d3);
-	DeviceList.Add(d4);
+	//UpdateDeviceList.Add(d2);
+	//UpdateDeviceList.Add(d3);
+	//UpdateDeviceList.Add(d4);
 #endif
-	return DeviceList;
+	DeviceList = UpdateDeviceList;
+	return UpdateDeviceList;
 }
 
 void UAndroidHapticLibrary::AndroidThunkCpp_Ping(FString DeviceAddress)
@@ -104,12 +135,71 @@ void UAndroidHapticLibrary::AndroidThunkCpp_Ping(FString DeviceAddress)
 #if PLATFORM_ANDROID
 	if (JNIEnv* Env = FAndroidApplication::GetJavaEnv())
 	{
-		static jmethodID PingMethod = FJavaWrapper::FindMethod(Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_Ping", "(Ljava/lang/String;)V", false);
 		jstring DeviceAddressJava = Env->NewStringUTF(TCHAR_TO_UTF8(*DeviceAddress));
-		FJavaWrapper::CallVoidMethod(Env, FJavaWrapper::GameActivityThis, PingMethod, DeviceAddressJava);
+		FJavaWrapper::CallVoidMethod(Env, FJavaWrapper::GameActivityThis, PingMethodId, DeviceAddressJava);
 		Env->DeleteLocalRef(DeviceAddressJava);
 	}
 #endif // PLATFORM_ANDROID
+}
+
+void UAndroidHapticLibrary::AndroidThunkJava_PingPosition(FString Position)
+{
+#if PLATFORM_ANDROID
+	if (JNIEnv* Env = FAndroidApplication::GetJavaEnv())
+	{
+		jstring PositionJava = Env->NewStringUTF(TCHAR_TO_UTF8(*Position));
+		FJavaWrapper::CallVoidMethod(Env, FJavaWrapper::GameActivityThis, PingPositionMethodId, PositionJava);
+		Env->DeleteLocalRef(PositionJava);
+	}
+#endif // PLATFORM_ANDROID
+}
+
+
+FString PosToString(EPosition Pos)
+{
+	switch (Pos)
+	{
+	case EPosition::VestFront:
+		return "Vest";
+	case EPosition::VestBack:
+		return "Vest";
+
+	case EPosition::Head:
+		return "Head";
+	case EPosition::ForearmL:
+		return "ForearmL";
+	case EPosition::ForearmR:
+		return "ForearmR";
+	case EPosition::HandL:
+		return "HandL";
+	case EPosition::HandR:
+		return "HandR";
+	case EPosition::FootL:
+		return "FootL";
+	case EPosition::FootR:
+		return "FootR";
+	case EPosition::Left:
+		return "Left";
+	case EPosition::Right:
+		return "Right";
+	default:
+		break;
+	}
+
+	return "Unknown";
+}
+
+
+bool UAndroidHapticLibrary::IsDeviceConnceted(EPosition Position)
+{
+	auto Devices = UAndroidHapticLibrary::GetCurrentDevices();
+	for (int i = 0; i < Devices.Num(); i++) {
+		FDevice d = Devices[i];
+		if (d.IsConnected && PosToString(Position) == d.Position) {
+			return true;
+		}
+	}
+	return false;
 }
 
 void UAndroidHapticLibrary::AndroidThunkCpp_PingAll()
@@ -117,8 +207,7 @@ void UAndroidHapticLibrary::AndroidThunkCpp_PingAll()
 #if PLATFORM_ANDROID
 	if (JNIEnv* Env = FAndroidApplication::GetJavaEnv())
 	{
-		static jmethodID PingAllMethod = FJavaWrapper::FindMethod(Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_PingAll", "()V", false);
-		FJavaWrapper::CallVoidMethod(Env, FJavaWrapper::GameActivityThis, PingAllMethod);
+		FJavaWrapper::CallVoidMethod(Env, FJavaWrapper::GameActivityThis, PingAllMethodId);
 	}
 #endif // PLATFORM_ANDROID
 }
@@ -149,62 +238,6 @@ void UAndroidHapticLibrary::AndroidThunkCpp_TogglePosition(FString DeviceAddress
 		Env->DeleteLocalRef(DeviceAddressJava);
 	}
 #endif // PLATFORM_ANDROID
-}
-
-void UAndroidHapticLibrary::AndroidThunkJava_RefreshPairing()
-{
-#if PLATFORM_ANDROID
-	if (JNIEnv* Env = FAndroidApplication::GetJavaEnv())
-	{
-		static jmethodID TogglePositionMethod = FJavaWrapper::FindMethod(Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_RefreshPairing", "()V", false);
-		FJavaWrapper::CallVoidMethod(Env, FJavaWrapper::GameActivityThis, TogglePositionMethod);
-	}
-#endif // PLATFORM_ANDROID
-}
-
-
-EPosition UAndroidHapticLibrary::StringToPosition(FString PositionString)
-{
-	EPosition ReturnValue = EPosition::Default;
-
-	if (PositionString == "ForearmL")
-	{
-		ReturnValue = EPosition::ForearmL;
-	}
-	else if (PositionString == "ForearmR")
-	{
-		ReturnValue = EPosition::ForearmR;
-	}
-	else if (PositionString == "VestFront")
-	{
-		ReturnValue = EPosition::VestFront;
-	}
-	else if (PositionString == "VestBack")
-	{
-		ReturnValue = EPosition::VestBack;
-	}
-	else if (PositionString == "Head")
-	{
-		ReturnValue = EPosition::Head;
-	}
-	else if (PositionString == "HandL")
-	{
-		ReturnValue = EPosition::HandL;
-	}
-	else if (PositionString == "HandR")
-	{
-		ReturnValue = EPosition::HandR;
-	}
-	else if (PositionString == "FootL")
-	{
-		ReturnValue = EPosition::FootL;
-	}
-	else if (PositionString == "FootR")
-	{
-		ReturnValue = EPosition::FootR;
-	}
-	
-	return ReturnValue;
 }
 
 void UAndroidHapticLibrary::SubmitDot(FString Key, FString Pos, TArray<FDotPoint> Points, int DurationMillis)
@@ -292,11 +325,8 @@ void UAndroidHapticLibrary::TurnOff(FString Key)
 #if PLATFORM_ANDROID
 	if (JNIEnv* Env = FAndroidApplication::GetJavaEnv())
 	{
-		static jmethodID isRegisterMethodId = 
-			FJavaWrapper::FindMethod(
-				Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_TurnOff", "(Ljava/lang/String;)V", false);
 		jstring keyStrJava = Env->NewStringUTF(TCHAR_TO_UTF8(*Key));
-		FJavaWrapper::CallVoidMethod(Env, FJavaWrapper::GameActivityThis, isRegisterMethodId, keyStrJava);
+		FJavaWrapper::CallVoidMethod(Env, FJavaWrapper::GameActivityThis, TurnOffMethodId, keyStrJava);
 		Env->DeleteLocalRef(keyStrJava);
 }
 #endif // PLATFORM_ANDROID
@@ -307,39 +337,21 @@ void UAndroidHapticLibrary::TurnOffAll()
 #if PLATFORM_ANDROID
 	if (JNIEnv* Env = FAndroidApplication::GetJavaEnv())
 	{
-		static jmethodID isRegisterMethodId = 
-			FJavaWrapper::FindMethod(
-				Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_TurnOffAll", "()V", false);
-		FJavaWrapper::CallVoidMethod(Env, FJavaWrapper::GameActivityThis, isRegisterMethodId);
+		FJavaWrapper::CallVoidMethod(Env, FJavaWrapper::GameActivityThis, TurnOffAllMethodId);
 	}
 #endif // PLATFORM_ANDROID
 }
 
-bool UAndroidHapticLibrary::IsDeviceConnceted(EPosition Position)
+bool UAndroidHapticLibrary::IsDeviceConnceted(FString Position)
 {
 	auto Devices = UAndroidHapticLibrary::GetCurrentDevices();
 	for (int i = 0; i < Devices.Num(); i++) {
 		FDevice d = Devices[i];
 		if (d.IsConnected
-			&& BhapticsUtils::PositionEnumToString(Position) == d.Position) {
+			&& Position == d.Position) {
 			return true;
 		}
 	}
-	return false;
-}
-
-bool UAndroidHapticLibrary::IsLegacyMode()
-{
-#if PLATFORM_ANDROID
-	if (JNIEnv* Env = FAndroidApplication::GetJavaEnv())
-	{
-		static jmethodID isLegacyModeId = FJavaWrapper::FindMethod(Env, FJavaWrapper::GameActivityClassID, "AndroidThunkJava_Is_legacy", "()Z", false);
-		bool res = FJavaWrapper::CallBooleanMethod(Env, FJavaWrapper::GameActivityThis, isLegacyModeId);
-
-		return res;
-	}
-#endif // PLATFORM_ANDROID
-
 	return false;
 }
 
