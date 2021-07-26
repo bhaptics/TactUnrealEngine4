@@ -158,7 +158,6 @@ void BhapticsLibrary::Free()
 {
 #if PLATFORM_ANDROID
 
-	UAndroidHapticLibrary::AndroidThunkCpp_StopScanning();
 #else
 	if (!IsLoaded)
 	{

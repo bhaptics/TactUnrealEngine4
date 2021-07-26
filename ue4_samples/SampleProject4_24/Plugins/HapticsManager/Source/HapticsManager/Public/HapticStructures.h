@@ -216,6 +216,11 @@ struct FDevice {
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Android|Haptic")
 		bool IsPaired;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Android|Haptic")
+		int Battery;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Android|Haptic")
+		bool IsAudioJackIn;
+
 };
 
 USTRUCT()
@@ -293,7 +298,7 @@ struct FPlayerResponse {
 
 	GENERATED_BODY()
 
-		TArray<FString> RegisteredKeys;
+	TArray<FString> RegisteredKeys;
 
 	TArray<FString> ActiveKeys;
 
