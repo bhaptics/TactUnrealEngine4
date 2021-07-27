@@ -28,13 +28,6 @@ public:
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "SetDeviceData", Keywords = "Haptics"), Category = "Haptics")
 		void SetDeviceData(FDevice LinkedDevice);
 
-	//Pair with the Haptic Device
-	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Pair", Keywords = "Haptics"), Category = "Haptics")
-		void Pair();
-	//Unpair with the Haptic Device
-	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Unpair", Keywords = "Haptics"), Category = "Haptics")
-		void Unpair();
-
 	//Ping the Haptic Device
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Ping", Keywords = "Haptics"), Category = "Haptics")
 		void Ping();
