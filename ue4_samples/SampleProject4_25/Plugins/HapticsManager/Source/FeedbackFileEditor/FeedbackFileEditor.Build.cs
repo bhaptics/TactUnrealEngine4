@@ -23,7 +23,6 @@ public class FeedbackFileEditor : ModuleRules
             {
                 "Core",
                 "UnrealEd"
-
             }
             );
 
@@ -34,7 +33,6 @@ public class FeedbackFileEditor : ModuleRules
                 "Engine", 
                 "Slate", 
                 "SlateCore", 
-                "FeedbackFileEditor",
                 "Json",
                 "JsonUtilities",
                 "Projects",
@@ -49,6 +47,5 @@ public class FeedbackFileEditor : ModuleRules
             {
             }
             );
-
-	}
+    }
 }

@@ -9,22 +9,6 @@ void UHapticDevice::SetDeviceData(FDevice LinkedDevice)
 	DidUpdateDevice = true;
 }
 
-void UHapticDevice::Pair()
-{
-	if (IsInitialised)
-	{
-		UAndroidHapticLibrary::AndroidThunkCpp_Pair(DeviceData.Address);
-	}
-}
-
-void UHapticDevice::Unpair()
-{
-	if (IsInitialised)
-	{
-		UAndroidHapticLibrary::AndroidThunkCpp_Unpair(DeviceData.Address);
-	}
-}
-
 void UHapticDevice::Ping()
 {
 	if (IsInitialised)
