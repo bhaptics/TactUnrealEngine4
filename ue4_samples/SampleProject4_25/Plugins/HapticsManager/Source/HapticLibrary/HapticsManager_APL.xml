@@ -29,7 +29,20 @@
     </insert>
   </proguardAdditions>
 
-  <prebuildCopies>
+  <resourceCopies>
+      <isArch arch="armeabi-v7a">
+          <log text="Copying libbhaptics-native-lib.so"/>
+          <copyFile src="$S(PluginDir)/Android/armeabi-v7a/libbhaptics-native-lib.so"
+                    dst="$S(BuildDir)/libs/armeabi-v7a/libbhaptics-native-lib.so" />
+      </isArch>
+      <isArch arch="arm64-v8a">
+          <log text="Copying libbhaptics-native-lib.so"/>
+          <copyFile src="$S(PluginDir)/Android/arm64-v8a/libbhaptics-native-lib.so"
+                    dst="$S(BuildDir)/libs/arm64-v8a/libbhaptics-native-lib.so" />
+      </isArch>
+  </resourceCopies>
+
+    <prebuildCopies>
     <log text="Copying bhaptics aar files"/>
     <copyFile src="$S(PluginDir)/Android/bhaptics_ble.aar"
             dst="$S(BuildDir)/gradle/bhaptics_ble.aar" />
