@@ -43,7 +43,8 @@ void FFeedbackFileEditorModule::StartupModule()
 	FSlateImageBrush* ThumbnailBrushHead = new FSlateImageBrush(StyleSet->RootToContentDir(TEXT("Resources/icon_tactal600"), TEXT(".png")), FVector2D(256.f, 256.f));
 	FSlateImageBrush* ThumbnailBrushBody = new FSlateImageBrush(StyleSet->RootToContentDir(TEXT("Resources/icon_tactot600"), TEXT(".png")), FVector2D(256.f, 256.f));
 	FSlateImageBrush* ThumbnailBrushHand = new FSlateImageBrush(StyleSet->RootToContentDir(TEXT("Resources/icon_hand600"), TEXT(".png")), FVector2D(256.f, 256.f));
-	FSlateImageBrush* ThumbnailBrushFoot = new FSlateImageBrush(StyleSet->RootToContentDir(TEXT("Resources/icon_Foot600"), TEXT(".png")), FVector2D(256.f, 256.f));
+	FSlateImageBrush* ThumbnailBrushFoot = new FSlateImageBrush(StyleSet->RootToContentDir(TEXT("Resources/icon_foot600"), TEXT(".png")), FVector2D(256.f, 256.f));
+	FSlateImageBrush* ThumbnailBrushGlove = new FSlateImageBrush(StyleSet->RootToContentDir(TEXT("Resources/icon_glove600"), TEXT(".png")), FVector2D(256.f, 256.f));
 
 	if (ThumbnailBrush)
 	{
@@ -74,6 +75,11 @@ void FFeedbackFileEditorModule::StartupModule()
 	if (ThumbnailBrushFoot)
 	{
 		StyleSet->Set("ClassThumbnail.FootFeedbackFile", ThumbnailBrushFoot);
+	}
+
+	if (ThumbnailBrushGlove)
+	{
+		StyleSet->Set("ClassThumbnail.GloveFeedbackFile", ThumbnailBrushGlove);
 	}
 
 	IAssetTools& AssetTools = FModuleManager::LoadModuleChecked<FAssetToolsModule>("AssetTools").Get();
