@@ -17,12 +17,6 @@ FString BhapticsUtils::PositionEnumToString(EPosition Position)
 
 	switch (Position)
 	{
-	case EPosition::Left:
-		PositionString = "Left";
-		break;
-	case EPosition::Right:
-		PositionString = "Right";
-		break;
 	case EPosition::Head:
 		PositionString = "Head";
 		break;
@@ -38,10 +32,18 @@ FString BhapticsUtils::PositionEnumToString(EPosition Position)
 	case EPosition::FootR:
 		PositionString = "FootR";
 		break;
+	case EPosition::GloveL:
+		PositionString = "GloveL";
+		break;
+	case EPosition::GloveR:
+		PositionString = "GloveR";
+		break;
 	case EPosition::ForearmL:
+	case EPosition::Left:
 		PositionString = "ForearmL";
 		break;
 	case EPosition::ForearmR:
+	case EPosition::Right:
 		PositionString = "ForearmR";
 		break;
 	case EPosition::VestFront:
@@ -63,12 +65,6 @@ FString BhapticsUtils::PositionEnumToDeviceString(EPosition Position)
 
 	switch (Position)
 	{
-	case EPosition::Left:
-		PositionString = "Left";
-		break;
-	case EPosition::Right:
-		PositionString = "Right";
-		break;
 	case EPosition::Head:
 		PositionString = "Head";
 		break;
@@ -83,11 +79,19 @@ FString BhapticsUtils::PositionEnumToDeviceString(EPosition Position)
 		break;
 	case EPosition::FootR:
 		PositionString = "FootR";
+		break;	
+	case EPosition::GloveL:
+		PositionString = "GloveL";
+		break;
+	case EPosition::GloveR:
+		PositionString = "GloveR";
 		break;
 	case EPosition::ForearmL:
+	case EPosition::Left:
 		PositionString = "ForearmL";
 		break;
 	case EPosition::ForearmR:
+	case EPosition::Right:
 		PositionString = "ForearmR";
 		break;
 	case EPosition::VestFront:
