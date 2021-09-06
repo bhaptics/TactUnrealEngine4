@@ -33,7 +33,6 @@ public class FeedbackFileEditor : ModuleRules
                 "Engine", 
                 "Slate", 
                 "SlateCore", 
-                "FeedbackFileEditor",
                 "Json",
                 "JsonUtilities",
                 "Projects",

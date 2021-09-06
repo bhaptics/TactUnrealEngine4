@@ -18,6 +18,7 @@
 #include "Feedback/TactalFeedbackFile.h"
 #include "Feedback/HandFeedbackFile.h"
 #include "Feedback/FootFeedbackFile.h"
+#include "Feedback/GloveFeedbackFile.h"
 
 #include "EditorFramework/AssetImportData.h"
 
@@ -84,6 +85,10 @@ UFeedbackFile* UFeedbackFileFactory::CreateFeebackFile(const FString& Device, UO
 	else if (Device.StartsWith("Foot"))
 	{
 		return NewObject<UFootFeedbackFile>(InParent, UFootFeedbackFile::StaticClass(), InName, Flags);
+	}
+	else if (Device.StartsWith("Glove"))
+	{
+		return NewObject<UGloveFeedbackFile>(InParent, UGloveFeedbackFile::StaticClass(), InName, Flags);
 	}
 
 	return NewObject<UFeedbackFile>(InParent, UFootFeedbackFile::StaticClass(), InName, Flags);

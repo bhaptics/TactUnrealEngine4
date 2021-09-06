@@ -53,7 +53,8 @@ DLL_PUBLIC bool TryGetExePath(char* buf, int& size);
 DLL_PUBLIC const char* GetExePath();
 
 // Initialises a connection to the bHaptics Player. Should only be called once: when the game starts.
-DLL_PUBLIC void Initialise(const char* appId, const char* appNmae);
+DLL_PUBLIC void Initialise(const char* appId, const char* appName);
+DLL_PUBLIC void InitialiseSync(const char* appId, const char* appName);
 
 // End the connecection to the bHaptics Player. Should only be called once: when the game ends.
 DLL_PUBLIC void Destroy();
@@ -74,6 +75,8 @@ DLL_PUBLIC void LoadAndRegisterFeedback(const char* Key, const char* FilePath);
 
 // Submit a request to play a registered feedback file using its Key.
 DLL_PUBLIC void SubmitRegistered(const char* key);
+
+DLL_PUBLIC void SubmitRegisteredStartMillis(const char* key, int startMillis);
 
 // Submit a request to play a registered feedback file, with additional options.
 // ScaleOption scales the intensity and duration of the feedback by some factor.

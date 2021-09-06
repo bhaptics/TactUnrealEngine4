@@ -484,57 +484,6 @@ bool BhapticsLibrary::Lib_IsDeviceConnected(EPosition Pos)
 	return Value;
 }
 
-TArray<FHapticFeedback> BhapticsLibrary::Lib_GetResponseStatus()
-{
-	InitializeCheck();
-	TArray<FHapticFeedback> ChangedFeedback;
-#if PLATFORM_ANDROID
-	FPlayerResponse Response;
-	ChangedFeedback = Response.Status;
-	TArray<EPosition> PositionEnum =
-	{ EPosition::ForearmL,EPosition::ForearmR,EPosition::Head, EPosition::VestFront,EPosition::VestBack,EPosition::HandL, EPosition::HandR, EPosition::FootL, EPosition::FootR };
-
-	for (int posIndex = 0; posIndex < PositionEnum.Num(); posIndex++)
-	{
-		EPosition pos = PositionEnum[posIndex];
-		FString posStr = BhapticsUtils::PositionEnumToString(pos);
-		TArray<uint8> val = UAndroidHapticLibrary::GetPositionStatus(posStr);
-
-		FHapticFeedback Feedback = FHapticFeedback(pos, val, EFeedbackMode::DOT_MODE);
-		ChangedFeedback.Add(Feedback);
-	}
-#else
-	if (!IsLoaded)
-	{
-		return ChangedFeedback;
-	}
-	TArray<bhaptics::PositionType> Positions =
-	{ bhaptics::PositionType::ForearmL,bhaptics::PositionType::ForearmR,bhaptics::PositionType::Head, bhaptics::PositionType::VestFront,bhaptics::PositionType::VestBack,
-	bhaptics::PositionType::HandL, bhaptics::PositionType::HandR, bhaptics::PositionType::FootL, bhaptics::PositionType::FootR };
-	TArray<EPosition> PositionEnum =
-	{ EPosition::ForearmL,EPosition::ForearmR,EPosition::Head, EPosition::VestFront,EPosition::VestBack,EPosition::HandL, EPosition::HandR, EPosition::FootL, EPosition::FootR };
-
-	for (int posIndex = 0; posIndex < Positions.Num(); posIndex++)
-	{
-		status stat;
-		bool res = TryGetResponseForPosition(Positions[posIndex], stat);
-		TArray<uint8> val;
-		val.Init(0, 20);
-		if (res)
-		{
-			for (int motorIndex = 0; motorIndex < val.Num(); motorIndex++)
-			{
-				val[motorIndex] = stat.values[motorIndex];
-			}
-		}
-
-		FHapticFeedback Feedback = FHapticFeedback(PositionEnum[posIndex], val, EFeedbackMode::DOT_MODE);
-		ChangedFeedback.Add(Feedback);
-	}
-#endif
-	return ChangedFeedback;
-}
-
 TArray<uint8> BhapticsLibrary::Lib_GetResponseStatus(EPosition Pos)
 {
 	InitializeCheck();
@@ -587,10 +536,12 @@ static bhaptics::PositionType PositionEnumToDeviceType(EPosition Position)
 	switch (Position)
 	{
 	case EPosition::Left:
-		Device = bhaptics::PositionType::Left;
+	case EPosition::ForearmL:
+		Device = bhaptics::PositionType::ForearmL;
 		break;
 	case EPosition::Right:
-		Device = bhaptics::PositionType::Right;
+	case EPosition::ForearmR:
+		Device = bhaptics::PositionType::ForearmR;
 		break;
 	case EPosition::Head:
 		Device = bhaptics::PositionType::Head;
@@ -601,17 +552,18 @@ static bhaptics::PositionType PositionEnumToDeviceType(EPosition Position)
 	case EPosition::HandR:
 		Device = bhaptics::PositionType::HandR;
 		break;
+
 	case EPosition::FootL:
 		Device = bhaptics::PositionType::FootL;
 		break;
 	case EPosition::FootR:
 		Device = bhaptics::PositionType::FootR;
 		break;
-	case EPosition::ForearmL:
-		Device = bhaptics::PositionType::ForearmL;
+	case EPosition::GloveL:
+		Device = bhaptics::PositionType::GloveL;
 		break;
-	case EPosition::ForearmR:
-		Device = bhaptics::PositionType::ForearmR;
+	case EPosition::GloveR:
+		Device = bhaptics::PositionType::GloveR;
 		break;
 	case EPosition::VestFront:
 		Device = bhaptics::PositionType::Vest;
@@ -632,12 +584,6 @@ static bhaptics::PositionType PositionEnumToPositionType(EPosition Position)
 
 	switch (Position)
 	{
-	case EPosition::Left:
-		Device = bhaptics::PositionType::Left;
-		break;
-	case EPosition::Right:
-		Device = bhaptics::PositionType::Right;
-		break;
 	case EPosition::Head:
 		Device = bhaptics::PositionType::Head;
 		break;
@@ -653,9 +599,17 @@ static bhaptics::PositionType PositionEnumToPositionType(EPosition Position)
 	case EPosition::FootR:
 		Device = bhaptics::PositionType::FootR;
 		break;
+	case EPosition::GloveL:
+		Device = bhaptics::PositionType::GloveL;
+		break;
+	case EPosition::GloveR:
+		Device = bhaptics::PositionType::GloveR;
+		break;
+	case EPosition::Left:
 	case EPosition::ForearmL:
 		Device = bhaptics::PositionType::ForearmL;
 		break;
+	case EPosition::Right:
 	case EPosition::ForearmR:
 		Device = bhaptics::PositionType::ForearmR;
 		break;

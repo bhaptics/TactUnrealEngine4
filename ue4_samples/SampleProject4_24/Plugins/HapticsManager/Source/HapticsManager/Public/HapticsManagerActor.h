@@ -16,14 +16,6 @@ class HAPTICSMANAGER_API AHapticsManagerActor : public AActor
 public:
 	AHapticsManagerActor();
 
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-	virtual void BeginDestroy() override;
-
-	// Called every frame
-	virtual void Tick(float DeltaSeconds) override;
-
 	TArray<USceneComponent*> TactotFront;
 
 	TArray<USceneComponent*> TactotBack;
@@ -44,15 +36,10 @@ public:
 
 	//For use in the UI to set the dots used in visualisation.
 	UFUNCTION(BlueprintCallable,
-		meta = (DisplayName = "Set TactSuit Variables",
+		meta = (DeprecatedFunction, DisplayName = "Set TactSuit Variables",
 			Keywords = "bHaptics"),
 		Category = "bHaptics")
 		void SetTactSuit(USceneComponent* SleeveLeft, USceneComponent* SleeveRight, USceneComponent* Head, USceneComponent* VestFront, USceneComponent* VestBack,
 			USceneComponent* GloveLeft, USceneComponent* GloveRight, USceneComponent* ShoeLeft, USceneComponent* ShoeRight);
-
-private:
-	bool IsTicking = false;
-	void VisualiseFeedback(FHapticFeedback Feedback, TArray<USceneComponent*> TactoSuitItem, float DeviceScale = 1.0f);
-	void InitialiseDots(TArray<USceneComponent*> TactoSuitItem, float Scale = 1.0f);
 
 };
