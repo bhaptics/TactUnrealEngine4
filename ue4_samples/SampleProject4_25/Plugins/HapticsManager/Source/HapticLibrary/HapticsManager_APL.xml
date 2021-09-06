@@ -42,7 +42,7 @@
       </isArch>
   </resourceCopies>
 
-    <prebuildCopies>
+  <prebuildCopies>
     <log text="Copying bhaptics aar files"/>
     <copyFile src="$S(PluginDir)/Android/bhaptics_ble.aar"
             dst="$S(BuildDir)/gradle/bhaptics_ble.aar" />
