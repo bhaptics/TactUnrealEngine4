@@ -82,12 +82,17 @@ TArray<FDevice> UAndroidHapticLibrary::GetCurrentDevices()
 	}
 
 #else
-	FDevice d, d2, d3, d4, d5, d6, d7;
+	FDevice d, d2, d3, d4, d5, d6, d7, d8;
 	d.Battery = 10;
 	d.Position = "ForearmL";
 	d.IsConnected = true;
 	d.IsAudioJackIn = false;
 	d.Battery = 30;
+
+	d8.Position = "GloveL";
+	d8.IsConnected = true;
+	d8.IsAudioJackIn = false;
+	d8.Battery= 40;
 
 	d2.Position = "Vest";
 	d2.IsConnected = true;
@@ -125,6 +130,7 @@ TArray<FDevice> UAndroidHapticLibrary::GetCurrentDevices()
 	//UpdateDeviceList.Add(d2);
 	//UpdateDeviceList.Add(d3);
 	//UpdateDeviceList.Add(d4);
+	//UpdateDeviceList.Add(d8);
 #endif
 	DeviceList = UpdateDeviceList;
 	return UpdateDeviceList;
@@ -166,10 +172,16 @@ FString PosToString(EPosition Pos)
 
 	case EPosition::Head:
 		return "Head";
+	case EPosition::Left:
 	case EPosition::ForearmL:
 		return "ForearmL";
+	case EPosition::Right:
 	case EPosition::ForearmR:
 		return "ForearmR";
+	case EPosition::GloveL:
+		return "GloveL";
+	case EPosition::GloveR:
+		return "GloveR";
 	case EPosition::HandL:
 		return "HandL";
 	case EPosition::HandR:
@@ -178,10 +190,6 @@ FString PosToString(EPosition Pos)
 		return "FootL";
 	case EPosition::FootR:
 		return "FootR";
-	case EPosition::Left:
-		return "Left";
-	case EPosition::Right:
-		return "Right";
 	default:
 		break;
 	}

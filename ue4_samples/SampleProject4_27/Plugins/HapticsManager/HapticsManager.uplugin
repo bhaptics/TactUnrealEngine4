@@ -1,7 +1,7 @@
 {
 	"FileVersion": 3,
 	"Version": 9,
-	"VersionName": "1.7.0",
+	"VersionName": "1.7.1",
 	"FriendlyName": "HapticsManager",
 	"Description": "bHaptics haptic library",
 	"Category": "Haptic",
@@ -10,7 +10,7 @@
 	"DocsURL": "https://github.com/bhaptics/TactUnrealEngine4/tree/master/Plugins/HapticsManager/Documentation",
 	"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/content/f2d84866699e419fbb97cddc7d6530b9",
 	"SupportURL": "https://github.com/bhaptics/TactUnrealEngine4/issues/new",
-	"EngineVersion": "4.23.0",
+	"EngineVersion": "4.26.0",
 	"CanContainContent": true,
 	"Installed": true,
 	"Modules": [
