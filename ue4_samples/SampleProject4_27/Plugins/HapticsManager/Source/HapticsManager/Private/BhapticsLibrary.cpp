@@ -13,7 +13,7 @@
 
 #if PLATFORM_ANDROID
 #include "AndroidHapticLibrary.h"
-#else
+#elif PLATFORM_WINDOWS
 #include "HapticLibrary/HapticLibrary.h"
 #endif // PLATFORM_ANDROID
 
@@ -24,7 +24,7 @@ FProcHandle BhapticsLibrary::Handle;
 bool BhapticsLibrary::Success = false;
 
 #if PLATFORM_ANDROID
-#else
+#elif PLATFORM_WINDOWS
 static bhaptics::PositionType PositionEnumToDeviceType(EPosition Position);
 static bhaptics::PositionType PositionEnumToPositionType(EPosition Position);
 #endif
@@ -67,7 +67,7 @@ bool BhapticsLibrary::Initialize()
 	}
 #if PLATFORM_ANDROID
 	IsInitialised = UAndroidHapticLibrary::AndroidThunkCpp_Initialize(ProjectName);
-#else
+#elif PLATFORM_WINDOWS
 	if (!IsLoaded)
 	{
 		return false;
@@ -158,7 +158,7 @@ void BhapticsLibrary::Free()
 {
 #if PLATFORM_ANDROID
 
-#else
+#elif PLATFORM_WINDOWS
 	if (!IsLoaded)
 	{
 		return;
@@ -180,7 +180,7 @@ void BhapticsLibrary::Lib_RegisterFeedback(FString Key, FString ProjectJson)
 	
 #if PLATFORM_ANDROID
 	UAndroidHapticLibrary::RegisterProject(Key, ProjectJson);
-#else
+#elif PLATFORM_WINDOWS
 	if (!IsLoaded)
 	{
 		return;
@@ -197,7 +197,7 @@ void BhapticsLibrary::Lib_RegisterReflectedFeedback(FString Key, FString Project
 
 #if PLATFORM_ANDROID
 	UAndroidHapticLibrary::RegisterProjectReflected(Key, ProjectJson);
-#else
+#elif PLATFORM_WINDOWS
 	if (!IsLoaded)
 	{
 		return;
@@ -217,7 +217,7 @@ void BhapticsLibrary::Lib_SubmitRegistered(FString Key)
 	
 #if PLATFORM_ANDROID
 	UAndroidHapticLibrary::SubmitRegistered(Key, Key, 1, 1, 0, 0);
-#else
+#elif PLATFORM_WINDOWS
 	if (!IsLoaded)
 	{
 		return;
@@ -236,7 +236,7 @@ void BhapticsLibrary::Lib_SubmitRegistered(FString Key, FString AltKey, FScaleOp
 #if PLATFORM_ANDROID
 	UAndroidHapticLibrary::SubmitRegistered(
 		Key, AltKey, ScaleOpt.Intensity, ScaleOpt.Duration, RotOption.OffsetAngleX, RotOption.OffsetY);
-#else
+#elif PLATFORM_WINDOWS
 	if (!IsLoaded)
 	{
 		return;
@@ -268,7 +268,7 @@ void BhapticsLibrary::Lib_Submit(FString Key, EPosition Pos, TArray<uint8> Motor
 		}
 	}
 	Lib_Submit(Key, Pos, Points, DurationMillis);
-#else
+#elif PLATFORM_WINDOWS
 	if (!IsLoaded)
 	{
 		return;
@@ -301,7 +301,7 @@ void BhapticsLibrary::Lib_Submit(FString Key, EPosition Pos, TArray<FDotPoint> P
 	
 #if PLATFORM_ANDROID
 	UAndroidHapticLibrary::SubmitDot(Key, BhapticsUtils::PositionEnumToString(Pos), Points, DurationMillis);
-#else
+#elif PLATFORM_WINDOWS
 	if (!IsLoaded)
 	{
 		return;
@@ -325,7 +325,7 @@ void BhapticsLibrary::Lib_Submit(FString Key, EPosition Pos, TArray<FPathPoint> 
 	InitializeCheck();
 #if PLATFORM_ANDROID
 	UAndroidHapticLibrary::SubmitPath(Key, BhapticsUtils::PositionEnumToString(Pos), Points, DurationMillis);
-#else
+#elif PLATFORM_WINDOWS
 	if (!IsLoaded)
 	{
 		return;
@@ -353,7 +353,7 @@ bool BhapticsLibrary::Lib_IsFeedbackRegistered(FString Key)
 	bool Value = false;
 #if PLATFORM_ANDROID
 	Value = UAndroidHapticLibrary::IsFeedbackRegistered(Key);
-#else
+#elif PLATFORM_WINDOWS
 	if (!IsLoaded)
 	{
 		return false;
@@ -371,7 +371,7 @@ bool BhapticsLibrary::Lib_IsPlaying()
 	bool Value = false;
 #if PLATFORM_ANDROID
 	return UAndroidHapticLibrary::IsAnyFeedbackPlaying();
-#else
+#elif PLATFORM_WINDOWS
 	if (!IsLoaded)
 	{
 		return false;
@@ -388,7 +388,7 @@ bool BhapticsLibrary::Lib_IsPlaying(FString Key)
 	bool Value = false;
 #if PLATFORM_ANDROID
 	return UAndroidHapticLibrary::IsFeedbackPlaying(Key);
-#else
+#elif PLATFORM_WINDOWS
 	if (!IsLoaded)
 	{
 		return false;
@@ -404,7 +404,7 @@ void BhapticsLibrary::Lib_TurnOff()
 	InitializeCheck();
 #if PLATFORM_ANDROID
 	UAndroidHapticLibrary::TurnOffAll();
-#else
+#elif PLATFORM_WINDOWS
 	if (!IsLoaded)
 	{
 		return;
@@ -418,7 +418,7 @@ void BhapticsLibrary::Lib_TurnOff(FString Key)
 	InitializeCheck();
 #if PLATFORM_ANDROID
 	UAndroidHapticLibrary::TurnOff(Key);
-#else
+#elif PLATFORM_WINDOWS
 	if (!IsLoaded)
 	{
 		return;
@@ -432,7 +432,7 @@ void BhapticsLibrary::Lib_EnableFeedback()
 {
 	InitializeCheck();
 #if PLATFORM_ANDROID
-#else
+#elif PLATFORM_WINDOWS
 	if (!IsLoaded)
 	{
 		return;
@@ -445,7 +445,7 @@ void BhapticsLibrary::Lib_DisableFeedback()
 {
 	InitializeCheck();
 #if PLATFORM_ANDROID
-#else
+#elif PLATFORM_WINDOWS
 	if (!IsLoaded)
 	{
 		return;
@@ -458,7 +458,7 @@ void BhapticsLibrary::Lib_ToggleFeedback()
 {
 	InitializeCheck();
 #if PLATFORM_ANDROID
-#else
+#elif PLATFORM_WINDOWS
 	if (!IsLoaded)
 	{
 		return;
@@ -473,7 +473,7 @@ bool BhapticsLibrary::Lib_IsDeviceConnected(EPosition Pos)
 	bool Value = false;
 #if PLATFORM_ANDROID
 	return UAndroidHapticLibrary::IsDeviceConnceted(Pos);
-#else
+#elif PLATFORM_WINDOWS
 	if (!IsLoaded)
 	{
 		return false;
@@ -492,7 +492,7 @@ TArray<uint8> BhapticsLibrary::Lib_GetResponseStatus(EPosition Pos)
 	FString posStr = BhapticsUtils::PositionEnumToString(Pos);
 	TArray<uint8> val = UAndroidHapticLibrary::GetPositionStatus(posStr);
 	return val;
-#else
+#elif PLATFORM_WINDOWS
 	TArray<uint8> val;
 	val.Init(0, 20);
 	if (!IsLoaded)
@@ -526,7 +526,7 @@ void BhapticsLibrary::InitializeCheck()
 	}
 }
 
-#if !PLATFORM_ANDROID
+#if PLATFORM_WINDOWS
 
 
 static bhaptics::PositionType PositionEnumToDeviceType(EPosition Position)
