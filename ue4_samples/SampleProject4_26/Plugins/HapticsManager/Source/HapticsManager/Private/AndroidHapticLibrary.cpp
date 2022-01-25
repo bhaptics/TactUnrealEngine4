@@ -222,6 +222,7 @@ void UAndroidHapticLibrary::AndroidThunkCpp_PingAll()
 
 void UAndroidHapticLibrary::AndroidThunkCpp_ChangePosition(FString DeviceAddress, FString Position)
 {
+	UE_LOG(LogTemp, Log, TEXT("AndroidThunkCpp_ChangePosition"));
 #if PLATFORM_ANDROID
 	if (JNIEnv* Env = FAndroidApplication::GetJavaEnv())
 	{
@@ -253,6 +254,7 @@ void UAndroidHapticLibrary::SubmitDot(FString Key, FString Pos, TArray<FDotPoint
 #if PLATFORM_ANDROID
 	if (JNIEnv* Env = FAndroidApplication::GetJavaEnv())
 	{
+		UE_LOG(LogTemp, Log, TEXT("SubmitDot"));
 		static jmethodID submitDotMethodId =
 			FJavaWrapper::FindMethod(
 				Env, FJavaWrapper::GameActivityClassID,
@@ -291,6 +293,7 @@ void UAndroidHapticLibrary::SubmitPath(FString Key, FString Pos, TArray<FPathPoi
 #if PLATFORM_ANDROID
 	if (JNIEnv* Env = FAndroidApplication::GetJavaEnv())
 	{
+		UE_LOG(LogTemp, Log, TEXT("SubmitPath"));
 		static jmethodID submitDotMethodId =
 			FJavaWrapper::FindMethod(
 				Env, FJavaWrapper::GameActivityClassID,
