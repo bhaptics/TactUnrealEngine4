@@ -17,6 +17,13 @@ class HAPTICSMANAGER_API UBhapticsRequestLibrary : public UBlueprintFunctionLibr
 	GENERATED_BODY()
 
 public:
+
+	UFUNCTION(BlueprintCallable,
+		meta = (DisplayName = "Initialize bHaptics",
+			Keywords = "bHaptics"),
+			Category = "bHaptics")
+		static void Initialize();
+
 	UFUNCTION(BlueprintCallable,
 		meta = (DisplayName = "Submit Feedback",
 			Keywords = "bHaptics"),
@@ -119,7 +126,7 @@ public:
 		static bool IsRegisteredFilePlaying(UFeedbackFile* Feedback);
 
 	//Is the given haptic device connected
-	UFUNCTION(BlueprintPure,
+	UFUNCTION(BlueprintCallable,
 		meta = (DisplayName = "Is Device Connected",
 			Keywords = "bHaptics"),
 		Category = "bHaptics")

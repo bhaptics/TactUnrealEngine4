@@ -25,8 +25,8 @@ class UAndroidHapticLibrary : public UBlueprintFunctionLibrary
 
 	//static void UpdateDevices(TArray<FDevice> DeviceList);
 
-	UFUNCTION(BlueprintPure, meta = (DisplayName = "GetCurrentDevices", Keywords = "Haptics"), Category = "Haptics")
-		static TArray<FDevice> GetCurrentDevices();
+	UFUNCTION(BlueprintPure, meta = (DisplayName = "GetCurrentDevices", Keywords = "Haptics"), Category = "bHaptics(Android)")
+	static TArray<FDevice> GetCurrentDevices();
 
 	static void SubmitDot(
 		FString Key, FString Pos, TArray<FDotPoint> Points, int DurationMillis);
@@ -47,31 +47,31 @@ class UAndroidHapticLibrary : public UBlueprintFunctionLibrary
 
 
 
-	UFUNCTION(BlueprintCallable, meta = (DisplayName = "IsBhapticsDeviceConnceted", Keywords = "Haptics"), Category = "Haptics")
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "IsBhapticsDeviceConnceted", Keywords = "Haptics"), Category = "bHaptics(Android)")
 	static bool IsDeviceConnceted(FString Position);
 
 	static void SubmitRegistered(
 		FString key, FString altKey, float intensity, float duration, float xOffsetAngle, float yOffset);
 
 	//Ping Haptic Device
-	UFUNCTION(BlueprintCallable, meta = (DisplayName = "PingHapticDevice", Keywords = "Haptics"), Category = "Haptics")
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "PingHapticDevice", Keywords = "Haptics"), Category = "bHaptics(Android)")
 	static void AndroidThunkCpp_Ping(FString DeviceAddress);
 	//Ping Haptic Device
-	UFUNCTION(BlueprintCallable, meta = (DisplayName = "PingByPosition", Keywords = "Haptics"), Category = "Haptics")
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "PingByPosition", Keywords = "Haptics"), Category = "bHaptics(Android)")
 	static void AndroidThunkJava_PingPosition(FString Position);
 
 	static bool IsDeviceConnceted(EPosition Position);
 	
 	//Ping all Haptic Devices
-	UFUNCTION(BlueprintCallable, meta = (DisplayName = "PingAll", Keywords = "Haptics"), Category = "Haptics")
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "PingAll", Keywords = "Haptics"), Category = "bHaptics(Android)")
 	static void AndroidThunkCpp_PingAll();
 
 	//Set the Position of Device
-	UFUNCTION(BlueprintCallable, meta = (DisplayName = "ChangeDevicePosition", Keywords = "Haptics"), Category = "Haptics")
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "ChangeDevicePosition", Keywords = "Haptics"), Category = "bHaptics(Android)")
 	static void AndroidThunkCpp_ChangePosition(FString DeviceAddress, FString Position);
 	
 	//Toggle the Position of Device
-	UFUNCTION(BlueprintCallable, meta = (DisplayName = "ToggleDevicePosition", Keywords = "Haptics"), Category = "Haptics")
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "ToggleDevicePosition", Keywords = "Haptics"), Category = "bHaptics(Android)")
 	static void AndroidThunkCpp_TogglePosition(FString DeviceAddress);
 
 	   
