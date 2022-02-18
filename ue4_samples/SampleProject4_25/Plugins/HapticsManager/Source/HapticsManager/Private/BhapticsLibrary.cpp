@@ -114,7 +114,7 @@ bool BhapticsLibrary::Initialize()
 		char Path[1000];
 		int Size = 0;
 		bool Result = TryGetExePath(Path, Size);
-		FString ExePath(Path);
+		FString ExePath(UTF8_TO_TCHAR(Path));
 		if (Result)
 		{
 			if (!ExePath.IsEmpty() && FPaths::FileExists(ExePath))
@@ -157,7 +157,7 @@ bool BhapticsLibrary::Initialize()
 void BhapticsLibrary::Free()
 {
 #if PLATFORM_ANDROID
-
+	
 #elif PLATFORM_WINDOWS
 	if (!IsLoaded)
 	{

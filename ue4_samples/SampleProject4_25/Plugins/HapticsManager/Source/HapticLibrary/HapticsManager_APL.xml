@@ -259,7 +259,12 @@
   <!-- optional additions to GameActivity onDestroy in GameActivity.java -->
   <gameActivityOnDestroyAdditions>
     <insert>
-
+        <![CDATA[
+        if (sdkRequestHandler != null) {
+            android.util.Log.d(BHAPTICS_TAG, "onDestroy() : ");
+            sdkRequestHandler.quit();
+        }
+      ]]>
     </insert>
   </gameActivityOnDestroyAdditions>
 
