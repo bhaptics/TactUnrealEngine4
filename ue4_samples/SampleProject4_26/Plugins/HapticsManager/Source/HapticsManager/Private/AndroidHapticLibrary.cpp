@@ -290,6 +290,7 @@ void UAndroidHapticLibrary::SubmitDot(FString Key, FString Pos, TArray<FDotPoint
 
 void UAndroidHapticLibrary::SubmitPath(FString Key, FString Pos, TArray<FPathPoint> Points, int DurationMillis)
 {
+	UE_LOG(LogTemp, Log, TEXT("UAndroidHapticLibrary: SubmitPath"));
 #if PLATFORM_ANDROID
 	if (JNIEnv* Env = FAndroidApplication::GetJavaEnv())
 	{
