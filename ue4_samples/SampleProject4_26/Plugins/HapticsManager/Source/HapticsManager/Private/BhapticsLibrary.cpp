@@ -35,7 +35,7 @@ std::string projectName;
 
 BhapticsLibrary::BhapticsLibrary()
 {
-
+	UE_LOG(LogTemp, Log, TEXT("BhapticsLibrary()"));
 }
 
 BhapticsLibrary::~BhapticsLibrary()
@@ -114,7 +114,7 @@ bool BhapticsLibrary::Initialize()
 		char Path[1000];
 		int Size = 0;
 		bool Result = TryGetExePath(Path, Size);
-		FString ExePath(Path);
+		FString ExePath(UTF8_TO_TCHAR(Path));
 		if (Result)
 		{
 			if (!ExePath.IsEmpty() && FPaths::FileExists(ExePath))
@@ -324,6 +324,7 @@ void BhapticsLibrary::Lib_Submit(FString Key, EPosition Pos, TArray<FPathPoint> 
 {
 	InitializeCheck();
 #if PLATFORM_ANDROID
+	UE_LOG(LogTemp, Log, TEXT("BhapticsLibrary::Lib_Submit"));
 	UAndroidHapticLibrary::SubmitPath(Key, BhapticsUtils::PositionEnumToString(Pos), Points, DurationMillis);
 #elif PLATFORM_WINDOWS
 	if (!IsLoaded)
