@@ -10,6 +10,11 @@
 
 FString REFLECT_SUFFIX = "REF";
 
+void UBhapticsRequestLibrary::Initialize()
+{
+	BhapticsLibrary::Lib_TurnOff("initialize");
+}
+
 void UBhapticsRequestLibrary::SubmitFeedback(UFeedbackFile* Feedback)
 {
 	if (Feedback == NULL)

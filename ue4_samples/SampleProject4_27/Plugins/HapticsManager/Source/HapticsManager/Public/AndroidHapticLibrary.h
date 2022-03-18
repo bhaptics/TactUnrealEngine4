@@ -1,4 +1,4 @@
-// Copyright 1998-2018 Epic Games, Inc. All Rights Reserved.
+// Copyright 2015-2022 bHaptics, Inc. All Rights Reserved.
 
 #pragma once
 
@@ -23,9 +23,9 @@ class UAndroidHapticLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_UCLASS_BODY()
 
-	//static void UpdateDevices(TArray<FDevice> DeviceList);
+		//static void UpdateDevices(TArray<FDevice> DeviceList);
 
-	UFUNCTION(BlueprintPure, meta = (DisplayName = "GetCurrentDevices", Keywords = "Haptics"), Category = "Haptics")
+		UFUNCTION(BlueprintPure, meta = (DisplayName = "GetCurrentDevices", Keywords = "Haptics"), Category = "bHaptics(Android)")
 		static TArray<FDevice> GetCurrentDevices();
 
 	static void SubmitDot(
@@ -33,7 +33,7 @@ class UAndroidHapticLibrary : public UBlueprintFunctionLibrary
 	static void SubmitPath(
 		FString Key, FString Pos, TArray<FPathPoint> Points, int DurationMillis);
 	static void TurnOff(
-		FString Key);	
+		FString Key);
 	static void TurnOffAll();
 
 	static bool IsFeedbackRegistered(FString key);
@@ -47,34 +47,34 @@ class UAndroidHapticLibrary : public UBlueprintFunctionLibrary
 
 
 
-	UFUNCTION(BlueprintCallable, meta = (DisplayName = "IsBhapticsDeviceConnceted", Keywords = "Haptics"), Category = "Haptics")
-	static bool IsDeviceConnceted(FString Position);
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "IsBhapticsDeviceConnceted", Keywords = "Haptics"), Category = "bHaptics(Android)")
+		static bool IsDeviceConnceted(FString Position);
 
 	static void SubmitRegistered(
 		FString key, FString altKey, float intensity, float duration, float xOffsetAngle, float yOffset);
 
 	//Ping Haptic Device
-	UFUNCTION(BlueprintCallable, meta = (DisplayName = "PingHapticDevice", Keywords = "Haptics"), Category = "Haptics")
-	static void AndroidThunkCpp_Ping(FString DeviceAddress);
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "PingHapticDevice", Keywords = "Haptics"), Category = "bHaptics(Android)")
+		static void AndroidThunkCpp_Ping(FString DeviceAddress);
 	//Ping Haptic Device
-	UFUNCTION(BlueprintCallable, meta = (DisplayName = "PingByPosition", Keywords = "Haptics"), Category = "Haptics")
-	static void AndroidThunkJava_PingPosition(FString Position);
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "PingByPosition", Keywords = "Haptics"), Category = "bHaptics(Android)")
+		static void AndroidThunkJava_PingPosition(FString Position);
 
 	static bool IsDeviceConnceted(EPosition Position);
-	
+
 	//Ping all Haptic Devices
-	UFUNCTION(BlueprintCallable, meta = (DisplayName = "PingAll", Keywords = "Haptics"), Category = "Haptics")
-	static void AndroidThunkCpp_PingAll();
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "PingAll", Keywords = "Haptics"), Category = "bHaptics(Android)")
+		static void AndroidThunkCpp_PingAll();
 
 	//Set the Position of Device
-	UFUNCTION(BlueprintCallable, meta = (DisplayName = "ChangeDevicePosition", Keywords = "Haptics"), Category = "Haptics")
-	static void AndroidThunkCpp_ChangePosition(FString DeviceAddress, FString Position);
-	
-	//Toggle the Position of Device
-	UFUNCTION(BlueprintCallable, meta = (DisplayName = "ToggleDevicePosition", Keywords = "Haptics"), Category = "Haptics")
-	static void AndroidThunkCpp_TogglePosition(FString DeviceAddress);
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "ChangeDevicePosition", Keywords = "Haptics"), Category = "bHaptics(Android)")
+		static void AndroidThunkCpp_ChangePosition(FString DeviceAddress, FString Position);
 
-	   
+	//Toggle the Position of Device
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "ToggleDevicePosition", Keywords = "Haptics"), Category = "bHaptics(Android)")
+		static void AndroidThunkCpp_TogglePosition(FString DeviceAddress);
+
+
 private:
 	static FPlayerResponse CurrentResponse;
 	static FPlayerResponse LastUpdatedResponse;
